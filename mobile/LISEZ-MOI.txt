@@ -1,0 +1,75 @@
+WAYI - APPLICATION MOBILE FLUTTER (client, livreur, restaurant)
+====================================================================
+
+Ce qui est fait
+  - Connexion unique et inscription avec choix du profil (Client, Restaurant, Livreur)
+  - Espace client complet, nouveau design : accueil avec photos du menu du jour,
+    explorer (recherche + filtres), fiche plat, panier, livraison (position ou carte,
+    repere, frais exacts, hors zone), paiement (especes, MoMo, Moov, Kkiapay),
+    suivi en direct (carte avec livreur, trajet, etapes, appel du livreur, annulation,
+    note), Yivi (assistante), profil (adresses, gouts retenus par Yivi, deconnexion)
+  - Espace livreur : en ligne / hors ligne, position partagee meme ecran eteint
+    (notification "WAYI Livreur en ligne"), course proposee avec compte a rebours
+    (accepter / refuser, alerte sonore et vibration), course en cours sur la carte
+    (restaurant, client, toi), itineraire Google Maps, appel du client, montant a
+    encaisser en especes, "J'ai recupere la commande", "Commande livree", gains du
+    jour et du mois, dernieres livraisons, compte en attente de validation, mot de passe
+  - Espace restaurant : commandes (alerte a chaque nouvelle commande), accepter /
+    refuser, confirmation du paiement Mobile Money recu, "Plat pret", choix d'un
+    livreur, suivi du livreur en direct sur la carte, menu (ajout / modification /
+    retrait de plats avec photo prise ou choisie dans la galerie), chiffres (jour,
+    net apres commission, panier moyen, plats qui se vendent), numeros d'encaissement
+    MoMo, mot de passe
+  - Admin : le backoffice reste sur le web (grand ecran), l'appli l'ouvre deja connecte
+
+Lancer sur ton telephone (une seule fois au debut)
+  1. Installer Flutter : https://docs.flutter.dev/get-started/install/windows
+     puis Android Studio (pour le SDK Android). Verifier avec : flutter doctor
+  2. Dans ce dossier (mobile) :
+       flutter create --platforms=android,ios --org com.wayibenin --project-name wayi .
+       dart run tool/patch_platforms.dart
+       flutter pub get
+  3. Brancher le telephone en USB (mode developpeur active) puis :
+       flutter run
+  Ou fabriquer l'APK a installer :
+       flutter build apk --release
+     -> build\app\outputs\flutter-apk\app-release.apk
+
+Notifications quand l'appli est fermee (Firebase)
+  Restaurant : nouvelle commande. Livreur : nouvelle course. Client : acceptee,
+  en route, livree, annulee. Toucher la notification ouvre le suivi de la commande.
+  1. console.firebase.google.com : creer le projet WAYI, ajouter une appli Android
+     avec le nom de paquet com.wayibenin.wayi
+  2. Parametres du projet > General > ton appli Android : recopier dans
+     firebase.json (copie de firebase.example.json) :
+       FIREBASE_API_KEY (Cle API Web / api key), FIREBASE_APP_ID (ID de l'appli),
+       FIREBASE_SENDER_ID (numero du projet), FIREBASE_PROJECT_ID (ID du projet)
+  3. Lancer / construire avec ce fichier :
+       flutter run --dart-define-from-file=firebase.json
+       flutter build apk --release --dart-define-from-file=firebase.json
+  4. Cote serveur : Parametres > Comptes de service > Generer une cle privee,
+     puis 3-CONFIGURER-SERVICES-REELS.bat (rubrique Notifications push Firebase).
+  Sans firebase.json, l'appli marche normalement, sans notifications appli fermee.
+  iPhone : il faut en plus une cle APNs Apple dans Firebase (compte Apple Developer).
+
+Mot de passe oublie : marche maintenant pour client, restaurant et livreur.
+
+Avec le serveur local au lieu du serveur en ligne
+  flutter run --dart-define=API_URL=http://10.0.2.2:3001        (emulateur)
+  flutter run --dart-define=API_URL=http://IP-DU-PC:3001         (telephone, meme Wi-Fi)
+
+Sans rien installer : GitHub
+  Mettre le dossier wayi-tout-en-un dans un depot GitHub, onglet Actions >
+  "Appli Flutter WAYI" > Run workflow. L'APK est a telecharger en bas de la page.
+
+Si une erreur apparait (flutter run, flutter build ou GitHub), copie le message et envoie-le.
+
+Organisation du code (lib/)
+  main.dart                  demarrage, choix de l'espace selon le compte
+  core/                      serveur (api), session, theme, icones, composants
+  models/, state/            plats, panier, menu
+  features/auth/             accueil, connexion, inscription, mot de passe oublie
+  features/client/           tous les ecrans du client
+  features/driver/           espace livreur (GPS en arriere-plan)
+  features/merchant/         espace restaurant
+  features/espaces/          compte, mot de passe, admin (web)
