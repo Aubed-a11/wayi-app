@@ -184,7 +184,7 @@ class _OrdersTabState extends State<OrdersTab> with WidgetsBindingObserver {
       decoration: BoxDecoration(
         color: status == 'pending' ? C.brandSoft : (compact ? C.surface : Colors.white),
         borderRadius: BorderRadius.circular(R.md),
-        border: Border.all(color: status == 'pending' ? C.brand.withOpacity(0.35) : C.line),
+        border: Border.all(color: status == 'pending' ? C.brand.withValues(alpha: 0.35) : C.line),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [

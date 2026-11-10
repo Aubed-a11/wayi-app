@@ -21,7 +21,7 @@ class PrimaryButton extends StatelessWidget {
       child: FilledButton(
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: bg, disabledBackgroundColor: bg.withOpacity(0.45),
+          backgroundColor: bg, disabledBackgroundColor: bg.withValues(alpha: 0.45),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(R.md)),
           textStyle: font(size: 15.5, weight: FontWeight.w700, color: Colors.white),

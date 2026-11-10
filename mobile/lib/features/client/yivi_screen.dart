@@ -244,7 +244,7 @@ class _TypingState extends State<_Typing> with SingleTickerProviderStateMixin {
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   width: 7, height: 7,
                   decoration: BoxDecoration(
-                    color: C.brand.withOpacity(0.35 + 0.65 * (((_c.value * 3 - i) % 3) < 1 ? 1 : 0)),
+                    color: C.brand.withValues(alpha: 0.35 + 0.65 * (((_c.value * 3 - i) % 3) < 1 ? 1 : 0)),
                     shape: BoxShape.circle,
                   ),
                 ),

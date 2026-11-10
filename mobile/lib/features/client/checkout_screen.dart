@@ -210,7 +210,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ],
               ),
               if (_pos == null)
-                Positioned.fill(child: Container(color: Colors.white.withOpacity(0.55), alignment: Alignment.center, child: Text('Aucun point choisi', style: h3()))),
+                Positioned.fill(child: Container(color: Colors.white.withValues(alpha: 0.55), alignment: Alignment.center, child: Text('Aucun point choisi', style: h3()))),
             ]),
           ),
         ),

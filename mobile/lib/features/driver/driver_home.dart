@@ -231,7 +231,7 @@ class _DriverHomeState extends State<DriverHome> with WidgetsBindingObserver {
 
   Widget _pingCard(Map<String, dynamic> p) {
     final exp = DateTime.tryParse(asStr(p['expiresAt']));
-    final left = exp == null ? null : exp.difference(DateTime.now()).inSeconds.clamp(0, 999);
+    final left = exp?.difference(DateTime.now()).inSeconds.clamp(0, 999);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(color: C.ink, borderRadius: BorderRadius.circular(R.lg)),
@@ -392,7 +392,7 @@ class _OnlineCard extends StatelessWidget {
               : Switch(
                   value: online,
                   onChanged: (disabled || status == 'busy') ? null : (_) => onTap(),
-                  activeColor: Colors.white,
+                  activeThumbColor: Colors.white,
                   activeTrackColor: Colors.white24,
                 ),
         ]),
