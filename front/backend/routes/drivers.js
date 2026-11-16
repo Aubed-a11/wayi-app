@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: 'Identifiants incorrects' });
 
     const token = signToken({ id: driver.id, role: 'driver', email: driver.email });
-    const { password: _, ...safe } = driver;
+    const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safe } = driver;
     res.json({ token, driver: safe, message: 'Connexion livreur réussie' });
   } catch {
     res.status(500).json({ error: 'Erreur serveur' });
@@ -110,7 +110,7 @@ router.post('/register/verify', async (req, res) => {
     };
     drivers.push(driver);
     const token = signToken({ id: driver.id, role: 'driver', email: driver.email });
-    const { password: _, ...safe } = driver;
+    const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safe } = driver;
     res.status(201).json({ token, driver: safe, message: 'Compte livreur créé, en attente de validation' });
   } catch {
     res.status(500).json({ error: 'Erreur serveur' });
@@ -133,7 +133,7 @@ router.put('/me/password', auth, driverAuth, async (req, res) => {
 });
 
 router.get('/me', auth, driverAuth, (req, res) => {
-  const { password: _, ...safe } = req.driver;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safe } = req.driver;
   res.json(safe);
 });
 

@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, admin.password).catch(() => false);
     if (!valid) return res.status(401).json({ error: 'Identifiants incorrects' });
     const token = signToken({ id: admin.id, role: 'admin', email: admin.email });
-    const { password: _, ...safe } = admin;
+    const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safe } = admin;
     res.json({ token, admin: safe, message: 'Connexion admin réussie' });
   } catch {
     res.status(500).json({ error: 'Erreur serveur' });
@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
 
 // GET /api/admin/me
 router.get('/me', auth, adminAuth, (req, res) => {
-  const { password: _, ...safe } = req.admin;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safe } = req.admin;
   res.json(safe);
 });
 
@@ -254,7 +254,7 @@ router.post('/drivers', auth, adminAuth, async (req, res) => {
   // pour qu'il puisse le transmettre au livreur par un autre canal.
   const emailFailed = !emailResult?.success;
 
-  const { password: _, ...safeDriver } = newDriver;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeDriver } = newDriver;
   res.status(201).json({
     driver: safeDriver,
     message: 'Livreur créé',
@@ -332,7 +332,7 @@ router.post('/merchants', auth, adminAuth, async (req, res) => {
   });
   const emailFailed = !emailResult?.success;
 
-  const { password: _, ...safeMerchant } = merchant;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeMerchant } = merchant;
   res.status(201).json({
     restaurant, merchant: safeMerchant,
     message: 'Restaurant et compte créés',
@@ -343,7 +343,7 @@ router.post('/merchants', auth, adminAuth, async (req, res) => {
 
 // GET /api/admin/merchants — supervision des comptes restaurateurs
 router.get('/merchants', auth, adminAuth, (req, res) => {
-  const safe = merchants.map(({ password, ...m }) => m);
+  const safe = merchants.map(({ password, inbox, fcmTokens, ...m }) => m);
   res.json({ merchants: safe, total: safe.length });
 });
 

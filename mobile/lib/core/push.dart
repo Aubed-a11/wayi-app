@@ -1,16 +1,29 @@
 import 'dart:async';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'api.dart';
-import 'config.dart';
 
-/// Notifications push : arrivent meme quand l'appli est fermee
-/// (nouvelle commande pour le restaurant, nouvelle course pour le livreur, suivi pour le client).
+/// Notifications WAYI sans service exterieur : le serveur range chaque alerte
+/// dans la boite du compte (sa propre base de donnees), l'appli la consulte
+/// toutes les quelques secondes et l'affiche sur le telephone.
+///   restaurant : nouvelle commande   livreur : nouvelle course
+///   client     : acceptee, en route, livree, annulee
+/// Le livreur en ligne et le restaurant ouvert gardent l'appli active en
+/// arriere-plan (notification permanente), les alertes arrivent ecran eteint.
 class Push {
-  static bool enabled = false;
-  static String? _token;
-  static StreamSubscription<String>? _refresh;
+  static const _kSince = 'wayi.notif.since';
+  static const _kRole = 'wayi.role';
+  static const _period = Duration(seconds: 10);
+
+  static final _plugin = FlutterLocalNotificationsPlugin();
+  static bool _ready = false;
+  static Timer? _timer;
+  static bool _busy = false;
+  static int _since = 0;
+  static StreamSubscription<Position>? _keepAlive;
 
   /// Messages affiches pendant que l'appli est ouverte
   static final messengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -18,51 +31,136 @@ class Push {
   static void Function(String type, String? orderId)? onOpen;
 
   static Future<void> init() async {
-    if (firebaseApiKey.isEmpty || firebaseAppId.isEmpty) return;
     try {
-      await Firebase.initializeApp(
-        options: const FirebaseOptions(apiKey: firebaseApiKey, appId: firebaseAppId, messagingSenderId: firebaseSenderId, projectId: firebaseProjectId),
+      await _plugin.initialize(
+        const InitializationSettings(
+          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+          iOS: DarwinInitializationSettings(requestAlertPermission: false, requestBadgePermission: false, requestSoundPermission: false),
+        ),
+        onDidReceiveNotificationResponse: (r) => _openPayload(r.payload),
       );
-      enabled = true;
-      FirebaseMessaging.onMessage.listen((m) {
-        final n = m.notification;
-        if (n == null) return;
-        messengerKey.currentState?.showSnackBar(SnackBar(content: Text('${n.title ?? ''}\n${n.body ?? ''}'.trim()), duration: const Duration(seconds: 6)));
-      });
-      FirebaseMessaging.onMessageOpenedApp.listen(_opened);
-      final first = await FirebaseMessaging.instance.getInitialMessage();
-      if (first != null) Future.delayed(const Duration(seconds: 2), () => _opened(first));
+      final launch = await _plugin.getNotificationAppLaunchDetails();
+      if (launch?.didNotificationLaunchApp ?? false) {
+        final payload = launch?.notificationResponse?.payload;
+        Future.delayed(const Duration(seconds: 2), () => _openPayload(payload));
+      }
+      _ready = true;
     } catch (_) {
-      enabled = false;
+      _ready = false;
     }
   }
 
-  static void _opened(RemoteMessage m) => onOpen?.call((m.data['type'] ?? '').toString(), m.data['orderId']?.toString());
+  static void _openPayload(String? payload) {
+    if (payload == null || payload.isEmpty) return;
+    final i = payload.indexOf('|');
+    final type = i < 0 ? payload : payload.substring(0, i);
+    final orderId = i < 0 ? null : payload.substring(i + 1);
+    onOpen?.call(type, (orderId == null || orderId.isEmpty) ? null : orderId);
+  }
 
-  /// Enregistre ce telephone pour le compte connecte
+  /// Compte connecte : demande l'autorisation et commence a ecouter
   static Future<void> register() async {
-    if (!enabled) return;
     try {
-      final fm = FirebaseMessaging.instance;
-      await fm.requestPermission(alert: true, badge: true, sound: true);
-      _token = await fm.getToken();
-      if (_token != null) await Api.instance.post('/devices', {'token': _token});
-      await _refresh?.cancel();
-      _refresh = fm.onTokenRefresh.listen((t) {
-        _token = t;
-        Api.instance.post('/devices', {'token': t}).catchError((_) => <String, dynamic>{});
-      });
+      await _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+      await _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(alert: true, badge: true, sound: true);
+    } catch (_) {}
+    final p = await SharedPreferences.getInstance();
+    _since = p.getInt(_kSince) ?? DateTime.now().millisecondsSinceEpoch;
+    await p.setInt(_kSince, _since);
+    _timer?.cancel();
+    _timer = Timer.periodic(_period, (_) => check());
+    check();
+    if (p.getString(_kRole) == 'merchant') _startKeepAlive();
+  }
+
+  /// A la deconnexion : plus d'alertes pour ce compte sur ce telephone
+  static Future<void> unregister() async {
+    _timer?.cancel();
+    _timer = null;
+    await _keepAlive?.cancel();
+    _keepAlive = null;
+    final p = await SharedPreferences.getInstance();
+    await p.remove(_kSince);
+    try {
+      await _plugin.cancelAll();
     } catch (_) {}
   }
 
-  /// A la deconnexion : ce telephone ne recoit plus les alertes de ce compte
-  static Future<void> unregister() async {
-    final t = _token;
-    _token = null;
-    if (!enabled || t == null) return;
+  /// Va chercher les nouvelles alertes du compte sur le serveur
+  static Future<void> check() async {
+    if (_busy) return;
+    _busy = true;
     try {
-      await _refresh?.cancel();
-      await Api.instance.delete('/devices?token=${Uri.encodeQueryComponent(t)}');
+      final r = await Api.instance.get('/notifications', query: {'since': '$_since'});
+      final list = (r['notifications'] as List?) ?? const [];
+      for (final raw in list) {
+        final n = (raw as Map).cast<String, dynamic>();
+        final at = (n['at'] as num?)?.toInt() ?? 0;
+        if (at > _since) _since = at;
+        await _show(n);
+      }
+      if (list.isNotEmpty) {
+        final p = await SharedPreferences.getInstance();
+        await p.setInt(_kSince, _since);
+      }
+    } catch (_) {
+      // Pas de reseau ou session expiree : on reessaie au prochain tour
+    } finally {
+      _busy = false;
+    }
+  }
+
+  static Future<void> _show(Map<String, dynamic> n) async {
+    final title = (n['title'] ?? '').toString();
+    final body = (n['body'] ?? '').toString();
+    final payload = '${n['type'] ?? ''}|${n['orderId'] ?? ''}';
+    final inApp = WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+    if (inApp) {
+      messengerKey.currentState?.showSnackBar(SnackBar(content: Text('$title\n$body'.trim()), duration: const Duration(seconds: 6)));
+    }
+    if (!_ready) return;
+    try {
+      await _plugin.show(
+        (n['id'] ?? title).hashCode & 0x7fffffff,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'wayi_alertes',
+            'Alertes WAYI',
+            channelDescription: 'Nouvelles commandes, courses et suivi de commande',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+          ),
+          iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        ),
+        payload: payload,
+      );
+    } catch (_) {}
+  }
+
+  /// Restaurant : garde l'appli active en arriere-plan pour ne rater aucune commande
+  static Future<void> _startKeepAlive() async {
+    if (_keepAlive != null || defaultTargetPlatform != TargetPlatform.android) return;
+    try {
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) perm = await Geolocator.requestPermission();
+      if (perm == LocationPermission.denied || perm == LocationPermission.deniedForever) return;
+      _keepAlive = Geolocator.getPositionStream(
+        locationSettings: AndroidSettings(
+          accuracy: LocationAccuracy.low,
+          distanceFilter: 5000,
+          intervalDuration: const Duration(minutes: 5),
+          foregroundNotificationConfig: const ForegroundNotificationConfig(
+            notificationTitle: 'WAYI Restaurant ouvert',
+            notificationText: 'À l\'écoute des nouvelles commandes.',
+            enableWakeLock: true,
+            setOngoing: true,
+          ),
+        ),
+      ).listen((_) {}, onError: (_) {});
     } catch (_) {}
   }
 }

@@ -78,6 +78,7 @@ app.get('/', (_req, res) => res.json({
 
 app.use('/api/auth',        authRoutes);
 app.use('/api/devices',     require('./routes/devices'));
+app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin',       adminRoutes);
 app.use('/api/ai',          aiRoutes);
 app.use('/api/menu',        menuRoutes);

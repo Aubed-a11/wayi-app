@@ -15,30 +15,20 @@ if errorlevel 1 (
   pause & exit /b 1
 )
 
-echo === 1/4 Preparation du projet Android ===
+echo === 1/3 Preparation du projet Android ===
 if not exist android (
   call flutter create --platforms=android --org com.wayibenin --project-name wayi . || goto erreur
 )
 call dart run tool/patch_platforms.dart || goto erreur
 
 echo.
-echo === 2/4 Installation des paquets ===
+echo === 2/3 Installation des paquets ===
 call flutter pub get || goto erreur
 
 echo.
-echo === 3/4 Notifications Firebase (facultatif) ===
-set FB=
-if exist google-services.json call dart run tool/firebase_config.dart
-if exist firebase.json (
-  set "FB=--dart-define-from-file=firebase.json"
-  echo Firebase active.
-) else (
-  echo Pas de google-services.json dans le dossier mobile : appli sans notifications appli fermee.
-)
-
 echo.
-echo === 4/4 Fabrication de l'APK (quelques minutes la premiere fois) ===
-call flutter build apk --release %FB% || goto erreur
+echo === 3/3 Fabrication de l'APK (quelques minutes la premiere fois) ===
+call flutter build apk --release || goto erreur
 
 if not exist "%~dp0APK" mkdir "%~dp0APK"
 copy /y build\app\outputs\flutter-apk\app-release.apk "%~dp0APK\WAYI.apk" >nul

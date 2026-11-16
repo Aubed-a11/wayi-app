@@ -1,15 +1,38 @@
 // ============================================================
-// WAYI - Notifications push (Firebase Cloud Messaging)
-// Arrivent sur le telephone meme quand l'appli est fermee :
+// WAYI - Notifications (boite interne, sans service exterieur)
+// Chaque notification est rangee dans la boite du compte (account.inbox),
+// sauvegardee avec le reste dans la base du serveur. L'appli la consulte
+// regulierement et affiche une notification sur le telephone :
 //   restaurant : nouvelle commande
 //   livreur    : nouvelle course proposee
 //   client     : commande acceptee, en route, livree, annulee
-// Sans configuration Firebase (FIREBASE_* dans .env), les envois sont simules.
+// Firebase reste possible en option (FIREBASE_* dans .env) mais n'est plus necessaire.
 // ============================================================
 const { users, drivers, merchants, admins, orders } = require('../data/store');
 const { sendPushNotification } = require('./notifications');
 
 const MAX_TOKENS = 5;
+const MAX_INBOX = 50;
+let seq = 0;
+
+function addToInbox(account, { title, body, data = {} }) {
+  if (!account) return null;
+  const n = {
+    id: `${Date.now()}-${++seq}`,
+    at: Date.now(),
+    title: String(title || ''),
+    body: String(body || ''),
+    type: String(data.type || ''),
+    orderId: data.orderId ? String(data.orderId) : null,
+  };
+  account.inbox = [n, ...(Array.isArray(account.inbox) ? account.inbox : [])].slice(0, MAX_INBOX);
+  return n;
+}
+
+function inboxSince(account, since) {
+  const t = Number(since) || 0;
+  return (Array.isArray(account?.inbox) ? account.inbox : []).filter(n => n.at > t).sort((a, b) => a.at - b.at);
+}
 
 function accountFor(user) {
   if (!user) return null;
@@ -36,6 +59,7 @@ function removeToken(account, token) {
 }
 
 async function pushTo(account, { title, body, data = {} }) {
+  addToInbox(account, { title, body, data });
   const tokens = account?.fcmTokens || [];
   if (!tokens.length) return 0;
   const strData = Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v ?? '')]));
@@ -88,4 +112,4 @@ function orderStatusToClient(orderId, status) {
   fire(pushTo(user, { title, body, data: { type: 'order_status', orderId, status } }));
 }
 
-module.exports = { accountFor, registerToken, removeToken, pushTo, newOrderToRestaurant, pingToDriver, orderStatusToClient };
+module.exports = { addToInbox, inboxSince, accountFor, registerToken, removeToken, pushTo, newOrderToRestaurant, pingToDriver, orderStatusToClient };

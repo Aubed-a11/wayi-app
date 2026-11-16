@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: 'Identifiants incorrects' });
 
     const token = signToken({ id: user.id, email: user.email });
-    const { password: _, ...safeUser } = user;
+    const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
     res.json({ token, user: safeUser, message: 'Connexion réussie' });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur' });
@@ -47,7 +47,7 @@ router.post('/login-any', async (req, res) => {
     if (!email || !password) return res.status(400).json({ error: 'E-mail et mot de passe requis' });
     const match = (a) => a.email === email || (a.phone && a.phone === email);
     const ok = async (a) => a?.password && bcrypt.compare(password, a.password).catch(() => false);
-    const strip = ({ password: _, ...rest }) => rest;
+    const strip = ({ password: _, inbox: _inbox, fcmTokens: _fcm, ...rest }) => rest;
     const accounts = [];
 
     const user = users.find(match);
@@ -140,7 +140,7 @@ router.post('/register/verify', async (req, res) => {
     deletePendingRegistration(email);
 
     const token = signToken({ id: newUser.id, email: newUser.email });
-    const { password: _, ...safeUser } = newUser;
+    const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = newUser;
     res.status(201).json({ token, user: safeUser, message: 'Compte créé et e-mail vérifié' });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur' });
@@ -306,7 +306,7 @@ router.post('/social', async (req, res) => {
     }
 
     const token = signToken({ id: user.id, phone: user.phone });
-    const { password: _, ...safeUser } = user;
+    const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
     res.json({ token, user: safeUser, message: `Connexion ${provider} réussie` });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur' });
@@ -317,7 +317,7 @@ router.post('/social', async (req, res) => {
 router.get('/me', auth, (req, res) => {
   const user = users.find(u => u.id === req.user.id);
   if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-  const { password: _, ...safeUser } = user;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
   res.json(safeUser);
 });
 
@@ -329,7 +329,7 @@ router.put('/me', auth, (req, res) => {
   if (name) user.name = name;
   if (email) user.email = email;
   if (city) user.city = city;
-  const { password: _, ...safeUser } = user;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
   res.json({ user: safeUser, message: 'Profil mis à jour' });
 });
 
@@ -362,7 +362,7 @@ router.post('/addresses', auth, (req, res) => {
     isDefault: isDefault || user.addresses.length === 0,
   };
   user.addresses.push(newAddress);
-  const { password: _, ...safeUser } = user;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
   res.status(201).json({ address: newAddress, user: safeUser });
 });
 
@@ -373,7 +373,7 @@ router.put('/addresses/:id/default', auth, (req, res) => {
   const found = (user.addresses || []).find(a => a.id === req.params.id);
   if (!found) return res.status(404).json({ error: 'Adresse introuvable' });
   user.addresses.forEach(a => { a.isDefault = a.id === req.params.id; });
-  const { password: _, ...safeUser } = user;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
   res.json({ user: safeUser });
 });
 
@@ -387,7 +387,7 @@ router.put('/addresses/:id/position', auth, (req, res) => {
   if (!validCoords(lat, lng)) return res.status(400).json({ error: 'Position invalide' });
   found.lat = lat; found.lng = lng; found.hasPosition = true;
   found.mapsLink = mapsLinkFromCoords(lat, lng);
-  const { password: _, ...safeUser } = user;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
   res.json({ user: safeUser, address: found });
 });
 
@@ -400,7 +400,7 @@ router.delete('/addresses/:id', auth, (req, res) => {
   const wasDefault = user.addresses[idx].isDefault;
   user.addresses.splice(idx, 1);
   if (wasDefault && user.addresses.length) user.addresses[0].isDefault = true;
-  const { password: _, ...safeUser } = user;
+  const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
   res.json({ user: safeUser });
 });
 

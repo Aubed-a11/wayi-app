@@ -25,6 +25,7 @@ void _android() {
     'android.permission.FOREGROUND_SERVICE_LOCATION',
     'android.permission.POST_NOTIFICATIONS',
     'android.permission.WAKE_LOCK',
+    'android.permission.VIBRATE',
   ];
   for (final p in perms) {
     if (!s.contains(p)) {
@@ -46,7 +47,7 @@ void _android() {
   }
   f.writeAsStringSync(s);
 
-  // Firebase (notifications) demande Android 6 minimum
+  // Android 6 minimum
   for (final name in ['android/app/build.gradle.kts', 'android/app/build.gradle']) {
     final g = File(name);
     if (!g.existsSync()) continue;
@@ -65,6 +66,20 @@ void _android() {
     final t = g.readAsStringSync();
     if (t.contains(marker)) continue;
     g.writeAsStringSync('$t\n$marker\nsubprojects {\n    tasks.matching { it.name.startsWith("lintVital") }.configureEach { enabled = false }\n}\n');
+  }
+
+  // Notifications du telephone (flutter_local_notifications) : desugaring Java requis
+  for (final name in ['android/app/build.gradle.kts', 'android/app/build.gradle']) {
+    final g = File(name);
+    if (!g.existsSync()) continue;
+    var t = g.readAsStringSync();
+    if (t.contains('desugar_jdk_libs')) continue;
+    final kts = name.endsWith('.kts');
+    t = t.replaceFirst('compileOptions {', kts ? 'compileOptions {\n        isCoreLibraryDesugaringEnabled = true' : 'compileOptions {\n        coreLibraryDesugaringEnabled true');
+    t += kts
+        ? '\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")\n}\n'
+        : '\ndependencies {\n    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.4"\n}\n';
+    g.writeAsStringSync(t);
   }
 
   // Icone : reprise des icones WAYI deja generees

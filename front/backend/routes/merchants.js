@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, merchant.password).catch(() => false);
     if (!valid) return res.status(401).json({ error: 'Identifiants incorrects' });
     const token = signToken({ id: merchant.id, role: 'merchant', email: merchant.email });
-    const { password: _, ...safe } = merchant;
+    const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safe } = merchant;
     res.json({ token, merchant: safe, message: 'Connexion réussie' });
   } catch {
     res.status(500).json({ error: 'Erreur serveur' });
@@ -133,7 +133,7 @@ router.post('/register/verify', async (req, res) => {
     merchants.push(merchant);
 
     const token = signToken({ id: merchant.id, role: 'merchant', email: merchant.email });
-    const { password: _, ...safeMerchant } = merchant;
+    const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeMerchant } = merchant;
     res.status(201).json({ token, merchant: safeMerchant, restaurant, message: 'Compte restaurant créé' });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur' });
