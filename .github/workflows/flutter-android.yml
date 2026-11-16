@@ -8,6 +8,9 @@ on:
   push:
     paths: ['mobile/**']
 
+permissions:
+  contents: write
+
 jobs:
   android:
     runs-on: ubuntu-latest
@@ -39,3 +42,14 @@ jobs:
         with:
           name: WAYI-flutter-apk
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
+
+      # Lien fixe pour telecharger l'appli : https://github.com/Aubed-a11/wayi-app/releases/latest
+      - name: Publier l'APK (page Releases)
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk WAYI.apk
+          TAG=apk-${{ github.run_number }}
+          gh release create "$TAG" WAYI.apk --title "WAYI Android (build ${{ github.run_number }})" \
+            --notes "Appli WAYI (client, restaurant, livreur). Telecharge WAYI.apk sur le telephone et ouvre-le pour l'installer." --latest
