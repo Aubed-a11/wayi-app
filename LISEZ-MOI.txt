@@ -1,3 +1,15 @@
+WAYI : DEMARRER EN 3 ETAPES
+===========================
+1. Mettre le serveur en ligne a jour (tes donnees restent en place) :
+   double-clic sur 1-DEPLOYER-SERVEUR.bat (mot de passe du VPS demande 2 fois).
+2. Installer l'appli sur le telephone :
+   https://github.com/Aubed-a11/wayi-app/releases/latest  ->  WAYI.apk
+   (ou double-clic sur 4-CONSTRUIRE-APPLI-ANDROID.bat si Flutter est installe).
+3. Se connecter : un seul ecran de connexion, l'appli ouvre l'espace client,
+   restaurant ou livreur selon le compte. L'admin reste sur admin.wayibenin.com.
+Tester tout sur le PC sans toucher au serveur : LANCER-EN-LOCAL.bat
+Aucun Firebase a configurer : les notifications passent par le serveur WAYI.
+
 WAYI : TOUT EN UN
 =================
 
