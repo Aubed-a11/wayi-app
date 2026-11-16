@@ -22,6 +22,10 @@ Ce qui est fait
     MoMo, mot de passe
   - Admin : le backoffice reste sur le web (grand ecran), l'appli l'ouvre deja connecte
 
+Le plus simple sur Windows : double-clic sur 4-CONSTRUIRE-APPLI-ANDROID.bat
+  (fait tout, l'APK arrive dans le dossier APK). Pour les notifications, poser
+  google-services.json (console Firebase) dans ce dossier mobile avant.
+
 Lancer sur ton telephone (une seule fois au debut)
   1. Installer Flutter : https://docs.flutter.dev/get-started/install/windows
      puis Android Studio (pour le SDK Android). Verifier avec : flutter doctor
