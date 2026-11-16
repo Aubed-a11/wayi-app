@@ -23,8 +23,7 @@ Ce qui est fait
   - Admin : le backoffice reste sur le web (grand ecran), l'appli l'ouvre deja connecte
 
 Le plus simple sur Windows : double-clic sur 4-CONSTRUIRE-APPLI-ANDROID.bat
-  (fait tout, l'APK arrive dans le dossier APK). Pour les notifications, poser
-  google-services.json (console Firebase) dans ce dossier mobile avant.
+  (fait tout, l'APK arrive dans le dossier APK).
 
 Lancer sur ton telephone (une seule fois au debut)
   1. Installer Flutter : https://docs.flutter.dev/get-started/install/windows
@@ -39,22 +38,15 @@ Lancer sur ton telephone (une seule fois au debut)
        flutter build apk --release
      -> build\app\outputs\flutter-apk\app-release.apk
 
-Notifications quand l'appli est fermee (Firebase)
+Notifications (sans Firebase, rien a configurer)
+  Le serveur range chaque alerte dans la boite du compte, sauvegardee dans ta base
+  de donnees. L'appli la consulte toutes les 10 secondes et l'affiche sur le telephone.
   Restaurant : nouvelle commande. Livreur : nouvelle course. Client : acceptee,
   en route, livree, annulee. Toucher la notification ouvre le suivi de la commande.
-  1. console.firebase.google.com : creer le projet WAYI, ajouter une appli Android
-     avec le nom de paquet com.wayibenin.wayi
-  2. Parametres du projet > General > ton appli Android : recopier dans
-     firebase.json (copie de firebase.example.json) :
-       FIREBASE_API_KEY (Cle API Web / api key), FIREBASE_APP_ID (ID de l'appli),
-       FIREBASE_SENDER_ID (numero du projet), FIREBASE_PROJECT_ID (ID du projet)
-  3. Lancer / construire avec ce fichier :
-       flutter run --dart-define-from-file=firebase.json
-       flutter build apk --release --dart-define-from-file=firebase.json
-  4. Cote serveur : Parametres > Comptes de service > Generer une cle privee,
-     puis 3-CONFIGURER-SERVICES-REELS.bat (rubrique Notifications push Firebase).
-  Sans firebase.json, l'appli marche normalement, sans notifications appli fermee.
-  iPhone : il faut en plus une cle APNs Apple dans Firebase (compte Apple Developer).
+  Livreur en ligne et restaurant connecte : l'appli reste active en arriere-plan
+  (notification permanente "WAYI ... en ligne / ouvert"), les alertes arrivent
+  ecran eteint. Si l'appli est completement fermee (balayee), les alertes
+  s'afficheront a la prochaine ouverture.
 
 Mot de passe oublie : marche maintenant pour client, restaurant et livreur.
 
