@@ -1,0 +1,39 @@
+# Généré par deploy/enable-ssl.sh : HTTPS + redirection du HTTP.
+# __LISTEN_HTTPS__ vaut « 443 ssl http2 » sur un serveur classique, ou l'adresse interne du routeur TCP
+# (ex. « 127.0.0.1:8444 ssl http2 ») quand un routeur nginx « stream » tient le port 443.
+server {
+    listen 80;
+    server_name __DOMAIN__;
+
+    location /.well-known/acme-challenge/ {
+        root __ACME_ROOT__;
+    }
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen __LISTEN_HTTPS__;
+    server_name __DOMAIN__;
+
+    ssl_certificate     __LE_DIR__/live/__DOMAIN__/fullchain.pem;
+    ssl_certificate_key __LE_DIR__/live/__DOMAIN__/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:wayi_ssl:10m;
+    ssl_session_timeout 1d;
+
+    client_max_body_size 6m;
+
+    location / {
+        proxy_pass http://127.0.0.1:__PORT__;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $wayi_connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+}

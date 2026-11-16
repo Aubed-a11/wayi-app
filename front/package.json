@@ -1,0 +1,15 @@
+{
+  "name": "wayi-local",
+  "private": true,
+  "description": "WAYI en local : serveur + appli client + espace restaurant/admin + appli livreur, en une commande",
+  "scripts": {
+    "installer": "npm install && npm install --prefix backend && npm install --prefix apps/client && npm install --prefix apps/ops && npm install --prefix apps/driver && node scripts/creer-env-local.js",
+    "dev": "node scripts/creer-env-local.js && concurrently -k -n serveur,client,restaurant,livreur -c green,yellow,magenta,cyan \"npm run serveur\" \"npm run dev --prefix apps/client\" \"npm run dev --prefix apps/ops\" \"npm run dev --prefix apps/driver\"",
+    "serveur": "cd backend && node --watch server.js",
+    "configurer": "npm run configurer --prefix backend",
+    "verifier": "npm run verifier --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

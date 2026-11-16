@@ -1,0 +1,107 @@
+WAYI : TOUT EN UN
+=================
+
+1) Dezippe ce fichier (clic droit > Extraire tout).
+
+2) SERVEUR : double-clique sur  1-DEPLOYER-SERVEUR.bat
+   - Il demande le mot de passe du VPS deux fois (envoi, puis installation).
+   - Il fait une sauvegarde automatique, installe, redemarre et verifie.
+
+3) FRONT : double-clique sur  2-DEPLOYER-FRONT.bat
+   - Il deploie le client, puis l'admin, puis le livreur (appuie sur une touche entre chaque).
+   - Si Vercel propose un "upgrade", reponds n.
+   - Il faut Node.js et Vercel deja installes et connectes (comme avant).
+
+4) POUR TESTER LES COMMANDES avec les plats d'exemple :
+   Sur le VPS, ajoute  ALLOW_DEMO_ORDERS=1  dans /home/wayi/wayi-backend/.env
+   (ssh root@76.13.37.17, puis nano /home/wayi/wayi-backend/.env, puis wayi-pm2 restart wayi-backend)
+
+5) POUR LE PAIEMENT KKIAPAY (quand tu auras ton compte) : ajoute dans le meme .env
+     KKIAPAY_PUBLIC_KEY=...
+     KKIAPAY_PRIVATE_KEY=...
+     KKIAPAY_SECRET=...
+     KKIAPAY_SANDBOX=true        (puis false pour l'argent reel)
+     KKIAPAY_WEBHOOK_SECRET=...
+     WEBHOOK_BASE_URL=https://api.wayibenin.com
+   Webhook a declarer dans le dashboard Kkiapay :
+     https://api.wayibenin.com/api/payments/webhook/kkiapay
+   Sans ces cles, les paiements MTN/Moov restent en mode manuel (le client envoie l'argent,
+   puis le restaurant ou l'admin confirme la reception).
+
+Contenu : serveur\ (mise a jour du serveur) et front\ (le code des 3 applications).
+
+6) YIVI (assistant IA)
+   La cle Claude est DEJA integree : 1-DEPLOYER-SERVEUR.bat l'ecrit toute seule dans
+   /home/wayi/wayi-backend/.env (ANTHROPIC_API_KEY + ANTHROPIC_MODEL=claude-sonnet-5-5)
+   puis redemarre le serveur. Rien a faire a la main.
+   ATTENTION : ce zip contient donc ta cle secrete. Ne l'envoie a personne.
+   Pour changer de cle plus tard : remplace la ligne "set CLAUDE_KEY=" dans
+   1-DEPLOYER-SERVEUR.bat et relance-le.
+   Le compte Anthropic doit avoir du credit, sinon Yivi passe en mode secours.
+   Verification : https://api.wayibenin.com/health doit contenir "claude":true,
+   et GET /api/ai/status (connecte) doit avoir "lastError" vide.
+   Si lastError parle de credit : recharger le compte Anthropic. Si 401 : cle invalide.
+
+
+==============================================================
+APPLICATION MOBILE FLUTTER (nouvelle version)
+==============================================================
+Dossier mobile/ : voir mobile/LISEZ-MOI.txt. Clients, livreurs et restaurants
+dans une seule appli native. Elle remplace l'appli Capacitor ci-dessous, gardee
+en secours le temps de valider la version Flutter.
+
+==============================================================
+APPLICATION MOBILE WAYI (Android et iOS)
+==============================================================
+Une seule appli pour tout le monde. A l'inscription, on choisit :
+Client, Restaurant ou Livreur. A la connexion, l'appli reconnait
+le compte et ouvre le bon espace :
+  client      -> menu du jour, panier, suivi       (front/apps/client)
+  livreur     -> courses, GPS, gains                (front/apps/driver)
+  restaurant  -> commandes, menu, statistiques      (front/apps/ops)
+  admin       -> backoffice                         (front/apps/ops)
+Si les memes identifiants ouvrent plusieurs espaces, l'appli demande lequel.
+Un livreur inscrit depuis l'appli attend la validation de l'admin
+(admin > Livreurs > Valider) avant de recevoir des courses.
+L'appli parle au serveur en ligne https://api.wayibenin.com
+(reglage : front/apps/client/.env.mobile, idem dans driver et ops).
+
+Construire l'APK sur ton PC Windows
+  1. Installer Android Studio une fois (https://developer.android.com/studio)
+     et l'ouvrir une premiere fois (il telecharge le SDK Android).
+  2. Double-clic sur 4-CONSTRUIRE-APPLI-ANDROID.bat
+  3. WAYI.apk est dans le dossier APK : envoie-le sur un telephone
+     Android et ouvre-le pour l'installer.
+
+Ou sans rien installer, avec GitHub
+  Mettre ce dossier dans un depot GitHub, onglet Actions >
+  "Appli mobile WAYI" > Run workflow. L'APK est a telecharger
+  en bas de la page, rubrique Artifacts.
+
+Publier sur le Play Store
+  1. 5-CREER-CLE-PLAY-STORE.bat (une seule fois, garder le dossier cles
+     en lieu sur : sans cette cle, plus de mise a jour possible).
+  2. 4-CONSTRUIRE-APPLI-ANDROID.bat produit alors WAYI.aab signe.
+  3. Compte Google Play Console (25 $ une fois), creer l'appli,
+     envoyer WAYI.aab. A chaque nouvelle version : augmenter
+     WAYI_VERSION_CODE (set WAYI_VERSION_CODE=2 avant de lancer le .bat).
+
+iPhone (App Store)
+  Le projet iOS est pret (front/apps/client/ios) mais il faut un Mac
+  avec Xcode et un compte Apple Developer (99 $/an) :
+  cd front/apps/client && npm run ios
+
+Apres une modification du code des ecrans, reconstruire l'appli
+(les sites se mettent a jour avec 2-DEPLOYER-FRONT.bat, l'appli non).
+
+SAUVEGARDE DES DONNEES (16/11/2026)
+  Les donnees du VPS (clients, restaurants, plats, livreurs) sont gardees dans
+  front\backend\data\sauvegarde\wayi-vps-2026-11-16.json
+  En local (LANCER-EN-LOCAL.bat), le serveur demarre avec ces donnees.
+  En ligne, le serveur utilise toujours la base PostgreSQL du VPS : la mise a jour
+  (1-DEPLOYER-SERVEUR.bat) ne touche pas aux donnees.
+  Refaire une sauvegarde fraiche : 0-RECUPERER-BACKEND-VPS.bat
+  En cas de perte de donnees sur le VPS, depuis /home/wayi/wayi-backend :
+    node scripts/restaurer-sauvegarde.js fichier.json            (verifie, ne change rien)
+    node scripts/restaurer-sauvegarde.js fichier.json --confirmer (remet la sauvegarde)
+  Ce fichier contient les donnees de tes clients : ne le mets jamais sur GitHub.

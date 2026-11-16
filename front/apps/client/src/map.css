@@ -1,0 +1,20 @@
+/* ── Cartes WAYI ─────────────────────────────────────────── */
+.wmap { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 6px 20px rgba(150, 80, 30, 0.08); background: #EEE8E2; isolation: isolate; }
+.wmap-canvas { position: absolute; inset: 0; }
+/* Les regles globales sur les images casseraient les tuiles de la carte */
+.leaflet-container img { max-width: none !important; max-height: none !important; }
+.leaflet-container { font-family: inherit; background: #EEE8E2; }
+.leaflet-tile-pane { filter: saturate(.75) brightness(1.03); }
+.wmap-pin span { display: grid; place-items: center; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22); }
+.wmap-btn { position: absolute; top: 10px; right: 10px; z-index: 500; width: 38px; height: 38px; border-radius: 50%; border: none; background: #fff; color: #3A322D; display: grid; place-items: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15); }
+.wmap-legend { position: absolute; left: 10px; top: 10px; z-index: 500; display: flex; gap: 6px; flex-wrap: wrap; max-width: 75%; }
+.wmap-legend span { display: inline-flex; align-items: center; gap: 5px; background: rgba(255, 255, 255, 0.94); padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #3A322D; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); }
+.wmap-legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.wmap-hint { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 500; background: rgba(30, 25, 22, 0.82); color: #fff; font-size: 12px; padding: 7px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.leaflet-control-attribution { font-size: 9px !important; background: rgba(255, 255, 255, 0.7) !important; }
+.leaflet-bar a { border-radius: 10px !important; }
+/* Les regles globales "max-width: 100%" ecrasaient les epingles (le calque des marqueurs a une largeur nulle) */
+.wmap .leaflet-container div, .wmap .leaflet-container span, .wmap .leaflet-container svg { max-width: none !important; min-width: 0; }
+
+.wmap-tip { background: #4F8A68 !important; color: #fff !important; border: none !important; border-radius: 999px !important; padding: 2px 8px !important; font-size: 10.5px !important; font-weight: 600 !important; box-shadow: 0 2px 6px rgba(0,0,0,.15) !important; }
+.wmap-tip::before { display: none !important; }

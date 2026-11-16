@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">WAYI</string>
+    <string name="title_activity_main">WAYI</string>
+    <string name="package_name">com.wayibenin.app</string>
+    <string name="custom_url_scheme">com.wayibenin.app</string>
+</resources>

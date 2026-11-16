@@ -1,0 +1,332 @@
+/* ============================================================
+   WAYI - Theme v7 (maquette orange / creme)
+   Charge APRES index.css : redefinit les couleurs et la police
+   de toute l'appli, puis ajoute les composants des nouveaux ecrans.
+   Sobre : aplats orange, cartes blanches, ombres douces,
+   aucun decor (pas de feuilles, pas d'eclats, pas d'emoji).
+   ============================================================ */
+:root {
+  /* Orange adouci (terre cuite claire) : chaleureux sans etre criard */
+  --brand:        #D9824E;
+  --brand-dark:   #B5652F;
+  --brand-light:  #F7ECE3;
+  --brand-mid:    #E9C8AE;
+
+  /* Couleurs du Benin, en version douce, pour quelques touches */
+  --bj-green:  #4F8A68;
+  --bj-yellow: #E2C468;
+  --bj-red:    #C0675C;
+  --bj-stripe: linear-gradient(90deg, var(--bj-green) 0 33.3%, var(--bj-yellow) 33.3% 66.6%, var(--bj-red) 66.6% 100%);
+
+  /* Les anciens noms pointent vers la nouvelle couleur : tout l'existant suit */
+  --emerald:       var(--brand);
+  --emerald-dark:  var(--brand-dark);
+  --emerald-light: var(--brand-light);
+  --emerald-mid:   var(--brand-mid);
+  --sun:           var(--brand);
+  --sun-light:     var(--brand-light);
+  --grad-brand:    linear-gradient(135deg, #E19463 0%, #D9824E 55%, #C9733F 100%);
+  --grad-sun:      var(--grad-brand);
+  --grad-soft:     linear-gradient(135deg, #FAF2EB 0%, #F1E2D5 100%);
+  --ring:          0 0 0 4px rgba(217, 130, 78, 0.14);
+
+  --cream:  #FBF7F2;
+  --ink:    #1E1916;
+  --gray:   #8B8079;
+  --border: #F2E7DE;
+  --danger: #B9584C;
+
+  --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-body:    'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --card-shadow: 0 6px 20px rgba(150, 80, 30, 0.08);
+  --card-radius: 18px;
+}
+
+html, body, #root, .app-shell { background: var(--cream); }
+body { font-family: var(--font-body); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.screen { background: var(--cream); }
+
+/* Boutons de l'existant : pilule orange pleine */
+.btn-primary, .btn-sun { background: var(--brand) !important; color: #fff !important; border-radius: 999px !important; box-shadow: 0 8px 18px rgba(217, 130, 78, 0.28) !important; font-weight: 600 !important; }
+.btn-primary:disabled, .btn-sun:disabled { opacity: .55; box-shadow: none !important; }
+.back-btn { background: transparent !important; box-shadow: none !important; border: none !important; color: var(--ink) !important; }
+
+/* ── Barre de navigation ─────────────────────────────────── */
+.bottom-nav {
+  background: #fff !important; border-top: none !important;
+  border-radius: 22px 22px 0 0 !important; box-shadow: 0 -6px 24px rgba(150, 80, 30, 0.08) !important;
+  backdrop-filter: none !important;
+}
+.nav-item { color: #9A8F88 !important; position: relative; }
+.nav-item .nav-label { font-size: 11px !important; font-weight: 500 !important; }
+.nav-item.active { color: var(--brand) !important; }
+.nav-item.active .nav-label { font-weight: 600 !important; }
+.nav-item.active .nav-ico { background: transparent !important; box-shadow: none !important; }
+.nav-item.active::after {
+  content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+  width: 28px; height: 3px; border-radius: 3px; background: var(--brand);
+}
+.nav-badge { background: var(--bj-red) !important; color: #fff !important; }
+
+/* ── Briques communes ────────────────────────────────────── */
+.w-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 110px; }
+.w-scroll::-webkit-scrollbar { display: none; }
+.w-pad { padding: 0 20px; }
+.w-topbar { display: flex; align-items: center; gap: 12px; padding: 6px 20px 14px; }
+.w-topbar-title { flex: 1; text-align: center; font-weight: 700; font-size: 18px; }
+.w-icon-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--ink);
+  display: grid; place-items: center; cursor: pointer; position: relative; flex-shrink: 0;
+}
+.w-icon-btn.on-img { background: rgba(255, 255, 255, 0.95); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); }
+.w-dot { position: absolute; top: 6px; right: 7px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--bj-red); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; border: 2px solid #fff; }
+.w-card { background: #fff; border-radius: var(--card-radius); box-shadow: var(--card-shadow); }
+.w-section-head { display: flex; align-items: center; justify-content: space-between; margin: 22px 0 12px; }
+.w-section-title { font-size: 18px; font-weight: 700; }
+.w-link { background: none; border: none; color: var(--brand); font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-family: var(--font-body); }
+.w-btn {
+  width: 100%; border: none; border-radius: 999px; background: var(--brand); color: #fff; font-family: var(--font-body);
+  font-weight: 600; font-size: 15px; padding: 16px 22px; display: flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer; box-shadow: 0 6px 14px rgba(217, 130, 78, 0.22); transition: transform .15s ease, opacity .2s ease;
+}
+.w-btn:active { transform: scale(.98); }
+.w-btn:disabled { opacity: .55; box-shadow: none; cursor: default; }
+.w-btn.ghost { background: #fff; color: var(--brand); box-shadow: none; border: 1.5px solid var(--brand-mid); }
+.w-price { color: var(--brand); font-weight: 700; }
+.w-muted { color: var(--gray); }
+
+/* Recherche */
+.w-search { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 999px; padding: 0 18px; height: 50px; box-shadow: var(--card-shadow); }
+.w-search svg { color: var(--ink); flex-shrink: 0; }
+.w-search input { flex: 1; border: none !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; height: 100%; font-size: 14px; font-family: var(--font-body); outline: none; min-width: 0; }
+.w-search input::placeholder { color: #A69C95; }
+
+/* Pastilles de creneau (Tous, Petit-dej...) */
+.w-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 20px 4px; margin: 0 -20px; }
+.w-chips::-webkit-scrollbar { display: none; }
+.w-chip {
+  flex-shrink: 0; border: none; background: #fff; color: var(--ink); border-radius: 999px; padding: 10px 18px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(150, 80, 30, 0.06);
+  transition: background .2s ease, color .2s ease;
+}
+.w-chip.on { background: var(--brand); color: #fff; box-shadow: 0 6px 14px rgba(217, 130, 78, 0.28); }
+
+/* Tuiles de creneau avec icone (accueil) */
+.w-periods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.w-period {
+  border: none; background: #fff; border-radius: 16px; padding: 12px 4px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-family: var(--font-body); font-size: 11.5px; font-weight: 500; color: var(--ink); cursor: pointer; box-shadow: 0 3px 10px rgba(150, 80, 30, 0.06);
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+}
+.w-period svg { color: var(--brand); }
+.w-period.on { background: var(--brand); color: #fff; box-shadow: 0 8px 18px rgba(217, 130, 78, 0.3); }
+.w-period.on svg { color: #fff; }
+.w-period:active { transform: scale(.96); }
+
+/* Logo de restaurant (rond) */
+.w-logo { border-radius: 50%; background: #fff; display: grid; place-items: center; overflow: hidden; flex-shrink: 0; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); color: var(--brand); }
+.w-logo img { width: 100%; height: 100%; object-fit: contain; }
+.w-logo-fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; text-align: center; padding: 4px; }
+.w-logo-fallback b { font-size: .62em; font-weight: 700; color: var(--brand-dark); margin-top: 2px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Photo de plat (avec repli sobre si pas de photo) */
+.w-img { background: var(--grad-soft) center / cover no-repeat; position: relative; overflow: hidden; }
+.w-img-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--brand-mid); }
+
+/* Banniere "Menu du jour" (accueil) */
+.w-banner {
+  position: relative; overflow: hidden; border-radius: 22px; background: #46705A; color: #fff; padding: 20px 20px 18px;
+  display: flex; min-height: 150px; box-shadow: 0 10px 24px rgba(70, 112, 90, 0.18);
+}
+.w-banner-txt { position: relative; z-index: 1; max-width: 62%; display: flex; flex-direction: column; align-items: flex-start; }
+.w-banner-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--brand); color: #fff; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 999px; margin-bottom: 10px; }
+.w-banner h3 { font-size: 17px; font-weight: 700; line-height: 1.3; margin: 0 0 12px; color: #fff; }
+.w-banner-cta { background: #fff; color: var(--ink); border: none; border-radius: 999px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--font-body); }
+.w-banner-img { position: absolute; right: -24px; top: 50%; transform: translateY(-50%); width: 46%; aspect-ratio: 1; border-radius: 50%; background-size: cover; background-position: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); }
+
+/* Carte "Menus du jour" en grille (accueil) */
+.w-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.w-mcard { position: relative; background: #fff; border-radius: 18px; box-shadow: var(--card-shadow); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; }
+.w-mcard .w-img { height: 112px; }
+.w-mcard-logo { position: absolute; top: 84px; left: 10px; z-index: 2; border: 3px solid #fff; }
+.w-mcard-tag { position: absolute; top: 8px; right: 8px; z-index: 2; background: #F7EFD3; color: #8A6A1F; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
+.w-mcard-body { padding: 26px 12px 12px; display: flex; flex-direction: column; flex: 1; }
+.w-mcard-name { font-size: 14px; font-weight: 700; line-height: 1.25; }
+.w-mcard-desc { font-size: 11.5px; color: var(--gray); margin-top: 3px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.w-mcard-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: auto; padding-top: 10px; }
+.w-mcard-foot .w-add { width: 100%; justify-content: center; padding: 9px 10px; }
+.w-mcard-meta { justify-content: space-between; }
+.w-mcard-price { color: var(--brand); font-weight: 700; font-size: 14px; white-space: nowrap; }
+.w-add {
+  border: none; background: var(--brand); color: #fff; border-radius: 999px; padding: 8px 12px; font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font-family: var(--font-body); white-space: nowrap;
+  box-shadow: 0 6px 12px rgba(217, 130, 78, 0.28); transition: transform .15s ease;
+}
+.w-add:active { transform: scale(.94); }
+.w-mcard-meta { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--gray); margin-top: 6px; }
+
+/* Carte en liste : logo | photo | infos (accueil, recherche) */
+.w-lcard { display: flex; gap: 10px; background: #fff; border-radius: 18px; box-shadow: var(--card-shadow); padding: 10px; cursor: pointer; margin-bottom: 12px; align-items: stretch; }
+.w-lcard-logo { width: 74px; display: grid; place-items: center; flex-shrink: 0; }
+.w-lcard .w-img { width: 96px; border-radius: 14px; flex-shrink: 0; }
+.w-lcard-body { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 2px 0; }
+.w-lcard-name { font-size: 14px; font-weight: 700; }
+.w-lcard-desc { font-size: 11.5px; color: var(--gray); line-height: 1.35; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.w-lcard-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: auto; padding-top: 6px; }
+
+/* Carte Explorer : logo en haut, photo, nom, prix */
+.w-ecard { background: #fff; border-radius: 18px; box-shadow: var(--card-shadow); padding: 10px 10px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+.w-ecard .w-logo { margin-bottom: -18px; z-index: 2; border: 3px solid #fff; }
+.w-ecard .w-img { width: 100%; height: 104px; border-radius: 14px; }
+.w-ecard-name { font-size: 13.5px; font-weight: 600; margin-top: 10px; line-height: 1.25; }
+.w-ecard-price { color: var(--brand); font-weight: 700; font-size: 15px; margin-top: 4px; }
+.w-ecard-add { position: absolute; top: 96px; right: 14px; z-index: 3; width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--brand); color: #fff; display: grid; place-items: center; cursor: pointer; box-shadow: 0 6px 12px rgba(217, 130, 78, 0.3); }
+
+/* Quantite (+ / -) */
+.w-qty { display: inline-flex; align-items: center; gap: 14px; background: #fff; border-radius: 999px; padding: 6px 8px; box-shadow: 0 3px 10px rgba(150, 80, 30, 0.07); }
+.w-qty button { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border); background: #fff; color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+.w-qty button:active { transform: scale(.92); }
+.w-qty span { min-width: 18px; text-align: center; font-weight: 600; font-size: 16px; }
+.w-qty.sm { gap: 10px; padding: 4px 6px; box-shadow: none; background: transparent; }
+.w-qty.sm button { width: 28px; height: 28px; border: none; background: transparent; }
+.w-qty.sm span { font-size: 15px; }
+
+/* Fiche plat */
+.w-dish-hero { position: relative; height: 300px; flex-shrink: 0; }
+.w-dish-hero .w-img { position: absolute; inset: 0; }
+.w-dish-hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 40px; background: var(--cream); border-radius: 28px 28px 0 0; }
+.w-dish-hero-bar { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 14px); left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 3; }
+.w-dish-logo { position: absolute; left: 20px; bottom: -6px; z-index: 4; border: 4px solid #fff; border-radius: 26px !important; }
+.w-dish-body { padding: 26px 20px 140px; }
+.w-dish-name { font-size: 24px; font-weight: 700; margin: 10px 0 4px; }
+.w-dish-price { font-size: 30px; font-weight: 700; color: var(--brand); margin: 14px 0 18px; }
+.w-dish-bottom { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 20px calc(16px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--cream) 75%, rgba(251, 247, 242, 0)); z-index: 20; }
+.w-about h4 { font-size: 16px; font-weight: 700; margin: 26px 0 8px; }
+.w-about p { font-size: 13.5px; color: #5E544E; line-height: 1.6; margin: 0; white-space: pre-line; }
+.w-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.w-tag { background: #fff; border: 1px solid var(--border); color: #6B605A; font-size: 11.5px; font-weight: 500; padding: 4px 10px; border-radius: 999px; }
+.w-tag.demo { background: #F4F1EE; color: #7C726B; }
+
+/* Panier et adresse */
+.w-cart-item { display: flex; gap: 12px; align-items: center; background: #fff; border-radius: 18px; box-shadow: var(--card-shadow); padding: 10px; margin-bottom: 12px; }
+.w-cart-item .w-img { width: 78px; height: 78px; border-radius: 14px; flex-shrink: 0; }
+.w-cart-info { flex: 1; min-width: 0; }
+.w-cart-name { font-weight: 600; font-size: 14.5px; }
+.w-cart-resto { font-size: 12px; color: var(--gray); margin: 2px 0 6px; }
+.w-sum-row { display: flex; justify-content: space-between; font-size: 14px; color: #4F4641; padding: 6px 0; }
+.w-sum-total { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; margin-top: 8px; border-top: 1px solid var(--border); font-size: 20px; font-weight: 700; }
+.w-sum-total span:last-child { color: var(--brand); font-size: 24px; }
+.w-sheet-bottom { position: absolute; left: 0; right: 0; bottom: calc(66px + env(safe-area-inset-bottom, 0px)); padding: 12px 20px 12px; background: linear-gradient(to top, var(--cream) 78%, rgba(251, 247, 242, 0)); z-index: 30; }
+.w-row-card { display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 16px; box-shadow: var(--card-shadow); padding: 14px 16px; width: 100%; border: none; text-align: left; font-family: var(--font-body); cursor: pointer; color: var(--ink); }
+.w-row-card .ico { color: var(--brand); flex-shrink: 0; display: flex; }
+.w-pay-list { background: #fff; border-radius: 16px; box-shadow: var(--card-shadow); overflow: hidden; }
+.w-pay { display: flex; align-items: center; gap: 14px; padding: 15px 16px; width: 100%; border: none; background: #fff; font-family: var(--font-body); font-size: 14px; color: var(--ink); cursor: pointer; text-align: left; }
+.w-pay + .w-pay { border-top: 1px solid var(--border); }
+.w-pay:disabled { opacity: .45; cursor: not-allowed; }
+.w-radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #D9CEC6; display: grid; place-items: center; flex-shrink: 0; color: #fff; }
+.w-radio.on { background: var(--brand); border-color: var(--brand); }
+.w-pay-logos { margin-left: auto; display: flex; gap: 4px; }
+.w-pay-logos span { font-size: 9px; font-weight: 700; padding: 3px 5px; border-radius: 4px; color: #fff; }
+.w-note { background: var(--brand-light); color: #8C5631; border-radius: 12px; padding: 10px 12px; font-size: 12.5px; line-height: 1.45; }
+.w-warn { background: #FFF7E6; color: #8A5A00; border: 1px solid #F3DDA8; border-radius: 12px; padding: 10px 12px; font-size: 12.5px; line-height: 1.45; }
+.w-error { background: #F6E7E4; color: var(--danger); border: 1px solid #F6C9C3; border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 500; }
+.w-field-label { font-size: 12px; font-weight: 600; color: var(--gray); margin-bottom: 6px; display: block; }
+
+/* Suivi : frise verticale */
+.w-timeline { padding: 6px 4px; }
+.w-step { display: flex; gap: 16px; position: relative; padding-bottom: 28px; }
+.w-step:last-child { padding-bottom: 0; }
+.w-step::before { content: ''; position: absolute; left: 15px; top: 34px; bottom: 2px; width: 2px; background: #E8DED6; }
+.w-step.done::before { background: var(--brand); }
+.w-step:last-child::before { display: none; }
+.w-step-dot { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: #E9E1DB; color: #fff; position: relative; z-index: 1; }
+.w-step.done .w-step-dot { background: var(--brand); }
+.w-step.now .w-step-dot { background: #fff; color: var(--brand); border: 2px solid var(--brand); }
+.w-step-title { font-weight: 600; font-size: 15px; }
+.w-step:not(.done):not(.now) .w-step-title { color: #9C928B; font-weight: 500; }
+.w-step-sub { font-size: 12.5px; color: var(--gray); margin-top: 2px; line-height: 1.4; }
+.w-help { display: flex; align-items: center; gap: 14px; background: #F3EEEA; border-radius: 18px; padding: 14px 16px; }
+.w-help-call { margin-left: auto; width: 46px; height: 46px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; flex-shrink: 0; border: none; cursor: pointer; text-decoration: none; box-shadow: 0 8px 16px rgba(217, 130, 78, 0.3); }
+
+/* Profil */
+.w-profile-head { background: var(--grad-brand); color: #fff; padding: calc(env(safe-area-inset-top, 0px) + 24px) 20px 46px; text-align: center; position: relative; border-radius: 0 0 50% 50% / 0 0 32px 32px; }
+.w-avatar { width: 88px; height: 88px; border-radius: 50%; background: #fff; border: 4px solid rgba(255, 255, 255, 0.55); margin: 0 auto 10px; display: grid; place-items: center; color: #B8ADA6; overflow: hidden; }
+.w-profile-name { font-size: 18px; font-weight: 700; }
+.w-profile-mail { font-size: 13px; opacity: .9; margin-top: 2px; }
+.w-profile-gear { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 18px); right: 16px; color: #fff; }
+.w-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: -26px 20px 0; position: relative; z-index: 2; }
+.w-stat { background: #fff; border-radius: 16px; box-shadow: var(--card-shadow); padding: 12px 6px; text-align: center; }
+.w-stat b { display: block; font-size: 18px; font-weight: 700; color: var(--ink); }
+.w-stat span { font-size: 10.5px; color: var(--gray); }
+.w-menu { background: #fff; border-radius: 18px; box-shadow: var(--card-shadow); overflow: hidden; }
+.w-menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 16px; width: 100%; border: none; background: #fff; font-family: var(--font-body); font-size: 14.5px; color: var(--ink); cursor: pointer; text-align: left; }
+.w-menu-item + .w-menu-item { border-top: 1px solid #F6EEE8; }
+.w-menu-item .ico { color: var(--brand); display: flex; flex-shrink: 0; }
+.w-menu-item .chev { margin-left: auto; color: #B5AAA3; display: flex; }
+.w-menu-item small { display: block; font-size: 11.5px; color: var(--gray); margin-top: 1px; }
+.w-order-row { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; box-shadow: var(--card-shadow); padding: 12px 14px; margin-bottom: 10px; cursor: pointer; }
+.w-status { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #F3EEEA; color: #6B605A; white-space: nowrap; }
+.w-status.ok { background: #E6F0EA; color: var(--bj-green); }
+.w-status.live { background: var(--brand-light); color: var(--brand-dark); }
+.w-status.ko { background: #F6E7E4; color: var(--danger); }
+
+/* Ecran de demarrage et connexion */
+.w-splash { position: absolute; inset: 0; background: var(--grad-brand); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
+.w-splash-logo { width: 150px; height: 150px; border-radius: 38px; overflow: hidden; box-shadow: 0 20px 40px rgba(150, 50, 0, 0.35); animation: scaleIn .6s ease both; }
+.w-splash-logo img { width: 100%; height: 100%; object-fit: cover; }
+.w-splash p { font-size: 18px; font-weight: 500; line-height: 1.4; margin: 28px 0 0; animation: fadeUp .6s ease .3s both; }
+.auth-hero { background: var(--grad-brand) !important; }
+.auth-hero .food-backdrop, .auth-hero [class*="backdrop"] { display: none !important; }
+.auth-tabs .on { background: var(--brand) !important; color: #fff !important; }
+.auth-sheet { background: var(--cream) !important; }
+.auth-link { color: var(--brand) !important; }
+.field-box { background: #fff !important; border-radius: 14px !important; }
+
+/* Etats vides */
+.w-empty { text-align: center; padding: 50px 30px; color: var(--gray); }
+.w-empty .ico { width: 76px; height: 76px; border-radius: 50%; background: var(--brand-light); color: var(--brand); display: grid; place-items: center; margin: 0 auto 14px; }
+.w-empty h3 { color: var(--ink); font-size: 17px; font-weight: 700; margin: 0 0 6px; }
+.w-empty p { font-size: 13.5px; margin: 0 0 18px; }
+
+/* Squelettes de chargement */
+.w-skel { background: linear-gradient(90deg, #F5ECE5 0%, #FBF5F0 50%, #F5ECE5 100%); background-size: 200% 100%; animation: shimmer 1.3s linear infinite; border-radius: 12px; }
+
+@media (min-width: 700px) {
+  .w-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* Connexion : aplat orange net, sans voile sombre ni photos qui defilent */
+.auth-hero::after { display: none !important; }
+.auth-hero .bd-row, .auth-hero .bd-track { display: none !important; }
+.auth-slogan { text-shadow: none !important; font-weight: 700 !important; }
+.auth-points > div { background: rgba(255, 255, 255, 0.16) !important; border-color: rgba(255, 255, 255, 0.28) !important; }
+
+
+/* ── Touches aux couleurs du Benin (discretes) ───────────── */
+/* Petit trait vert-jaune-rouge sous les titres de section */
+.w-section-title { position: relative; padding-bottom: 6px; }
+.w-section-title::after { content: ''; position: absolute; left: 0; bottom: 0; width: 34px; height: 3px; border-radius: 3px; background: var(--bj-stripe); }
+/* Liseré tricolore sous l'en-tete du profil et en bas de l'ecran de demarrage */
+.w-profile-head::after { content: ''; position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: 56px; height: 4px; border-radius: 4px; background: var(--bj-stripe); opacity: .9; }
+.w-splash::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: var(--bj-stripe); opacity: .85; }
+.auth-hero::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--bj-stripe); opacity: .85; z-index: 3; }
+/* Banniere : etiquette jaune douce, comme le jaune du drapeau */
+.w-banner-tag { background: var(--bj-yellow) !important; color: #3D3420 !important; }
+/* Etats : vert du Benin pour ce qui est fait */
+.w-step.done .w-step-dot { background: var(--bj-green) !important; }
+.w-step.done::before { background: var(--bj-green) !important; }
+.w-step.now .w-step-dot { border-color: var(--brand) !important; color: var(--brand) !important; }
+.yivi-status-dot { background: var(--bj-green) !important; }
+/* Moins d'eclat general */
+.w-btn, .w-add, .w-chip.on, .w-period.on, .w-ecard-add, .w-help-call { box-shadow: 0 5px 12px rgba(217, 130, 78, 0.2) !important; }
+.w-price, .w-mcard-price, .w-ecard-price, .w-dish-price { color: var(--brand-dark) !important; }
+.fav-btn, .fav-btn.on, .dish-fav-heart { color: #BFB2A8 !important; }
+
+/* Ecran de demarrage : fond blanc conserve, accents orange adoucis */
+.w-splash { background: #FFFFFF !important; color: var(--brand-dark) !important; }
+.w-splash-logo { box-shadow: 0 14px 30px rgba(181, 101, 47, 0.16) !important; }
+.w-splash p { color: #9A6440 !important; }
+
+/* Cases a cocher : taille normale (les regles des champs texte ne s'appliquent pas) */
+input[type="checkbox"] { -webkit-appearance: auto !important; appearance: auto !important; width: 18px !important; height: 18px !important; min-height: 0 !important; padding: 0 !important; margin: 0; border-radius: 4px !important; box-shadow: none !important; flex-shrink: 0; accent-color: var(--brand); }

@@ -1,4 +1,19 @@
+# Secrets : ne jamais envoyer sur GitHub
+.env
+cle-claude.txt
+1-DEPLOYER-SERVEUR.bat
+cles/
 mobile/firebase.json
+mobile/google-services.json
+*-firebase-adminsdk-*.json
+# Donnees des clients
+front/backend/data/sauvegarde/
+recuperation/
+front/backend/uploads/
+# Fichiers generes
+node_modules/
+dist/
+APK/
+serveur/*.tgz
 mobile/build/
 mobile/.dart_tool/
-mobile/google-services.json

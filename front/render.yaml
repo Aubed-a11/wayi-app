@@ -1,0 +1,88 @@
+# Déploiement WAYI sur Render (https://render.com) via "Blueprint"
+#
+# Comment l'utiliser :
+# 1. Pousse ce projet complet sur un dépôt GitHub (voir README pour les étapes)
+# 2. Sur render.com : "New" -> "Blueprint" -> connecte ton dépôt GitHub
+# 3. Render détecte ce fichier et propose de créer les 4 services ci-dessous
+# 4. Renseigne les variables d'environnement marquées "sync: false" dans le tableau
+#    de bord Render pour chaque service (voir backend/.env.example et
+#    apps/*/.env.example pour la liste complète et les instructions)
+# 5. Clique "Apply" : les 4 services se déploient automatiquement
+
+services:
+  # ── Backend API ──────────────────────────────────────────────
+  - type: web
+    name: wayi-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URLS
+        sync: false  # à renseigner : URLs des 3 apps ci-dessous, séparées par des virgules
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: FACEBOOK_APP_ID
+        sync: false
+      - key: WEBHOOK_BASE_URL
+        sync: false  # à renseigner après le premier déploiement : l'URL de ce service
+
+  # ── App client ────────────────────────────────────────────────
+  - type: web
+    name: wayi-client
+    runtime: static
+    rootDir: apps/client
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false  # à renseigner : l'URL du service wayi-backend ci-dessus
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false
+      - key: VITE_FACEBOOK_APP_ID
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # ── App livreur ───────────────────────────────────────────────
+  - type: web
+    name: wayi-driver
+    runtime: static
+    rootDir: apps/driver
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # ── App ops (restaurant + super admin) ───────────────────────
+  - type: web
+    name: wayi-ops
+    runtime: static
+    rootDir: apps/ops
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

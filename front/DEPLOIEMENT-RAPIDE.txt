@@ -1,0 +1,27 @@
+WAYI - REDEPLOIEMENT RAPIDE PAR LIGNE DE COMMANDE
+==================================================
+Prerequis (deja faits sur votre PC) : Node.js 18+, "vercel" installe (npm install -g vercel), vercel login.
+
+1. Extraire ce zip, ouvrir un terminal (CMD ou PowerShell) DANS le dossier extrait (celui qui contient le dossier "apps").
+   Astuce : dans l'explorateur, taper "cmd" dans la barre d'adresse du dossier, puis Entree.
+
+2. Commandes (chaque commande installe, compile, deploie, puis verifie le site en ligne) :
+
+     node deploy-front.mjs client        -> www.wayibenin.com   (application client)
+     node deploy-front.mjs admin         -> admin.wayibenin.com (tableau de bord admin et restaurants)
+     node deploy-front.mjs driver        -> driver.wayibenin.com (application livreur)
+
+   Les 3 d'un coup :
+
+     deployer-tout.bat                   (ou double-clic dessus)
+
+   Raccourcis par double-clic : deployer-client.bat, deployer-dashboard.bat, deployer-livreur.bat
+
+3. Options utiles :
+     node deploy-front.mjs client --build-only     compile et controle sur le PC, sans rien envoyer
+     node deploy-front.mjs all --verify-only       verifie les 3 sites en ligne (verifier-en-ligne.bat)
+     node deploy-front.mjs client --skip-install   saute "npm install" (plus rapide)
+
+4. Apres deploiement : ouvrir le site en fenetre privee (Ctrl+Maj+N) puis Ctrl+F5.
+
+Le backend (serveur VPS) n'a pas change dans cette version : rien a faire cote serveur.

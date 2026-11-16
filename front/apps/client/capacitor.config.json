@@ -1,0 +1,41 @@
+{
+  "appId": "com.wayibenin.app",
+  "appName": "WAYI",
+  "webDir": "dist",
+  "backgroundColor": "#FBF7F1",
+  "android": {
+    "backgroundColor": "#FBF7F1",
+    "allowMixedContent": false,
+    "captureInput": true
+  },
+  "ios": {
+    "backgroundColor": "#FBF7F1",
+    "contentInset": "automatic",
+    "scheme": "WAYI"
+  },
+  "server": {
+    "androidScheme": "https",
+    "hostname": "localhost",
+    "allowNavigation": [
+      "*.kkiapay.me",
+      "kkiapay.me"
+    ]
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "native",
+      "style": "LIGHT"
+    },
+    "SplashScreen": {
+      "launchShowDuration": 900,
+      "launchAutoHide": true,
+      "backgroundColor": "#FBF7F1",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_INSIDE"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_wayi",
+      "iconColor": "#D9824E"
+    }
+  }
+}
