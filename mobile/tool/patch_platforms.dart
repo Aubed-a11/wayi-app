@@ -56,6 +56,17 @@ void _android() {
     g.writeAsStringSync(t);
   }
 
+  // L'analyse "lintVital" d'Android plante sur certains modules (image_picker) :
+  // elle ne sert qu'aux avertissements, on la desactive pour la compilation.
+  const marker = '// WAYI: lintVital desactive';
+  for (final name in ['android/build.gradle.kts', 'android/build.gradle']) {
+    final g = File(name);
+    if (!g.existsSync()) continue;
+    final t = g.readAsStringSync();
+    if (t.contains(marker)) continue;
+    g.writeAsStringSync('$t\n$marker\nsubprojects {\n    tasks.matching { it.name.startsWith("lintVital") }.configureEach { enabled = false }\n}\n');
+  }
+
   // Icone : reprise des icones WAYI deja generees
   const dens = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi'];
   for (final d in dens) {
