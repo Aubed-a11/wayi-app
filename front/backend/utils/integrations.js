@@ -65,9 +65,9 @@ const SERVICES = [
     ou: 'console.twilio.com',
   },
   {
-    id: 'firebase', label: 'Notifications push Firebase', besoin: 'conseillé',
+    id: 'firebase', label: 'Notifications push Firebase', besoin: 'inutile',
     keys: ['FIREBASE_PROJECT_ID', 'FIREBASE_CLIENT_EMAIL', 'FIREBASE_PRIVATE_KEY'],
-    pourquoi: "Alertes sur le téléphone même appli fermée : nouvelle commande (restaurant), nouvelle course (livreur), suivi (client).",
+    pourquoi: "Plus nécessaire : les notifications passent par la boîte interne du serveur, sauvegardée dans ta base de données.",
     ou: "console.firebase.google.com : créer le projet WAYI, Paramètres > Comptes de service > Générer une clé privée (project_id, client_email, private_key).",
   },
   {
