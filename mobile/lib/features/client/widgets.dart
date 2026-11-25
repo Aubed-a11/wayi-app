@@ -46,7 +46,7 @@ class FeatureCard extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(dish.name, style: h2(Colors.white), maxLines: 2, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 6),
-                    Text('${dish.restaurantName}  ·  ${dish.prepTime} min', style: font(size: 13, color: Colors.white70)),
+                    RestoLine(logo: dish.restaurantLogo, name: dish.restaurantName, suffix: '${dish.prepTime} min', color: Colors.white.withValues(alpha: 0.9), size: 22),
                   ]),
                 ),
                 const SizedBox(width: 12),
@@ -95,7 +95,7 @@ class TallCard extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(dish.name, style: font(size: 14.5, weight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 2),
-                Text(dish.restaurantName, style: small(), maxLines: 1, overflow: TextOverflow.ellipsis),
+                RestoLine(logo: dish.restaurantLogo, name: dish.restaurantName),
                 const SizedBox(height: 8),
                 Row(children: [
                   Expanded(child: Text(fcfa(dish.price), style: font(size: 14, weight: FontWeight.w800, color: C.brandDark))),
@@ -124,8 +124,8 @@ class DishRow extends StatelessWidget {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(dish.name, style: h3(), maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 4),
-                Text(dish.desc, style: small(), maxLines: 2, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 5),
+                RestoLine(logo: dish.restaurantLogo, name: dish.restaurantName),
                 const SizedBox(height: 8),
                 Row(children: [
                   Text(fcfa(dish.price), style: font(size: 14, weight: FontWeight.w800, color: C.brandDark)),

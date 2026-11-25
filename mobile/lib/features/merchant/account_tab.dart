@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/api.dart';
 import '../../core/format.dart';
@@ -21,6 +23,25 @@ class _AccountTabState extends State<AccountTab> {
   final _moov = TextEditingController();
   Map<String, dynamic>? _dash;
   bool _saving = false;
+  bool _logoBusy = false;
+
+  Future<void> _changeLogo() async {
+    final file = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 600, maxHeight: 600, imageQuality: 85);
+    if (file == null) return;
+    setState(() => _logoBusy = true);
+    try {
+      final bytes = await file.readAsBytes();
+      final n = file.name.toLowerCase();
+      final ext = n.endsWith('.png') ? 'png' : n.endsWith('.webp') ? 'webp' : 'jpg';
+      final r = await Api.instance.post('/merchants/logo', {'data': base64Encode(bytes), 'ext': ext});
+      if (mounted) toast(context, asStr(r['message'], 'Logo enregistré'));
+      await _load();
+    } on ApiException catch (e) {
+      if (mounted) toast(context, e.message);
+    } finally {
+      if (mounted) setState(() => _logoBusy = false);
+    }
+  }
 
   @override
   void initState() {
@@ -59,11 +80,31 @@ class _AccountTabState extends State<AccountTab> {
         Text('Compte', style: h1()),
         const SizedBox(height: 18),
         Row(children: [
-          Container(width: 58, height: 58, decoration: BoxDecoration(color: C.brandSoft, borderRadius: BorderRadius.circular(18)), child: const Icon(Ic.store, color: C.brandDark)),
+          GestureDetector(
+            onTap: _logoBusy ? null : _changeLogo,
+            child: Stack(children: [
+              RestoLogo(url: m['restaurantLogo'] as String?, name: asStr(m['restaurantName'], s.name), size: 64),
+              Positioned(
+                right: 0, bottom: 0,
+                child: Container(
+                  width: 24, height: 24,
+                  decoration: BoxDecoration(color: C.brand, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
+                  child: _logoBusy
+                      ? const Padding(padding: EdgeInsets.all(4), child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(Ic.camera, size: 12, color: Colors.white),
+                ),
+              ),
+            ]),
+          ),
           const SizedBox(width: 14),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(asStr(m['restaurantName'], s.name), style: h2()),
             Text('${s.name} · offre ${asStr(sub['label'], 'gratuite').toLowerCase()}', style: small()),
+            const SizedBox(height: 4),
+            GestureDetector(
+              onTap: _logoBusy ? null : _changeLogo,
+              child: Text(m['restaurantLogo'] == null ? 'Ajouter le logo du restaurant' : 'Changer le logo', style: font(size: 13, weight: FontWeight.w700, color: C.brand)),
+            ),
           ])),
         ]),
         const SizedBox(height: 28),

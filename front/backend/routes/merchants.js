@@ -430,6 +430,30 @@ router.post('/dishes/photo', auth, merchantAuth, (req, res) => {
   res.status(201).json({ url: `${base}/uploads/dishes/${name}` });
 });
 
+// POST /api/merchants/logo : logo du restaurant envoye depuis l'appli (image en base64)
+// Affiche a cote du nom du restaurant dans les menus. Enregistre dans uploads/logos.
+router.post('/logo', auth, merchantAuth, (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  if (!req.restaurant) return res.status(404).json({ error: 'Restaurant introuvable' });
+  const { data, ext } = req.body || {};
+  const type = String(ext || 'jpg').toLowerCase().replace('jpeg', 'jpg');
+  if (!['jpg', 'png', 'webp'].includes(type)) return res.status(400).json({ error: 'Format non accepté (JPG, PNG ou WebP).' });
+  const buf = Buffer.from(String(data || ''), 'base64');
+  if (buf.length < 500) return res.status(400).json({ error: 'Image vide ou illisible.' });
+  if (buf.length > 2 * 1024 * 1024) return res.status(413).json({ error: 'Logo trop lourd (2 Mo maximum).' });
+  const sig = buf.subarray(0, 12).toString('hex');
+  const isImage = sig.startsWith('ffd8ff') || sig.startsWith('89504e47') || (sig.startsWith('52494646') && buf.subarray(8, 12).toString() === 'WEBP');
+  if (!isImage) return res.status(400).json({ error: "Ce fichier n'est pas une image." });
+  const dir = path.join(__dirname, '..', 'uploads', 'logos');
+  fs.mkdirSync(dir, { recursive: true });
+  const name = `${req.restaurant.id}-${uuidv4()}.${type}`;
+  fs.writeFileSync(path.join(dir, name), buf);
+  const base = (process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`).replace(/\/+$/, '');
+  req.restaurant.logo = `${base}/uploads/logos/${name}`;
+  res.status(201).json({ url: req.restaurant.logo, message: 'Logo enregistré' });
+});
+
 // GET /api/merchants/subscription/plans
 router.get('/subscription/plans', (req, res) => {
   res.json({ plans: PLATFORM_CONFIG.subscriptionPlans });

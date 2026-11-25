@@ -120,7 +120,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         const SizedBox(height: 10),
                         Text(d.name, style: font(size: 14.5, weight: FontWeight.w700), maxLines: 2, overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 3),
-                        Text(d.restaurantName, style: small(), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        RestoLine(logo: d.restaurantLogo, name: d.restaurantName),
                         const SizedBox(height: 5),
                         Text(fcfa(d.price), style: font(size: 14, weight: FontWeight.w800)),
                       ]),

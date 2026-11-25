@@ -12,6 +12,7 @@ class Dish {
   final String taste;
   final String restaurantId;
   final String restaurantName;
+  final String? restaurantLogo;
   final String? restaurantTagline;
   final String prepTime;
   final List<String> composition;
@@ -22,7 +23,7 @@ class Dish {
   Dish({
     required this.id, required this.name, required this.desc, required this.price, this.image,
     required this.period, required this.category, required this.taste,
-    required this.restaurantId, required this.restaurantName, this.restaurantTagline,
+    required this.restaurantId, required this.restaurantName, this.restaurantLogo, this.restaurantTagline,
     required this.prepTime, this.composition = const [], this.advantages = const [],
     this.demo = false, this.popular = false,
   });
@@ -42,6 +43,7 @@ class Dish {
       taste: asStr(j['taste']),
       restaurantId: asStr(j['restaurantId']),
       restaurantName: asStr(r['name'] ?? j['restaurantName'], 'Restaurant'),
+      restaurantLogo: (r['logo'] is String && (r['logo'] as String).isNotEmpty) ? r['logo'] as String : null,
       restaurantTagline: r['tagline'] as String?,
       prepTime: asStr(r['prepTime'], '20-30'),
       composition: _lines(j['characteristics']),

@@ -304,3 +304,57 @@ class StatusPill extends StatelessWidget {
         child: Text(label, style: font(size: 11.5, weight: FontWeight.w700, color: color)),
       );
 }
+
+/// Logo du restaurant (rond). Sans logo envoye : ses initiales sur une couleur fixe.
+class RestoLogo extends StatelessWidget {
+  final String? url;
+  final String name;
+  final double size;
+  const RestoLogo({super.key, this.url, required this.name, this.size = 22});
+
+  static const _colors = [Color(0xFFF2690D), Color(0xFF1E9E5A), Color(0xFF2F7BE5), Color(0xFF8B4FD8), Color(0xFFD9467A), Color(0xFFE59A00), Color(0xFF0F8A8A)];
+
+  String get _initials {
+    final words = name.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty && w.length > 2).toList();
+    if (words.isEmpty) return name.isNotEmpty ? name[0].toUpperCase() : 'W';
+    return words.take(2).map((w) => w[0].toUpperCase()).join();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _colors[name.codeUnits.fold<int>(0, (a, b) => a + b) % _colors.length];
+    final fallback = Container(
+      color: color,
+      alignment: Alignment.center,
+      child: Text(_initials, style: font(size: size * 0.38, weight: FontWeight.w800, color: Colors.white)),
+    );
+    return Container(
+      width: size, height: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white, width: size > 30 ? 2 : 1.2), boxShadow: const [BoxShadow(color: Color(0x1A000000), blurRadius: 4)]),
+      child: ClipOval(
+        child: (url == null || url!.isEmpty)
+            ? fallback
+            : CachedNetworkImage(imageUrl: url!, fit: BoxFit.cover, placeholder: (_, __) => fallback, errorWidget: (_, __, ___) => fallback),
+      ),
+    );
+  }
+}
+
+/// Logo + nom du restaurant sur une ligne
+class RestoLine extends StatelessWidget {
+  final String? logo;
+  final String name;
+  final Color? color;
+  final double size;
+  final String? suffix;
+  const RestoLine({super.key, this.logo, required this.name, this.color, this.size = 18, this.suffix});
+  @override
+  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
+        RestoLogo(url: logo, name: name, size: size),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(suffix == null ? name : '$name  ·  $suffix', maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: font(size: 12.5, weight: FontWeight.w600, color: color ?? C.muted)),
+        ),
+      ]);
+}

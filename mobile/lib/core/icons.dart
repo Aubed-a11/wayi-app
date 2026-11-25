@@ -5,7 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class Ic {
   static const IconData home = LucideIcons.house;
   static const IconData search = LucideIcons.search;
-  static const IconData yivi = LucideIcons.sparkles;
+  static const IconData yivi = LucideIcons.chefHat;
   static const IconData bag = LucideIcons.shoppingBag;
   static const IconData user = LucideIcons.user;
   static const IconData mail = LucideIcons.mail;

@@ -44,8 +44,8 @@ class _DishScreenState extends State<DishScreen> {
               Text(d.name, style: h1()),
               const SizedBox(height: 10),
               Row(children: [
-                const Icon(Ic.store, size: 15, color: C.muted),
-                const SizedBox(width: 6),
+                RestoLogo(url: d.restaurantLogo, name: d.restaurantName, size: 24),
+                const SizedBox(width: 8),
                 Flexible(child: Text(d.restaurantName, style: font(size: 14, weight: FontWeight.w600, color: C.ink2), overflow: TextOverflow.ellipsis)),
                 const SizedBox(width: 14),
                 const Icon(Ic.clock, size: 15, color: C.muted),
@@ -79,7 +79,7 @@ class _DishScreenState extends State<DishScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: cardBox(radius: R.md),
                   child: Row(children: [
-                    Container(width: 44, height: 44, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)), child: const Icon(Ic.store, size: 20, color: C.brandDark)),
+                    RestoLogo(url: d.restaurantLogo, name: d.restaurantName, size: 48),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(d.restaurantName, style: h3()),
