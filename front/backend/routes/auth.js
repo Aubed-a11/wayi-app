@@ -69,7 +69,12 @@ router.post('/login-any', async (req, res) => {
 // POST /api/auth/register/start — envoie un code de vérification par e-mail
 router.post('/register/start', async (req, res) => {
   try {
-    const { name, phone, email, password } = req.body;
+    const { name, phone, email, password, promoCode } = req.body;
+    const { findPromo, normPromo } = require('../services/promo');
+    const promo = promoCode && String(promoCode).trim() ? findPromo(promoCode) : null;
+    if (promoCode && String(promoCode).trim() && !promo) {
+      return res.status(400).json({ error: "Ce code promo n'existe pas ou n'est plus valable. Vérifie-le, ou laisse le champ vide." });
+    }
     if (!name || !email || !password)
       return res.status(400).json({ error: 'Nom, e-mail et mot de passe requis' });
 
@@ -79,7 +84,7 @@ router.post('/register/start', async (req, res) => {
       return res.status(409).json({ error: 'Cet e-mail est déjà enregistré' });
 
     const hashed = await bcrypt.hash(password, 10);
-    const code = createPendingRegistration(email, { name, phone, email, password: hashed });
+    const code = createPendingRegistration(email, { name, phone, email, password: hashed, promo: promo ? { code: normPromo(promo.code), percent: promo.percent } : null });
 
     const emailResult = await sendEmail({
       to: email,
@@ -125,8 +130,9 @@ router.post('/register/verify', async (req, res) => {
       return res.status(400).json({ error: 'Code incorrect' });
     }
 
-    const { name, phone, password } = pending.data;
+    const { name, phone, password, promo } = pending.data;
     const newUser = {
+      ...(promo ? { promo: { ...promo, addedAt: new Date().toISOString() } } : {}),
       id: uuidv4(), name, phone, email,
       password, avatar: name[0].toUpperCase(),
       city: 'Abomey-Calavi', addresses: [], favoriteDishes: [],

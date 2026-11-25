@@ -47,6 +47,11 @@ const FAQ = [
     answer: () => `Pour l'instant on livre Cotonou, Abomey-Calavi et leurs environs, jusqu'à ${cfg.maxDeliveryKm} km du restaurant. Au moment de commander, tu places l'épingle sur la carte : si ton point est trop loin, l'appli te le dit avant de payer.`,
   },
   {
+    id: 'promo', sujet: 'Code promo',
+    re: /(code|coupon).{0,12}(promo|reduc|remise)|(promo|reduction|remise|reduc).{0,20}(premiere|1ere|inscription|bienvenue)/,
+    answer: () => `À l'inscription, tu peux saisir un code promo : il te donne une réduction sur le prix des plats de ta première commande (par exemple -20 %). La réduction apparaît dans le récapitulatif avant de payer. Si ta première commande est annulée, elle reste valable pour la suivante.`,
+  },
+  {
     id: 'frais', sujet: 'Frais de livraison',
     re: /(frais|cout|coute|prix|combien|tarif).{0,25}(livraison|livrer|livreur|deplacement)|(livraison|delivery).{0,15}(gratuite|offerte|payante|combien|cher|prix)/,
     answer: () => `Les frais dépendent de la distance : ${fmt(cfg.deliveryPerKm)} par kilomètre entre le restaurant et toi (par exemple ${fmt(cfg.deliveryPerKm * 4)} pour 4 km). Si ton panier vient de deux restaurants, il y a deux livraisons, donc deux frais. Avec un abonnement WAYI, la livraison est offerte. Le montant exact s'affiche dans ton panier une fois ton point choisi.`,

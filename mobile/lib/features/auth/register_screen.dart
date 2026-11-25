@@ -25,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _confirm = TextEditingController();
+  final _promo = TextEditingController();
   final _code = TextEditingController();
   String _vehicle = 'moto';
   bool _loading = false;
@@ -40,7 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    for (final c in [_name, _restaurant, _phone, _zone, _plate, _email, _password, _confirm, _code]) {
+    for (final c in [_name, _restaurant, _phone, _zone, _plate, _email, _password, _confirm, _promo, _code]) {
       c.dispose();
     }
     super.dispose();
@@ -65,6 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Map<String, dynamic> get _form => {
+        'promoCode': _promo.text.trim(),
         'name': _name.text.trim(), 'restaurantName': _restaurant.text.trim(), 'phone': _phone.text.trim(),
         'zone': _zone.text.trim(), 'vehicleType': _vehicle, 'vehiclePlate': _plate.text.trim(),
         'email': _email.text.trim(), 'password': _password.text,
@@ -230,6 +232,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Field(label: 'Mot de passe', icon: Ic.lock, controller: _password, hint: 'Au moins 6 caractères', password: true, autofill: const [AutofillHints.newPassword]),
       gap,
       Field(label: 'Confirmer le mot de passe', icon: Ic.lock, controller: _confirm, hint: 'Retape ton mot de passe', password: true, action: TextInputAction.done, onSubmitted: (_) => _sendCode()),
+      if (_role == Role.client) ...[
+        gap,
+        Field(label: 'Code promo (facultatif)', icon: Ic.ticket, controller: _promo, hint: 'Ex : WAYI20', helper: 'Une réduction sur ta première commande.', action: TextInputAction.done, onSubmitted: (_) => _sendCode()),
+      ],
       const SizedBox(height: 20),
       if (_error != null) ...[Notice(_error!), const SizedBox(height: 16)],
       PrimaryButton(

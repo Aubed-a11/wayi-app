@@ -209,12 +209,18 @@ function cartSummary(user, cart, pos = null) {
   const farthest = Math.max(0, ...restaurants.map(r => r._km || 0));
   restaurants.forEach(r => delete r._km);
   const fees = restaurants.reduce((s, r) => s + r.frais_livraison, 0);
+  const { welcomeDiscount, discountAmount } = require('../promo');
+  const promo = welcomeDiscount(user);
+  const reduction = promo ? restaurants.reduce((sum, r) => sum + discountAmount(promo, r.sous_total), 0) : 0;
   return {
     vide: cart.length === 0,
     restaurants,
     sous_total: subtotal,
     frais_livraison: fees,
-    total: subtotal + fees,
+    total: subtotal + fees - reduction,
+    reduction: reduction || undefined,
+    code_promo: reduction ? promo.code : undefined,
+    code_promo_libelle: reduction ? promo.label : undefined,
     livraison_gratuite_abonnement: freeDelivery,
     hors_zone: outOfZone(farthest) ? outOfZoneMessage(farthest) : undefined,
     adresse_livraison: addr ? [addr.label, addr.address, addr.landmark].filter(Boolean).join(' - ') : null,

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, ArrowRight, AlertCircle, CheckCircle2, MailCheck, KeyRound, Store, Bike, Phone, MapPin, Hash, ShieldCheck, UtensilsCrossed } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, ArrowRight, AlertCircle, CheckCircle2, MailCheck, KeyRound, Store, Bike, Phone, MapPin, Hash, ShieldCheck, UtensilsCrossed, BadgePercent } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Spinner } from '../components/UI';
 import { authAPI, signupAPI, menuAPI } from '../api';
@@ -39,7 +39,7 @@ export default function LoginScreen() {
   useEffect(() => {
     menuAPI.get({}).then(r => setPhotos((r.data?.dishes || []).map(d => d.image).filter(Boolean))).catch(() => {});
   }, []);
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', restaurantName: '', phone: '', zone: '', vehicleType: 'moto', vehiclePlate: '' });
+  const [form, setForm] = useState({ promoCode: '', name: '', email: '', password: '', confirmPassword: '', restaurantName: '', phone: '', zone: '', vehicleType: 'moto', vehiclePlate: '' });
   // Profil choisi a l'inscription : client, restaurant ou livreur
   const [role, setRole] = useState('client');
   // Plusieurs espaces pour les memes identifiants : on demande lequel ouvrir
@@ -387,6 +387,7 @@ export default function LoginScreen() {
             )}
             {mode === 'login' && <button type="button" className="a7-link right" onClick={() => go('forgot')}>Mot de passe oublié ?</button>}
             {mode === 'register' && field({ label: 'Confirmer le mot de passe', Icon: Lock, k: 'confirmPassword', password: true, placeholder: 'Retape ton mot de passe', autoComplete: 'new-password', onEnter: handleSubmit })}
+            {mode === 'register' && role === 'client' && field({ label: 'Code promo (facultatif)', Icon: BadgePercent, k: 'promoCode', placeholder: 'Ex : WAYI20', hint: 'Une réduction sur ta première commande.', onEnter: handleSubmit })}
 
             {mode === 'verify' && (
               <>

@@ -105,7 +105,8 @@ export default function CartScreen() {
     ? (quote.outOfZoneMessage || "Ta position actuelle est hors de la zone de livraison (Cotonou, Calavi et environs). Choisis le point de livraison sur la carte à l'étape suivante.")
     : '';
   const estimatedDeliveryFee = outOfZone ? 0 : exact ? quote.deliveryFee : restaurantCount * DELIVERY_FEE_ESTIMATE;
-  const total = cartTotal + estimatedDeliveryFee;
+  const discount = exact && !outOfZone ? (quote.discount || 0) : 0;
+  const total = cartTotal + estimatedDeliveryFee - discount;
 
   const validatePaymentDetails = (payMethod) => {
     if (payMethod === 'mtn_momo' || payMethod === 'moov') {
@@ -243,6 +244,11 @@ export default function CartScreen() {
         <span>Livraison{restaurantCount > 1 ? ` (${restaurantCount} restaurants)` : ''}</span>
         <span>{outOfZone ? 'Hors zone' : exact ? (estimatedDeliveryFee ? fcfa(estimatedDeliveryFee) : 'Offerte') : `env. ${fcfa(estimatedDeliveryFee)}`}</span>
       </div>
+      {discount > 0 && (
+        <div className="w-sum-row" style={{ color: '#1E9E5A', fontWeight: 700 }}>
+          <span>Réduction {quote.promoCode} ({quote.promoLabel || 'première commande'})</span><span>- {fcfa(discount)}</span>
+        </div>
+      )}
       <div className="w-sum-total"><span>{exact && !outOfZone ? 'Total' : 'Total estimé'}</span><span>{fcfa(total)}</span></div>
       {outOfZone && step === 'cart' && <p className="w-hint" style={{ marginTop: 8, fontSize: 12.5, color: '#8A909C' }}>Ta position actuelle est hors zone. Tu choisiras le point de livraison à l'étape suivante, les frais seront calculés à ce moment.</p>}
     </div>

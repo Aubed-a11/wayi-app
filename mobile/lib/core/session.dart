@@ -141,7 +141,10 @@ class Session extends ChangeNotifier {
           'zone': form['zone'], 'vehicleType': form['vehicleType'], 'vehiclePlate': form['vehiclePlate'],
         });
       default:
-        return Api.instance.post('/auth/register/start', {'name': form['name'], 'email': form['email'], 'password': form['password']});
+        return Api.instance.post('/auth/register/start', {
+          'name': form['name'], 'email': form['email'], 'password': form['password'],
+          if ((form['promoCode'] ?? '').toString().isNotEmpty) 'promoCode': form['promoCode'],
+        });
     }
   }
 

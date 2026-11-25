@@ -261,6 +261,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         const SizedBox(height: 12),
         _row('Sous-total', fcfa(cart.subtotal)),
         _row('Livraison', _pos == null ? 'Choisis un point' : _quoting ? 'Calcul...' : outOfZone ? 'Hors zone' : (_quote?['freeDelivery'] == true ? 'Offerte' : fcfa(fee))),
+        if (!outOfZone && asNum(_quote?['discount']) > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Row(children: [
+              const Icon(Ic.ticket, size: 16, color: C.success),
+              const SizedBox(width: 6),
+              Expanded(child: Text('Réduction ${_quote?['promoCode'] ?? ''}', style: font(size: 14, weight: FontWeight.w700, color: C.success))),
+              Text('- ${fcfa(asNum(_quote?['discount']))}', style: font(size: 14, weight: FontWeight.w800, color: C.success)),
+            ]),
+          ),
         const Divider(height: 24),
         _row('Total', fcfa(total), bold: true),
         if (_error != null) ...[const SizedBox(height: 18), Notice(_error!)],

@@ -73,13 +73,18 @@ router.post('/', auth, (req, res) => {
     if (outOfZone(far)) return res.status(422).json({ error: outOfZoneMessage(far), outOfZone: true });
   }
 
+  // Code promo de bienvenue : premiere commande uniquement (toutes les commandes de ce panier)
+  const { welcomeDiscount, discountAmount } = require('../services/promo');
+  const promo = welcomeDiscount(buyer);
+
   for (const [restaurantId, dishItems] of Object.entries(groups)) {
     const restaurant = getRestaurantById(restaurantId);
     const subtotal = dishItems.reduce((s, i) => s + i.dish.price * i.qty, 0);
 
     const distKm = lat && lng ? calcDistance(lat, lng, restaurant.lat, restaurant.lng) : 2;
     const deliveryFee = hasActiveSubscription ? 0 : calcDeliveryFee(distKm);
-    const total = subtotal + deliveryFee;
+    const discount = discountAmount(promo, subtotal);
+    const total = subtotal + deliveryFee - discount;
 
     const order = {
       id: `WY-${new Date().getFullYear()}-${String(orders.length + 1).padStart(4, '0')}`,
@@ -94,6 +99,8 @@ router.post('/', auth, (req, res) => {
       subtotal,
       deliveryFee,
       freeDeliveryApplied: hasActiveSubscription,
+      discount,
+      promoCode: discount > 0 ? promo.code : null,
       total,
       address: address || 'Adresse par défaut',
       landmark: landmark ? String(landmark).trim().slice(0, 200) : '',
@@ -145,7 +152,7 @@ router.post('/quote', auth, (req, res) => {
   const cart = sanitizeCart((req.body?.items || []).map(i => ({ id: i.dishId, qty: i.qty })));
   const { point } = require('../utils/tracking');
   const s = cartSummary(user, cart, point(req.body?.lat, req.body?.lng));
-  res.json({ outOfZone: !!s.hors_zone, outOfZoneMessage: s.hors_zone || null, subtotal: s.sous_total, deliveryFee: s.frais_livraison, total: s.total, freeDelivery: s.livraison_gratuite_abonnement, restaurants: s.restaurants.map(r => ({ name: r.restaurant, deliveryFee: r.frais_livraison })) });
+  res.json({ outOfZone: !!s.hors_zone, outOfZoneMessage: s.hors_zone || null, subtotal: s.sous_total, deliveryFee: s.frais_livraison, discount: s.reduction || 0, promoCode: s.code_promo || null, promoLabel: s.code_promo_libelle || null, total: s.total, freeDelivery: s.livraison_gratuite_abonnement, restaurants: s.restaurants.map(r => ({ name: r.restaurant, deliveryFee: r.frais_livraison })) });
 });
 
 // GET /api/orders/:id — détail + suivi
