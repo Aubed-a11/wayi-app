@@ -13,6 +13,14 @@ WAYI : DEMARRER EN 3 ETAPES
 Tester tout sur le PC sans toucher au serveur : LANCER-EN-LOCAL.bat
 Aucun Firebase a configurer : les notifications passent par le serveur WAYI.
 
+METTRE LES SITES EN LIGNE (client, admin, livreur)
+  www.wayibenin.com, admin.wayibenin.com et driver.wayibenin.com sont sur Vercel.
+  Automatique depuis GitHub : creer un jeton sur vercel.com/account/tokens, l'ajouter
+  dans le depot (Settings, Secrets and variables, Actions) sous le nom VERCEL_TOKEN,
+  puis Actions, "Deployer les sites WAYI", Run workflow. Ensuite, chaque changement
+  d'un site le remet en ligne tout seul, et le resultat est verifie.
+  Depuis le PC : 2-DEPLOYER-FRONT.bat (il faut "npm install -g vercel" puis "vercel login").
+
 PUBLIER SUR LE PLAY STORE ET L'APP STORE
 ========================================
 Tout est pret dans le depot : textes, icones et reponses aux questionnaires dans

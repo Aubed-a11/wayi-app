@@ -1,0 +1,55 @@
+# Deploie les trois sites WAYI sur Vercel et verifie qu'ils marchent :
+#   client  -> https://www.wayibenin.com     (projet Vercel wayi-client)
+#   admin   -> https://admin.wayibenin.com   (projet Vercel wayi-admin : administration et restaurants)
+#   livreur -> https://driver.wayibenin.com  (projet Vercel wayi-driver)
+# Prerequis : secret VERCEL_TOKEN (vercel.com/account/tokens, portee : ton equipe).
+# Lancement : automatique quand un site change, ou Actions > "Deployer les sites WAYI" > Run workflow.
+name: Deployer les sites WAYI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['front/apps/**', '.github/workflows/deployer-sites.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  deployer:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [client, admin, driver]
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_SCOPE: ${{ vars.VERCEL_SCOPE || 'aubed-a11s-projects' }}
+      WAYI_API_URL: https://api.wayibenin.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Secret VERCEL_TOKEN present ?
+        if: env.VERCEL_TOKEN == ''
+        run: |
+          echo "Le secret VERCEL_TOKEN manque : ajoute-le dans Settings > Secrets and variables > Actions."
+          exit 1
+      - name: Deployer ${{ matrix.app }}
+        working-directory: front
+        run: |
+          npm install -g vercel@latest --silent
+          case "${{ matrix.app }}" in
+            client) DIR=apps/client; PROJECT=wayi-client ;;
+            admin)  DIR=apps/ops;    PROJECT=wayi-admin ;;
+            driver) DIR=apps/driver; PROJECT=wayi-driver ;;
+          esac
+          cd "$DIR"
+          vercel link --yes --project "$PROJECT" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"
+          vercel deploy --prod --yes --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN" --build-env VITE_API_URL="$WAYI_API_URL"
+      - name: Verifier le site en ligne
+        working-directory: front
+        run: |
+          sleep 20
+          node deploy-front.mjs ${{ matrix.app }} --verify-only
