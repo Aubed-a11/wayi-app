@@ -3,7 +3,7 @@
 // GET /api/menu?period=dejeuner&category=healthy&search=riz
 // ============================================================
 const express = require('express');
-const { PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, getMenu, getDishById, enrichDish, users, orders, restaurants } = require('../data/store');
+const { PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, getMenu, getDishById, enrichDish, users, orders, restaurants, dishes } = require('../data/store');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -88,6 +88,59 @@ router.get('/restaurant-of-week', (req, res) => {
     ordersCount: best[1].orders,
     periodDays: 7,
   });
+});
+
+// GET /api/menu/top-restaurants : restaurants phares, classes par nombre de plats vendus
+// (commandes livrees, sinon commandes non annulees), puis par favoris des clients.
+// Sans aucune vente : restaurants qui ont le plus de plats au menu.
+router.get('/top-restaurants', (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 8, 20);
+  const sold = {};
+  const add = (list) => {
+    for (const o of list) {
+      if (!o.restaurantId) continue;
+      const s = sold[o.restaurantId] || (sold[o.restaurantId] = { dishes: 0, orders: 0, byDish: {} });
+      s.orders += 1;
+      for (const it of o.items || []) {
+        const q = Number(it.qty) || 1;
+        s.dishes += q;
+        if (it.dishId) s.byDish[it.dishId] = (s.byDish[it.dishId] || 0) + q;
+      }
+    }
+  };
+  add(orders.filter(o => o.status === 'delivered'));
+  if (!Object.keys(sold).length) add(orders.filter(o => o.status !== 'cancelled'));
+
+  const favs = {};
+  for (const u of users) {
+    for (const rid of u.favoriteRestaurants || []) favs[rid] = (favs[rid] || 0) + 1;
+    for (const did of u.favoriteDishes || []) {
+      const d = getDishById(did);
+      if (d) favs[d.restaurantId] = (favs[d.restaurantId] || 0) + 1;
+    }
+  }
+
+  const list = restaurants
+    .filter(r => r.active !== false)
+    .map(r => {
+      const menu = dishes.filter(d => d.restaurantId === r.id && d.available !== false);
+      if (!menu.length) return null;
+      const s = sold[r.id] || { dishes: 0, orders: 0, byDish: {} };
+      const bestId = Object.entries(s.byDish).sort((a, b) => b[1] - a[1])[0]?.[0];
+      const best = menu.find(d => d.id === bestId) || menu.find(d => d.image) || menu[0];
+      return {
+        restaurant: { id: r.id, name: r.name, logo: r.logo || null, tagline: r.tagline || '', rating: r.rating || null, verified: !!r.verified, zone: r.zone || '' },
+        dishesSold: s.dishes,
+        ordersCount: s.orders,
+        favorites: favs[r.id] || 0,
+        menuCount: menu.length,
+        topDish: best ? { id: best.id, name: best.name, image: best.image || null, price: best.price } : null,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => (b.dishesSold - a.dishesSold) || (b.favorites - a.favorites) || ((b.restaurant.rating || 0) - (a.restaurant.rating || 0)) || (b.menuCount - a.menuCount))
+    .slice(0, limit);
+  res.json({ restaurants: list });
 });
 
 // GET /api/menu/:id — détail d'un plat

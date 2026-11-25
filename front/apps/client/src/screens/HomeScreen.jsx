@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav } from '../components/UI';
 import { PERIODS, MenuCard, toCartItem, Empty } from '../components/Wayi';
 import AddressSheet from '../components/AddressSheet';
+import TopRestaurants from '../components/TopRestaurants';
 import { menuAPI, ordersAPI } from '../api';
 
 function currentPeriodId() {
@@ -101,6 +102,9 @@ export default function HomeScreen() {
             </div>
             {bannerImg && <div className="w-banner-img" style={{ backgroundImage: `url("${bannerImg}")` }} />}
           </div>
+
+          {/* Restaurants phares (les plus vendus) */}
+          <TopRestaurants dishes={dishes} onOpenDish={openDish} onAdd={addToCart} />
 
           {/* Creneaux */}
           <div className="w-periods" style={{ marginTop: 18 }}>

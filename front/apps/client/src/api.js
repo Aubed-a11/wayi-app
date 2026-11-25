@@ -70,6 +70,7 @@ export const menuAPI = {
   dish: (id) => api.get(`/menu/${id}`),
   recommendations: () => api.get('/menu/recommendations'),
   restaurantOfWeek: () => api.get('/menu/restaurant-of-week'),
+  topRestaurants: (limit = 8) => api.get('/menu/top-restaurants', { params: { limit } }),
 };
 
 export const aiAPI = {

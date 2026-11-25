@@ -86,13 +86,21 @@ await p.close();
   await w.screenshot({ path: `${OUT}/41-site-connexion.png` }); console.log('  capture 41-site-connexion');
   await clickText('Inscription'); await sleep(2500);
   await w.screenshot({ path: `${OUT}/42-site-inscription.png` }); console.log('  capture 42-site-inscription');
+  if (client) {
+    await w.evaluate((t) => localStorage.setItem('wayi_token', t), client.token);
+    await w.goto('http://localhost:8081', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await sleep(6000);
+    await w.screenshot({ path: `${OUT}/43-site-accueil-connecte.png` }); console.log('  capture 43-site-accueil-connecte');
+    await w.evaluate(() => window.scrollBy(0, 600)); await w.evaluate(() => document.querySelector('.w-scroll')?.scrollBy(0, 560)); await sleep(1500);
+    await w.screenshot({ path: `${OUT}/44-site-restaurants-phares.png` }); console.log('  capture 44-site-restaurants-phares');
+  }
   await w.close();
 }
 
 if (client) {
   p = await open({ token: client.token, role: 'client', name: client.name });
   await shot(p, '10-client-accueil');
-  await scroll(p, 700); await shot(p, '11-client-accueil-suite');
+  await scroll(p, 620); await shot(p, '11-client-accueil-suite');
   await scroll(p, 900); await shot(p, '12-client-accueil-bas');
   await tap(p, tabX(1, 5), navY); await shot(p, '13-client-explorer');
   await tap(p, tabX(2, 5), navY); await shot(p, '14-client-yivi');
