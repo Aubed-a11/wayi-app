@@ -19,35 +19,68 @@ class ProfileScreen extends StatelessWidget {
     final s = context.watch<Session>();
     final u = s.user ?? const {};
     final addresses = (u['addresses'] as List? ?? []).whereType<Map>().toList();
-    return SafeArea(
-      bottom: false,
-      child: RefreshIndicator(
+    final top = MediaQuery.of(context).padding.top;
+    final orders = asNum(u['ordersCount']).toInt();
+    return RefreshIndicator(
         color: C.brand,
         onRefresh: () => s.refreshUser(),
-        child: ListView(padding: const EdgeInsets.fromLTRB(20, 14, 20, 110), children: [
-          Text('Profil', style: h1()),
-          const SizedBox(height: 20),
-          Row(children: [
-            Container(
-              width: 62, height: 62, alignment: Alignment.center,
-              decoration: const BoxDecoration(color: C.brandSoft, shape: BoxShape.circle),
-              child: Text(s.name.isNotEmpty ? s.name[0].toUpperCase() : 'W', style: h2(C.brandDark)),
+        child: ListView(padding: const EdgeInsets.only(bottom: 110), children: [
+          // En-tete degrade : avatar, nom, e-mail
+          Container(
+            padding: EdgeInsets.fromLTRB(20, top + 18, 20, 70),
+            decoration: const BoxDecoration(gradient: brandGradient, borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
+            child: Row(children: [
+              Container(
+                width: 68, height: 68, alignment: Alignment.center,
+                decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 14, offset: const Offset(0, 6))]),
+                child: Text(s.name.isNotEmpty ? s.name[0].toUpperCase() : 'W', style: h1(C.brand)),
+              ),
+              const SizedBox(width: 16),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(s.name, style: h2(Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(asStr(u['email']), style: font(size: 13, weight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.88)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                if (asStr(u['phone']).isNotEmpty) Text(asStr(u['phone']), style: font(size: 13, weight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.88))),
+              ])),
+            ]),
+          ),
+          // Chiffres dans une carte qui chevauche l'en-tete
+          Transform.translate(
+            offset: const Offset(0, -46),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: cardBox(radius: 22),
+                child: Row(children: [
+                  _Stat(value: '$orders', label: 'Commandes', icon: Ic.receipt),
+                  Container(width: 1, height: 40, color: C.line),
+                  _Stat(value: '${asNum(u['loyaltyPoints']).toInt()}', label: 'Points', icon: Ic.star),
+                  Container(width: 1, height: 40, color: C.line),
+                  _Stat(value: u['subscription'] != null ? 'Actif' : 'Aucun', label: 'Abonnement', icon: Ic.ticket),
+                ]),
+              ),
             ),
-            const SizedBox(width: 16),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(s.name, style: h2()),
-              Text(asStr(u['email']), style: small()),
-            ])),
-          ]),
-          const SizedBox(height: 22),
-          Row(children: [
-            _Stat(value: '${asNum(u['ordersCount']).toInt()}', label: 'Commandes'),
-            const SizedBox(width: 10),
-            _Stat(value: '${asNum(u['loyaltyPoints']).toInt()}', label: 'Points'),
-            const SizedBox(width: 10),
-            _Stat(value: u['subscription'] != null ? 'Actif' : 'Non', label: 'Abonnement'),
-          ]),
-          const SizedBox(height: 28),
+          ),
+          if (u['promo'] != null && orders == 0)
+            Transform.translate(
+              offset: const Offset(0, -30),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(color: C.successSoft, borderRadius: BorderRadius.circular(18)),
+                  child: Row(children: [
+                    const Icon(Ic.ticket, color: C.success, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(child: Text('Code ${asStr((u['promo'] as Map)['code'])} : -${asNum((u['promo'] as Map)['percent']).toInt()} % sur ta première commande.', style: font(size: 13.5, weight: FontWeight.w700, color: C.success))),
+                  ]),
+                ),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
             Expanded(child: Text('Mes adresses', style: h3())),
             TextButton.icon(
@@ -93,11 +126,10 @@ class ProfileScreen extends StatelessWidget {
           _Tile(icon: Ic.logout, title: 'Se déconnecter', danger: true, onTap: () => s.logout()),
           _Tile(icon: Ic.trash, title: 'Supprimer mon compte', danger: true, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DeleteAccountScreen()))),
           const SizedBox(height: 26),
-          Center(child: Column(children: [
-            Text('WAYI Bénin · version 1.0', style: small()),
-          ])),
+          Center(child: Text('WAYI Bénin · version 1.0', style: small())),
+            ]),
+          ),
         ]),
-      ),
     );
   }
 
@@ -149,14 +181,16 @@ class ProfileScreen extends StatelessWidget {
 
 class _Stat extends StatelessWidget {
   final String value, label;
-  const _Stat({required this.value, required this.label});
+  final IconData icon;
+  const _Stat({required this.value, required this.label, required this.icon});
   @override
   Widget build(BuildContext context) => Expanded(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: cardBox(radius: R.md),
-          child: Column(children: [Text(value, style: h3()), const SizedBox(height: 2), Text(label, style: small())]),
-        ),
+        child: Column(children: [
+          Icon(icon, size: 18, color: C.brand),
+          const SizedBox(height: 6),
+          Text(value, style: h3()),
+          Text(label, style: small()),
+        ]),
       );
 }
 
