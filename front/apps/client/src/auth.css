@@ -234,7 +234,7 @@
    v8 : en-tete vivant (degrade orange -> rouge sombre, plats qui defilent)
    ============================================================ */
 .a7 { background: #F5F6F8; }
-.a7 .a7-hero { background: linear-gradient(165deg, #F9A15A 0%, #F58A3D 40%, #C2462B 82%, #8E2318 100%); color: #fff;
+.a7 .a7-hero, .a7 .a7-hero.small { background: linear-gradient(165deg, #F9A15A 0%, #F58A3D 40%, #C2462B 82%, #8E2318 100%) !important; color: #fff;
   padding-bottom: 70px; border-radius: 0 0 32px 32px; }
 .a7 .a7-hero .a7-title h1, .a7 .a7-hero .a7-title h1 span { color: #fff; }
 .a7 .a7-hero .a7-title p { color: rgba(255, 255, 255, 0.88); }
@@ -257,3 +257,4 @@
 .a7 .a7-blob { display: none; }
 .a7 .a7-tabs-pill { background: linear-gradient(90deg, #F58A3D, #C2462B) !important; }
 .a7 .a7-cta { background: linear-gradient(90deg, #F58A3D 0%, #D85A2E 60%, #A8321F 100%) !important; border: 0 !important; }
+.a7 .a7-hero .a7-title h1 span::after { background: rgba(255, 255, 255, 0.28); }
