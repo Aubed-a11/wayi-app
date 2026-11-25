@@ -10,7 +10,9 @@ const IMG = (slug) => `${SITE}/plats/guedalia/${slug}.jpg`;
 const RESTAURANT = {
   id: 'resto-guedalia',
   name: 'Guédalia Restaurant',
-  tagline: 'Salades, chawarmas, grillades, pizzas et spécialités africaines',
+  tagline: 'Spécialités africaines et grillades au feu',
+  // Ancienne phrase remplacee au demarrage si elle n'a pas ete modifiee depuis
+  oldTaglines: ['Salades, chawarmas, grillades, pizzas et spécialités africaines'],
   logo: `${SITE}/restaurants/guedalia.jpg`,
   zone: 'Cotonou',
   lat: 6.3654, lng: 2.4183,

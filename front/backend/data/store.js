@@ -597,10 +597,12 @@ function seedPartners() {
   let added = 0;
   for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js'))) {
     const { RESTAURANT, DISHES } = require(path.join(dir, f));
+    const known = restaurants.find(r => r.id === RESTAURANT.id);
+    if (known && (RESTAURANT.oldTaglines || []).includes(known.tagline)) known.tagline = RESTAURANT.tagline;
     if (partnersSeeded.includes(RESTAURANT.id)) continue;
     if (!restaurants.find(r => r.id === RESTAURANT.id)) {
       restaurants.push({ icon: 'utensils', rating: null, verified: true, priorityScore: 60, momoMtn: null, momoMoov: null,
-        createdAt: new Date().toISOString(), ...RESTAURANT });
+        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined });
     }
     for (const d of DISHES) {
       if (dishes.find(x => x.id === d.id)) continue;
