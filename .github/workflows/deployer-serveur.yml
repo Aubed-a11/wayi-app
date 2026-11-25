@@ -1,0 +1,75 @@
+# Met a jour le serveur WAYI (api.wayibenin.com) sur le VPS, depuis GitHub.
+# Lancement manuel uniquement : Actions > "Deployer le serveur WAYI" > Run workflow.
+# 1. sauvegarde des donnees (si elle echoue, rien n'est modifie)
+# 2. copie de l'ancien code, installation du nouveau, redemarrage, verification
+# Secrets necessaires (Settings > Secrets and variables > Actions) :
+#   VPS_PASSWORD        mot de passe root du VPS
+#   VPS_HOST            facultatif (par defaut 76.13.37.17)
+#   ANTHROPIC_API_KEY   facultatif : si present, remplace la cle de Yivi dans le .env du serveur
+name: Deployer le serveur WAYI
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deployer-serveur
+  cancel-in-progress: false
+
+jobs:
+  serveur:
+    runs-on: ubuntu-latest
+    env:
+      HOST: ${{ secrets.VPS_HOST || '76.13.37.17' }}
+      SSHPASS: ${{ secrets.VPS_PASSWORD }}
+      CLAUDE_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secret VPS_PASSWORD present ?
+        if: env.SSHPASS == ''
+        run: |
+          echo "Le secret VPS_PASSWORD manque : ajoute-le dans Settings > Secrets and variables > Actions."
+          exit 1
+      - name: Preparer l'archive du serveur
+        run: |
+          sudo apt-get install -y -qq sshpass > /dev/null
+          tar --exclude=node_modules --exclude=.env --exclude=uploads --exclude=data/sauvegarde \
+              -czf wayi-serveur-maj.tgz -C front/backend .
+          ls -la wayi-serveur-maj.tgz
+      - name: Envoyer sur le VPS
+        run: |
+          sshpass -e scp -o StrictHostKeyChecking=accept-new wayi-serveur-maj.tgz serveur/sauvegarde-avant-maj.sh root@$HOST:/root/
+      - name: 1. Sauvegarder les donnees
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new root@$HOST "sed -i 's/\r$//' /root/sauvegarde-avant-maj.sh && bash /root/sauvegarde-avant-maj.sh"
+      - name: 2. Installer et redemarrer
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new root@$HOST bash -s -- "$CLAUDE_KEY" <<'SCRIPT'
+          set -e
+          B=/home/wayi/wayi-backend
+          cp -r "$B" "$B.sauvegarde-$(date +%Y%m%d-%H%M)"
+          cd "$B"
+          tar -xzf /root/wayi-serveur-maj.tgz
+          touch .env
+          if [ -n "$1" ]; then
+            sed -i '/^ANTHROPIC_API_KEY=/d;/^ANTHROPIC_MODEL=/d;/^CLAUDE_MODEL=/d' .env
+            printf '\nANTHROPIC_API_KEY=%s\nANTHROPIC_MODEL=claude-sonnet-5-5\n' "$1" >> .env
+          fi
+          chmod 600 .env
+          npm install --omit=dev --no-audit --no-fund --silent
+          chown -R wayi:wayi "$B"
+          wayi-pm2 restart wayi-backend
+          sleep 6
+          wayi-pm2 logs wayi-backend --lines 25 --nostream
+          # On ne garde que les 5 dernieres copies de l'ancien code
+          ls -1dt /home/wayi/wayi-backend.sauvegarde-* 2>/dev/null | tail -n +6 | xargs -r rm -rf
+          SCRIPT
+      - name: 3. Verifier le serveur en ligne
+        run: |
+          sleep 5
+          curl -sf https://api.wayibenin.com/health | head -c 400; echo
+          code=$(curl -s -o /dev/null -w '%{http_code}' https://api.wayibenin.com/api/notifications)
+          echo "Route des notifications (doit repondre 401, signe que la nouvelle version tourne) : $code"
+          test "$code" = "401"
