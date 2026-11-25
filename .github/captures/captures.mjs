@@ -115,6 +115,25 @@ if (client) {
   await scroll(p, 1150); await tap(p, W / 2, 420, 4000); await shot(p, '17-client-plat');
   await p.close();
 }
+if (client) {
+  // Panier de l'appli : deux plats deja dans le panier, puis ouverture par la barre du panier
+  const menu = await (await fetch(API + '/menu')).json().catch(() => ({}));
+  const ds = (menu.dishes || []).filter(d => d.image).slice(0, 2);
+  const items = ds.map((d, i) => ({ id: d.id, name: d.name, price: d.price, image: d.image, restaurantId: d.restaurantId, restaurantName: d.restaurant?.name || 'Restaurant', qty: i + 1 }));
+  const page = await browser.newPage();
+  await page.setViewport({ width: W, height: H, deviceScaleFactor: 2, isMobile: true });
+  await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: 60000 }); await sleep(2000);
+  await page.evaluate((t, cart) => {
+    localStorage.setItem('flutter.wayi.token', JSON.stringify(t));
+    localStorage.setItem('flutter.wayi.role', JSON.stringify('client'));
+    localStorage.setItem('flutter.wayi.name', JSON.stringify('Marzouk'));
+    localStorage.setItem('flutter.wayi.cart', JSON.stringify(JSON.stringify(cart)));
+  }, client.token, items);
+  await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: 60000 }); await sleep(9000);
+  await tap(page, W / 2, H - 100, 4000);
+  await shot(page, '18-client-panier');
+  await page.close();
+}
 if (merchant) {
   p = await open({ token: merchant.token, role: 'merchant', name: merchant.name });
   await shot(p, '20-restaurant-commandes');
