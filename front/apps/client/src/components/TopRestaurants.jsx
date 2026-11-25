@@ -16,7 +16,7 @@ function Logo({ url, name, size = 44 }) {
   );
 }
 
-// Carrousel des restaurants phares : ceux dont les plats se vendent le plus sur WAYI
+// Carrousel "Nos restaurants favoris de la semaine" : classement mis a jour chaque lundi
 export default function TopRestaurants({ dishes = [], onOpenDish, onAdd }) {
   const [list, setList] = useState([]);
   const [index, setIndex] = useState(0);
@@ -53,7 +53,7 @@ export default function TopRestaurants({ dishes = [], onOpenDish, onAdd }) {
   return (
     <>
       <div className="w-section-head" style={{ marginTop: 22 }}>
-        <span className="w-section-title">Restaurants phares</span>
+        <span className="w-section-title">Nos restaurants favoris de la semaine</span>
       </div>
       <div className="tr-track" ref={track} onScroll={onScroll}>
         {list.map((item, i) => {

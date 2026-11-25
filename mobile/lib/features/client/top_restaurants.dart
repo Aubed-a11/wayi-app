@@ -9,7 +9,7 @@ import '../../core/ui.dart';
 import '../../state/menu.dart';
 import 'widgets.dart';
 
-/// Carrousel des restaurants phares : ceux dont les plats se vendent le plus sur WAYI.
+/// Carrousel "Nos restaurants favoris de la semaine" : classement mis a jour chaque lundi.
 class TopRestaurants extends StatefulWidget {
   const TopRestaurants({super.key});
   @override
@@ -56,7 +56,7 @@ class _TopRestaurantsState extends State<TopRestaurants> {
   Widget build(BuildContext context) {
     if (_list.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const SectionTitle('Restaurants phares'),
+      const SectionTitle('Nos restaurants favoris de la semaine'),
       SizedBox(
         height: 206,
         child: PageView.builder(

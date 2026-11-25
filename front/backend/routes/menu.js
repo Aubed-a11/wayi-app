@@ -90,11 +90,27 @@ router.get('/restaurant-of-week', (req, res) => {
   });
 });
 
-// GET /api/menu/top-restaurants : restaurants phares, classes par nombre de plats vendus
-// (commandes livrees, sinon commandes non annulees), puis par favoris des clients.
-// Sans aucune vente : restaurants qui ont le plus de plats au menu.
+// GET /api/menu/top-restaurants : nos restaurants favoris de la semaine.
+// Classement fige pour 7 jours : chaque lundi (heure du Benin), on classe les restaurants
+// selon les plats vendus pendant les 7 jours precedents, puis les favoris des clients,
+// la note et la taille du menu. Il ne bouge plus jusqu'au lundi suivant.
+const DAY = 24 * 3600 * 1000;
+function weekStartBenin(now = Date.now()) {
+  const b = new Date(now + 3600 * 1000);            // heure du Benin (UTC+1)
+  const dow = (b.getUTCDay() + 6) % 7;              // lundi = 0
+  const midnight = Date.UTC(b.getUTCFullYear(), b.getUTCMonth(), b.getUTCDate()) - 3600 * 1000;
+  return midnight - dow * DAY;                      // lundi 00:00 heure du Benin, en ms UTC
+}
+let weeklyTop = { key: null, list: [] };
 router.get('/top-restaurants', (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 8, 20);
+  const start = weekStartBenin();
+  const nextUpdate = new Date(start + 7 * DAY).toISOString();
+  if (weeklyTop.key === start && weeklyTop.list.length) {
+    return res.json({ restaurants: weeklyTop.list.slice(0, limit), weekOf: new Date(start).toISOString(), nextUpdate });
+  }
+  const from = start - 7 * DAY;
+  const inWeek = (o) => { const t = new Date(o.createdAt || 0).getTime(); return t >= from && t < start; };
   const sold = {};
   const add = (list) => {
     for (const o of list) {
@@ -108,8 +124,8 @@ router.get('/top-restaurants', (req, res) => {
       }
     }
   };
-  add(orders.filter(o => o.status === 'delivered'));
-  if (!Object.keys(sold).length) add(orders.filter(o => o.status !== 'cancelled'));
+  add(orders.filter(o => o.status === 'delivered' && inWeek(o)));
+  if (!Object.keys(sold).length) add(orders.filter(o => o.status !== 'cancelled' && inWeek(o)));
 
   const favs = {};
   for (const u of users) {
@@ -139,8 +155,9 @@ router.get('/top-restaurants', (req, res) => {
     })
     .filter(Boolean)
     .sort((a, b) => (b.dishesSold - a.dishesSold) || (b.favorites - a.favorites) || ((b.restaurant.rating || 0) - (a.restaurant.rating || 0)) || (b.menuCount - a.menuCount))
-    .slice(0, limit);
-  res.json({ restaurants: list });
+    .slice(0, 20);
+  weeklyTop = { key: start, list };
+  res.json({ restaurants: list.slice(0, limit), weekOf: new Date(start).toISOString(), nextUpdate });
 });
 
 // GET /api/menu/:id — détail d'un plat
