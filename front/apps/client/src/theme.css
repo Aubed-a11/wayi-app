@@ -516,3 +516,60 @@ html, body, #root, .app-shell, .screen { background: #FFFFFF; }
 .yv-banner-txt small { color: rgba(255, 255, 255, 0.8); font-size: 13px; line-height: 1.4; }
 .yv-banner-btn { margin-top: 8px; background: #fff; color: #4B2E83; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 800; }
 .yv-banner-ico { width: 70px; height: 70px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); color: #FFC66E; display: grid; place-items: center; flex-shrink: 0; }
+
+/* ============================================================
+   Carte du restaurant (RestaurantScreen)
+   ============================================================ */
+.rs { background: #fff; }
+.rs-scroll { flex: 1; overflow-y: auto; }
+.rs-cover { position: relative; height: 230px; background: #2a1a12 center / cover no-repeat; }
+.rs-cover-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%); }
+.rs-back { position: absolute; top: 14px; left: 14px; }
+.rs-head { position: relative; margin: -34px 16px 0; background: #fff; border-radius: 24px; padding: 48px 18px 18px; text-align: center;
+  box-shadow: 0 12px 30px rgba(21, 24, 31, 0.10); border: 1px solid #EEF0F3; }
+.rs-head .rs-logo { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); border: 4px solid #fff; border-radius: 50%; box-shadow: 0 6px 16px rgba(0,0,0,0.15); background: #fff; overflow: hidden; }
+.rs-head .rs-logo img { width: 100%; height: 100%; object-fit: cover; }
+.rs-head h1 { margin: 0; font-family: var(--font-display); font-size: 23px; font-weight: 800; color: #15181F; }
+.rs-head p { margin: 6px 0 0; color: #6B7280; font-size: 13.5px; line-height: 1.45; }
+.rs-meta { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.rs-meta span { display: inline-flex; align-items: center; gap: 6px; background: #FFF4EB; color: #A8321F; border-radius: 999px; padding: 7px 12px; font-size: 12.5px; font-weight: 700; }
+.rs-stars { margin-top: 24px; }
+.rs-stars h2, .rs-section h2 { margin: 0 16px; font-family: var(--font-display); font-size: 19px; font-weight: 800; color: #15181F; }
+.rs-stars-track { display: flex; gap: 12px; overflow-x: auto; padding: 12px 16px 6px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.rs-stars-track::-webkit-scrollbar { display: none; }
+.rs-star { flex: 0 0 210px; scroll-snap-align: start; cursor: pointer; }
+.rs-star-img { position: relative; height: 170px; border-radius: 20px; background: #F4F5F7 center / cover no-repeat; box-shadow: 0 8px 20px rgba(21,24,31,0.12); }
+.rs-star-rank { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.95); color: #A8321F; font-size: 11.5px; font-weight: 800; border-radius: 999px; padding: 5px 10px; }
+.rs-star-img .rs-add, .rs-star-img .rs-step { position: absolute; right: 10px; bottom: 10px; }
+.rs-star strong { display: block; margin-top: 10px; font-size: 15px; font-weight: 800; color: #15181F; }
+.rs-price { display: inline-block; margin-top: 4px; color: #F2690D; font-weight: 800; font-size: 14.5px; }
+.rs-tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; overflow-x: auto; padding: 12px 16px; margin-top: 18px; background: rgba(255,255,255,0.97);
+  border-bottom: 1px solid #EEF0F3; scrollbar-width: none; }
+.rs-tabs::-webkit-scrollbar { display: none; }
+.rs-tabs button { flex-shrink: 0; border: 1px solid #EEF0F3; background: #fff; color: #15181F; border-radius: 999px; padding: 9px 14px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit; }
+.rs-tabs button small { color: #8A909C; font-weight: 700; margin-left: 4px; }
+.rs-tabs button.on { background: linear-gradient(90deg, #F2690D, #A8321F); color: #fff; border-color: transparent; }
+.rs-tabs button.on small { color: rgba(255,255,255,0.85); }
+.rs-section { padding-top: 20px; }
+.rs-section-sub { margin: 4px 16px 6px; color: #8A909C; font-size: 13px; }
+.rs-row { display: flex; gap: 14px; align-items: center; margin: 0 16px; padding: 16px 0; border-bottom: 1px solid #F1F2F4; cursor: pointer; }
+.rs-row:last-child { border-bottom: 0; }
+.rs-row-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.rs-row-txt strong { font-size: 15.5px; font-weight: 800; color: #15181F; }
+.rs-row-txt p { margin: 5px 0 0; color: #6B7280; font-size: 13px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.rs-side { margin-top: 8px; background: #E9F7EF; color: #1E7D4B; font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 4px 10px; }
+.rs-row-txt .rs-price { margin-top: 8px; }
+.rs-row-img { position: relative; flex: 0 0 112px; height: 112px; border-radius: 18px; background: #F4F5F7 center / cover no-repeat; box-shadow: 0 6px 16px rgba(21,24,31,0.10); }
+.rs-row-img .rs-add, .rs-row-img .rs-step { position: absolute; right: -6px; bottom: -6px; }
+.rs-add { width: 38px; height: 38px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer; color: #fff;
+  background: linear-gradient(135deg, #F2690D, #A8321F); box-shadow: 0 6px 14px rgba(168,50,31,0.35); border: 3px solid #fff; }
+.rs-step { display: inline-flex; align-items: center; gap: 8px; background: #fff; border-radius: 999px; padding: 4px; box-shadow: 0 6px 14px rgba(21,24,31,0.18); }
+.rs-step button { width: 28px; height: 28px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer; background: #FFEEDF; color: #A8321F; }
+.rs-step b { min-width: 14px; text-align: center; font-size: 14px; color: #15181F; }
+.rs-cartbar { position: absolute; left: 16px; right: 16px; bottom: 18px; z-index: 20; display: flex; align-items: center; gap: 12px; border: 0; cursor: pointer;
+  padding: 14px 16px; border-radius: 18px; color: #fff; font-family: inherit; font-size: 15px; font-weight: 800;
+  background: linear-gradient(90deg, #F2690D, #D85A2E, #A8321F); box-shadow: 0 12px 26px rgba(168,50,31,0.35); }
+.rs-cartbar > span:nth-child(2) { flex: 1; text-align: left; }
+.rs-cartbar-n { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.2); border-radius: 999px; padding: 5px 10px; font-size: 13px; }
+.rs-link { background: none; border: 0; padding: 0; color: #F2690D; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit; }
+.w-dish-logo-btn { background: none; border: 0; padding: 0; cursor: pointer; }

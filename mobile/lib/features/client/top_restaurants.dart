@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../core/api.dart';
 import '../../core/format.dart';
 import '../../core/icons.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
-import '../../state/menu.dart';
+import 'restaurant_screen.dart';
 import 'widgets.dart';
 
 /// Carrousel "Nos restaurants favoris de la semaine" : classement mis a jour chaque lundi.
@@ -98,7 +97,7 @@ class _Card extends StatelessWidget {
     final rating = asNum(r['rating']);
     final badge = sold > 0 ? '$sold plat${sold > 1 ? 's' : ''} vendu${sold > 1 ? 's' : ''}' : (rank <= 3 ? 'Coup de cœur' : 'À découvrir');
     return GestureDetector(
-      onTap: () => _openRestaurant(context, asStr(r['id']), name, r['logo'] as String?, asStr(r['tagline'])),
+      onTap: () => openRestaurant(context, id: asStr(r['id']), name: name, logo: r['logo'] as String?, tagline: asStr(r['tagline'])),
       child: Container(
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(R.lg), boxShadow: softShadow),
         clipBehavior: Clip.antiAlias,
@@ -156,34 +155,4 @@ class _Card extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Les plats d'un restaurant, dans une feuille qui monte du bas
-void _openRestaurant(BuildContext context, String id, String name, String? logo, String tagline) {
-  final dishes = context.read<Menu>().dishes.where((d) => d.restaurantId == id).toList();
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (c) => DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.75,
-      maxChildSize: 0.92,
-      builder: (_, scroll) => ListView(controller: scroll, padding: const EdgeInsets.fromLTRB(20, 0, 20, 30), children: [
-        Row(children: [
-          RestoLogo(url: logo, name: name, size: 54),
-          const SizedBox(width: 14),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(name, style: h2()),
-            if (tagline.isNotEmpty) Text(tagline, style: small()),
-          ])),
-        ]),
-        const SizedBox(height: 18),
-        if (dishes.isEmpty) Text('Pas de plat disponible pour le moment.', style: body(C.muted)),
-        for (var i = 0; i < dishes.length; i++) ...[
-          if (i > 0) const Divider(),
-          DishRow(dish: dishes[i]),
-        ],
-      ]),
-    ),
-  );
 }

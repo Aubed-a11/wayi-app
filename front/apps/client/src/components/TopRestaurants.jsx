@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Flame, Star, X } from 'lucide-react';
 import { menuAPI } from '../api';
 import { MenuCard } from './Wayi';
+import { useApp } from '../context/AppContext';
 
 // Initiales du restaurant (quand il n'a pas encore envoye son logo)
 const COLORS = ['#F2690D', '#1E9E5A', '#2F7BE5', '#8B4FD8', '#D9467A', '#E59A00', '#0F8A8A'];
@@ -21,6 +22,8 @@ export default function TopRestaurants({ dishes = [], onOpenDish, onAdd }) {
   const [list, setList] = useState([]);
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(null);
+  const { dispatch, navigate } = useApp();
+  const openResto = (r) => { dispatch({ type: 'SET_ACTIVE_RESTAURANT', payload: r }); navigate('restaurant'); };
   const track = useRef(null);
 
   useEffect(() => {
@@ -61,7 +64,7 @@ export default function TopRestaurants({ dishes = [], onOpenDish, onAdd }) {
           const sold = item.dishesSold || 0;
           const badge = sold > 0 ? `${sold} plat${sold > 1 ? 's' : ''} vendu${sold > 1 ? 's' : ''}` : (i < 3 ? 'Coup de cœur' : 'À découvrir');
           return (
-            <button key={r.id} className="tr-card" onClick={() => setOpen(r)}>
+            <button key={r.id} className="tr-card" onClick={() => openResto(r)}>
               {item.topDish?.image && <img className="tr-cover" src={item.topDish.image} alt="" loading="lazy" />}
               <span className="tr-shade" />
               <span className="tr-badge"><Flame size={13} strokeWidth={2.4} aria-hidden="true" /> #{i + 1} · {badge}</span>

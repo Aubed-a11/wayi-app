@@ -93,6 +93,16 @@ await p.close();
     await w.screenshot({ path: `${OUT}/43-site-accueil-connecte.png` }); console.log('  capture 43-site-accueil-connecte');
     await w.evaluate(() => window.scrollBy(0, 600)); await w.evaluate(() => document.querySelector('.w-scroll')?.scrollBy(0, 560)); await sleep(1500);
     await w.screenshot({ path: `${OUT}/44-site-restaurants-phares.png` }); console.log('  capture 44-site-restaurants-phares');
+    if (await clickText('Guédalia Restaurant')) {
+      await sleep(4000);
+      await w.screenshot({ path: `${OUT}/49-site-carte-restaurant.png` }); console.log('  capture 49-site-carte-restaurant');
+      await w.evaluate(() => document.querySelector('.rs-scroll')?.scrollBy(0, 520)); await sleep(1500);
+      await w.evaluate(() => document.querySelector('.rs-add')?.click()); await sleep(1200);
+      await w.screenshot({ path: `${OUT}/50-site-carte-incontournables.png` }); console.log('  capture 50-site-carte-incontournables');
+      await w.evaluate(() => document.querySelector('.rs-scroll')?.scrollBy(0, 700)); await sleep(1500);
+      await w.screenshot({ path: `${OUT}/51-site-carte-menu.png` }); console.log('  capture 51-site-carte-menu');
+      await w.evaluate(() => document.querySelector('.rs-back')?.click()); await sleep(2500);
+    }
     await clickText('Panier'); await sleep(3500);
     await w.screenshot({ path: `${OUT}/45-site-panier-vide.png` }); console.log('  capture 45-site-panier-vide');
     await clickText('Ajouter'); await sleep(800); await clickText('Ajouter'); await sleep(1200);

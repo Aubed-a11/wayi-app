@@ -53,13 +53,15 @@ export default function DishScreen() {
               <button className="w-icon-btn on-img" onClick={share} aria-label="Partager"><Share2 size={19} aria-hidden="true" /></button>
             </div>
           </div>
-          <RestoLogo restaurant={r} size={92} className="w-dish-logo" />
+          <button className="w-dish-logo-btn" onClick={() => { dispatch({ type: 'SET_ACTIVE_RESTAURANT', payload: r }); navigate('restaurant'); }} aria-label={`Voir la carte de ${r?.name || 'ce restaurant'}`}>
+            <RestoLogo restaurant={r} size={92} className="w-dish-logo" />
+          </button>
         </div>
 
         <div className="w-dish-body">
           <div className="w-dish-name">{dish.name}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, color: 'var(--gray)' }}>
-            <span>{r?.name}</span>
+            <button className="rs-link" onClick={() => { dispatch({ type: 'SET_ACTIVE_RESTAURANT', payload: r }); navigate('restaurant'); }}>{r?.name} · voir la carte</button>
             {r?.prepTime && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Clock size={13} aria-hidden="true" /> {r.prepTime} min</span>}
           </div>
           <div className="w-tags">

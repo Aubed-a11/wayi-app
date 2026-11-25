@@ -11,6 +11,7 @@ import { setBackHandler } from './lib/native';
 // Ils sont precharges en arriere-plan juste apres le premier affichage.
 const loaders = {
   dish:    () => import('./screens/DishScreen'),
+  restaurant: () => import('./screens/RestaurantScreen'),
   explore: () => import('./screens/ExploreScreen'),
   ai:      () => import('./screens/AIScreen'),
   cart:    () => import('./screens/CartScreen'),
@@ -18,6 +19,7 @@ const loaders = {
   profile: () => import('./screens/ProfileScreen'),
 };
 const DishScreen    = lazy(loaders.dish);
+const RestaurantScreen = lazy(loaders.restaurant);
 const ExploreScreen = lazy(loaders.explore);
 const AIScreen      = lazy(loaders.ai);
 const CartScreen    = lazy(loaders.cart);
@@ -44,6 +46,7 @@ export default function App() {
     login:   <LoginScreen />,
     home:    <HomeScreen />,
     dish:    <DishScreen />,
+    restaurant: <RestaurantScreen />,
     explore: <ExploreScreen />,
     ai:      <AIScreen />,
     cart:    <CartScreen />,

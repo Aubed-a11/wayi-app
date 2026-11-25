@@ -37,6 +37,8 @@ function reducer(state, action) {
       return { ...state, screen: action.payload, prevScreen: state.screen };
     case 'GO_BACK':
       return { ...state, screen: state.prevScreen || 'home', prevScreen: null };
+    case 'SET_ACTIVE_RESTAURANT':
+      return { ...state, activeRestaurant: action.payload };
     case 'SET_ACTIVE_DISH':
       return { ...state, activeDish: action.payload };
     case 'SET_ACTIVE_ORDERS':
