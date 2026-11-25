@@ -11,7 +11,7 @@ name: Appli Flutter WAYI
 on:
   workflow_dispatch:
   push:
-    paths: ['mobile/**']
+    paths: ['mobile/**', '.github/workflows/flutter-android.yml']
 
 permissions:
   contents: write
