@@ -1,0 +1,24 @@
+name: Photos des plats (recherche)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/images/recherches.json', '.github/images/candidats.py']
+permissions:
+  contents: write
+jobs:
+  chercher:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow
+      - working-directory: .github/images
+        run: python3 candidats.py recherches.json
+      - name: Publier les candidats sur la branche images-candidats
+        working-directory: .github/images
+        run: |
+          cd cand
+          git init -q -b images-candidats
+          git config user.name "wayi-bot"; git config user.email "bot@wayibenin.com"
+          git add -A; git commit -qm "Candidats photos des plats"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" images-candidats
