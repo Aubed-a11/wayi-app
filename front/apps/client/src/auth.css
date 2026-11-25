@@ -226,3 +226,6 @@
 .a7-space small { font-size: 12px; color: var(--gray); }
 .a7-space > svg { color: var(--brand-dark); }
 .a7-space .a7-role-ico { background: var(--brand-light); color: var(--brand-dark); }
+
+/* Plus de bande aux couleurs du drapeau */
+.a7-card-stripe, .a7-brand small::after { display: none !important; }

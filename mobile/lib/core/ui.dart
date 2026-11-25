@@ -152,25 +152,6 @@ class Photo extends StatelessWidget {
   }
 }
 
-/// Fine bande aux couleurs du Benin
-class BeninStripe extends StatelessWidget {
-  final double width;
-  const BeninStripe({super.key, this.width = 42});
-  @override
-  Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(2),
-        child: SizedBox(
-          width: width,
-          height: 3,
-          child: const Row(children: [
-            Expanded(child: ColoredBox(color: C.bjGreen)),
-            Expanded(child: ColoredBox(color: C.bjYellow)),
-            Expanded(child: ColoredBox(color: C.bjRed)),
-          ]),
-        ),
-      );
-}
-
 /// Pastille selectionnable (filtres)
 class Chip2 extends StatelessWidget {
   final String label;

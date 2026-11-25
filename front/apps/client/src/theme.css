@@ -16,7 +16,7 @@
   --bj-green:  #4F8A68;
   --bj-yellow: #E2C468;
   --bj-red:    #C0675C;
-  --bj-stripe: linear-gradient(90deg, var(--bj-green) 0 33.3%, var(--bj-yellow) 33.3% 66.6%, var(--bj-red) 66.6% 100%);
+  --bj-stripe: transparent; /* plus de bande vert-jaune-rouge */
 
   /* Les anciens noms pointent vers la nouvelle couleur : tout l'existant suit */
   --emerald:       var(--brand);
@@ -330,3 +330,6 @@ body { font-family: var(--font-body); color: var(--ink); -webkit-font-smoothing:
 
 /* Cases a cocher : taille normale (les regles des champs texte ne s'appliquent pas) */
 input[type="checkbox"] { -webkit-appearance: auto !important; appearance: auto !important; width: 18px !important; height: 18px !important; min-height: 0 !important; padding: 0 !important; margin: 0; border-radius: 4px !important; box-shadow: none !important; flex-shrink: 0; accent-color: var(--brand); }
+
+/* Plus de bande aux couleurs du drapeau */
+.w-section-title::after, .w-profile-head::after, .w-splash::after, .auth-hero::before { display: none !important; }

@@ -88,8 +88,6 @@ class SplashView extends StatelessWidget {
         body: Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             ClipRRect(borderRadius: BorderRadius.circular(28), child: Image.asset('assets/logo.png', width: 104, height: 104)),
-            const SizedBox(height: 22),
-            const BeninStripe(width: 54),
           ]),
         ),
       );

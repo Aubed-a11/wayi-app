@@ -138,7 +138,7 @@ class _AccountTabState extends State<AccountTab> {
           onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DeleteAccountScreen())),
         ),
         const SizedBox(height: 20),
-        Center(child: Column(children: [const BeninStripe(width: 40), const SizedBox(height: 8), Text('WAYI Pro', style: small())])),
+        Center(child: Column(children: [Text('WAYI Pro', style: small())])),
       ]),
     );
   }

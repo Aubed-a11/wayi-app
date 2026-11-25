@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Palette WAYI, style super-appli : fond gris tres clair, cartes blanches,
-/// orange vif du logo pour les actions, une fine touche des couleurs du Benin.
+/// orange vif du logo pour les actions.
 class C {
   static const bg = Color(0xFFF5F6F8);
   static const card = Color(0xFFFFFFFF);

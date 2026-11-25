@@ -43,7 +43,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   const SizedBox(width: 10),
                   Text('WAYI', style: font(size: 20, weight: FontWeight.w800, color: Colors.white, spacing: 1)),
                   const Spacer(),
-                  const BeninStripe(width: 34),
                 ]),
                 const SizedBox(height: 22),
                 Expanded(

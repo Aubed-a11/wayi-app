@@ -94,8 +94,6 @@ class ProfileScreen extends StatelessWidget {
           _Tile(icon: Ic.trash, title: 'Supprimer mon compte', danger: true, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DeleteAccountScreen()))),
           const SizedBox(height: 26),
           Center(child: Column(children: [
-            const BeninStripe(width: 40),
-            const SizedBox(height: 10),
             Text('WAYI Bénin · version 1.0', style: small()),
           ])),
         ]),
