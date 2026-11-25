@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Home, Search, ChefHat, ShoppingCart, User, ChevronLeft, ChevronRight, Heart, Star, Check, Plus, Minus, LayoutGrid, Soup, Leaf, Sandwich, Flame, CupSoda, Wheat, Fish, Cookie, Tag } from 'lucide-react';
+import { Home, Search, ChefHat, ShoppingCart, User, Heart, Star, Check, Plus, Minus, LayoutGrid, Soup, Leaf, Sandwich, Flame, CupSoda, Wheat, Fish, Cookie, Tag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { TASTE_META } from './DynamicIcon';
 
@@ -92,7 +92,7 @@ export function BackBtn({ onBack, light = false }) {
       onClick={onBack || goBack}
       aria-label="Retour"
     >
-      <ChevronLeft size={22} strokeWidth={2.2} aria-hidden="true" />
+      Retour
     </button>
   );
 }
@@ -167,7 +167,7 @@ export function PromoCard({ promo, onAction }) {
         <div className="banner-sub">{promo.subtitle}</div>
         {onAction && (
           <button className="banner-btn" onClick={onAction}>
-            {promo.cta || 'Commander'} <ChevronRight size={16} strokeWidth={2.6} aria-hidden="true" />
+            {promo.cta || 'Commander'}
           </button>
         )}
       </div>
@@ -456,7 +456,7 @@ export function WeekRestaurant({ data, onSeeDishes }) {
         {r.rating != null && <div><strong><Star size={15} fill="currentColor" strokeWidth={0} aria-hidden="true" /> {r.rating}</strong><span>note</span></div>}
         {r.prepTime != null && <div><strong>{r.prepTime} min</strong><span>préparation</span></div>}
       </div>
-      <button className="week-btn" onClick={onSeeDishes}>Voir ses plats <ChevronRight size={18} strokeWidth={2.6} aria-hidden="true" /></button>
+      <button className="week-btn" onClick={onSeeDishes}>Voir ses plats</button>
     </div>
   );
 }

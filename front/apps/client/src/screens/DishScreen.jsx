@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, Share2, ShoppingCart, Clock } from 'lucide-react';
+import { Heart, Share2, ShoppingCart, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
 import { DishImg, RestoLogo, Qty, toCartItem, fcfa } from '../components/Wayi';
@@ -45,7 +45,7 @@ export default function DishScreen() {
         <div className="w-dish-hero">
           <DishImg src={dish.image} iconSize={56} />
           <div className="w-dish-hero-bar">
-            <button className="w-icon-btn on-img" onClick={goBack} aria-label="Retour"><ArrowLeft size={20} aria-hidden="true" /></button>
+            <button className="ct-back" onClick={goBack}>Retour</button>
             <div style={{ display: 'flex', gap: 10 }}>
               <button className="w-icon-btn on-img" onClick={() => toggleFavorite(dish)} aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}>
                 <span className="dish-fav-heart"><Heart size={19} strokeWidth={1.8} fill={isFavorite ? 'currentColor' : 'none'} aria-hidden="true" /></span>

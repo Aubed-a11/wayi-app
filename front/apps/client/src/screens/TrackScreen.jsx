@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Star, Check, CheckCircle2, X, ArrowLeft, Bike, Headphones, Phone, ChefHat, Receipt, ClipboardList } from 'lucide-react';
+import { Star, Check, CheckCircle2, X, Bike, Headphones, Phone, ChefHat, Receipt, ClipboardList } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav, Spinner, launchConfetti } from '../components/UI';
 import { Empty, fcfa } from '../components/Wayi';
@@ -224,7 +224,7 @@ export default function TrackScreen() {
       <div className="screen">
         <StatusBar />
         <div className="w-topbar">
-          <button className="w-icon-btn" onClick={goBack} aria-label="Retour"><ArrowLeft size={22} aria-hidden="true" /></button>
+          <button className="ct-back" onClick={goBack}>Retour</button>
           <div className="w-topbar-title">Suivi de commande</div><span style={{ width: 40 }} />
         </div>
         {fetching
@@ -297,7 +297,7 @@ export default function TrackScreen() {
     <div className="screen">
       <StatusBar />
       <div className="w-topbar">
-        <button className="w-icon-btn" onClick={goBack} aria-label="Retour"><ArrowLeft size={22} aria-hidden="true" /></button>
+        <button className="ct-back" onClick={goBack}>Retour</button>
         <div className="w-topbar-title">Suivi de votre commande</div>
         <span style={{ width: 40 }} />
       </div>

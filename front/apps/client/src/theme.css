@@ -503,3 +503,7 @@ html, body, #root, .app-shell, .screen { background: #FFFFFF; }
 .w-menu-item:last-child .ico { background: #FDECEC; }
 .w-menu-item small { display: block; color: #8A909C; font-size: 12px; font-weight: 500; margin-top: 2px; }
 .w-order-row { background: #fff; border: 1px solid #EEF0F3; border-radius: 18px; padding: 12px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(21, 24, 31, 0.05); }
+
+/* Retour en texte (plus de fleche) */
+.back-btn { width: auto !important; height: auto !important; padding: 8px 14px !important; border-radius: 999px !important; background: #fff !important;
+  border: 1px solid #EEF0F3 !important; color: #15181F !important; font-weight: 700; font-size: 13.5px; box-shadow: 0 2px 8px rgba(21, 24, 31, 0.08); }
