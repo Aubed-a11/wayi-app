@@ -97,6 +97,8 @@ const DISH_LABELS = [
 let demoSeeded = false;
 // Restaurants partenaires deja inseres une fois (ne reviennent pas s'ils sont supprimes depuis l'admin)
 const partnersSeeded = [];
+// Nettoyages ponctuels deja appliques (chacun ne s'execute qu'une fois)
+const cleanupsDone = [];
 
 function enrichDish(dish) {
   const r = restaurants.find(x => x.id === dish.restaurantId);
@@ -414,7 +416,7 @@ function deleteDish(id) {
 // Voir services/database/supabase.js pour le détail de l'approche et ses limites.
 
 function snapshotState() {
-  return { users, drivers, merchants, admins, restaurants, dishes, reviews, orders, receipts, callLogs, demoSeeded, partnersSeeded };
+  return { users, drivers, merchants, admins, restaurants, dishes, reviews, orders, receipts, callLogs, demoSeeded, partnersSeeded, cleanupsDone };
 }
 
 // Remplace le CONTENU des tableaux existants (sans changer leur référence,
@@ -440,7 +442,26 @@ function restoreState(saved) {
   if (saved.demoSeeded) demoSeeded = true;
   replaceContents(partnersSeeded, saved.partnersSeeded || []);
   purgeDemoAccounts();
+  replaceContents(cleanupsDone, saved.cleanupsDone || []);
   if (process.env.DEMO_MENU !== '1') purgeDemoRestaurants();
+  keepOnlyGuedaliaOnce();
+}
+
+// Nettoyage demande le 25/11/2026 : retirer tous les restaurants et plats
+// existants et ne garder que Guedalia. S'execute une seule fois : les
+// restaurants ajoutes ensuite ne sont jamais touches. Historique des commandes conserve.
+function keepOnlyGuedaliaOnce() {
+  const KEY = 'garder-uniquement-guedalia-2026-11-25';
+  if (cleanupsDone.includes(KEY)) return;
+  const keep = new Set(['resto-guedalia']);
+  const gone = new Set(restaurants.filter(r => !keep.has(r.id)).map(r => r.id));
+  for (let i = restaurants.length - 1; i >= 0; i--) if (gone.has(restaurants[i].id)) restaurants.splice(i, 1);
+  let n = 0;
+  for (let i = dishes.length - 1; i >= 0; i--) if (!keep.has(dishes[i].restaurantId)) { dishes.splice(i, 1); n++; }
+  let m = 0;
+  for (let i = merchants.length - 1; i >= 0; i--) if (gone.has(merchants[i].restaurantId)) { merchants.splice(i, 1); m++; }
+  cleanupsDone.push(KEY);
+  console.log(`[Store] Nettoyage : ${gone.size} restaurant(s), ${n} plat(s) et ${m} compte(s) restaurant retires. Seul Guedalia reste.`);
 }
 
 // Restaurants et plats fictifs (menu de demonstration) : retires des donnees au demarrage.

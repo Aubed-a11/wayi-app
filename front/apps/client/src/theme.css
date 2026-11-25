@@ -507,3 +507,12 @@ html, body, #root, .app-shell, .screen { background: #FFFFFF; }
 /* Retour en texte (plus de fleche) */
 .back-btn { width: auto !important; height: auto !important; padding: 8px 14px !important; border-radius: 999px !important; background: #fff !important;
   border: 1px solid #EEF0F3 !important; color: #15181F !important; font-weight: 700; font-size: 13.5px; box-shadow: 0 2px 8px rgba(21, 24, 31, 0.08); }
+
+/* Bandeau Yivi (violet) sur l'accueil */
+.yv-banner { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 16px; padding: 16px 12px 16px 18px; border: 0; cursor: pointer; text-align: left;
+  border-radius: 20px; background: linear-gradient(90deg, #2A1F45, #4B2E83); box-shadow: 0 8px 20px rgba(42, 31, 69, 0.22); font-family: inherit; }
+.yv-banner-txt { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.yv-banner-txt b { color: #fff; font-size: 17px; font-weight: 800; }
+.yv-banner-txt small { color: rgba(255, 255, 255, 0.8); font-size: 13px; line-height: 1.4; }
+.yv-banner-btn { margin-top: 8px; background: #fff; color: #4B2E83; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 800; }
+.yv-banner-ico { width: 70px; height: 70px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); color: #FFC66E; display: grid; place-items: center; flex-shrink: 0; }

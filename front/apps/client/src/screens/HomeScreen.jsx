@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { Search, MapPin, ChevronDown, Bell, CalendarDays, Check, RefreshCw, UtensilsCrossed } from 'lucide-react';
+import { Search, MapPin, ChevronDown, Bell, CalendarDays, Check, RefreshCw, UtensilsCrossed, ChefHat } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav } from '../components/UI';
 import { PERIODS, MenuCard, toCartItem, Empty } from '../components/Wayi';
@@ -103,7 +103,17 @@ export default function HomeScreen() {
             {bannerImg && <div className="w-banner-img" style={{ backgroundImage: `url("${bannerImg}")` }} />}
           </div>
 
-          {/* Restaurants phares (les plus vendus) */}
+          {/* Bandeau Yivi */}
+          <button className="yv-banner" onClick={() => navigate('ai')}>
+            <span className="yv-banner-txt">
+              <b>Pas d'idée pour ce repas ?</b>
+              <small>Dis à Yivi ce qui te fait envie, il te trouve le bon plat.</small>
+              <span className="yv-banner-btn">Demander à Yivi</span>
+            </span>
+            <span className="yv-banner-ico"><ChefHat size={34} strokeWidth={1.9} aria-hidden="true" /></span>
+          </button>
+
+          {/* Restaurants favoris de la semaine */}
           <TopRestaurants dishes={dishes} onOpenDish={openDish} onAdd={addToCart} />
 
           {/* Creneaux */}
