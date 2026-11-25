@@ -57,6 +57,35 @@ void _android() {
     g.writeAsStringSync(t);
   }
 
+  // Signature Play Store : si android/key.properties existe (cree par
+  // 4-CONSTRUIRE-APPLI-ANDROID.bat ou par GitHub), l'appli est signee avec la cle WAYI.
+  final app = File('android/app/build.gradle.kts');
+  if (app.existsSync()) {
+    var t = app.readAsStringSync();
+    if (!t.contains('keystoreProperties')) {
+      t = 'import java.io.FileInputStream\nimport java.util.Properties\n\n$t';
+      t = t.replaceFirst(RegExp(r'\nandroid \{'), '\n'
+          'val keystoreProperties = Properties()\n'
+          'val keystorePropertiesFile = rootProject.file("key.properties")\n'
+          'if (keystorePropertiesFile.exists()) keystoreProperties.load(FileInputStream(keystorePropertiesFile))\n'
+          '\nandroid {');
+      t = t.replaceFirst('    buildTypes {', '    signingConfigs {\n'
+          '        create("release") {\n'
+          '            if (keystorePropertiesFile.exists()) {\n'
+          '                keyAlias = keystoreProperties["keyAlias"] as String\n'
+          '                keyPassword = keystoreProperties["keyPassword"] as String\n'
+          '                storeFile = file(keystoreProperties["storeFile"] as String)\n'
+          '                storePassword = keystoreProperties["storePassword"] as String\n'
+          '            }\n'
+          '        }\n'
+          '    }\n'
+          '    buildTypes {');
+      t = t.replaceFirst('signingConfig = signingConfigs.getByName("debug")',
+          'signingConfig = if (keystorePropertiesFile.exists()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")');
+      app.writeAsStringSync(t);
+    }
+  }
+
   // L'analyse "lintVital" d'Android plante sur certains modules (image_picker) :
   // elle ne sert qu'aux avertissements, on la desactive pour la compilation.
   const marker = '// WAYI: lintVital desactive';
@@ -112,6 +141,18 @@ void _ios() {
 	<string>Pour photographier tes plats.</string>''');
   }
   s = s.replaceFirst(RegExp(r'<key>CFBundleDisplayName</key>\s*<string>[^<]*</string>'), '<key>CFBundleDisplayName</key>\n\t<string>WAYI</string>');
+  // Pas de chiffrement propre : evite la question "export compliance" a chaque envoi
+  if (!s.contains('ITSAppUsesNonExemptEncryption')) {
+    s = s.replaceFirst('<dict>', '<dict>\n\t<key>ITSAppUsesNonExemptEncryption</key>\n\t<false/>');
+  }
+  // Icones WAYI (tool/ios_icons) a la place de l'icone Flutter
+  final icons = Directory('tool/ios_icons');
+  final set = Directory('ios/Runner/Assets.xcassets/AppIcon.appiconset');
+  if (icons.existsSync() && set.existsSync()) {
+    for (final e in icons.listSync().whereType<File>()) {
+      e.copySync('${set.path}/${e.uri.pathSegments.last}');
+    }
+  }
   f.writeAsStringSync(s);
-  stdout.writeln('iOS : autorisation de position et nom OK');
+  stdout.writeln('iOS : autorisations, nom et icone OK');
 }

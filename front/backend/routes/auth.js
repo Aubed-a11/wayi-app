@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
 const { OAuth2Client } = require('google-auth-library');
-const { users, drivers, merchants, admins, createPendingRegistration, getPendingRegistration, deletePendingRegistration, PLATFORM_CONFIG } = require('../data/store');
+const { users, drivers, merchants, admins, orders, restaurants, persistToDatabase, createPendingRegistration, getPendingRegistration, deletePendingRegistration, PLATFORM_CONFIG } = require('../data/store');
 const { signToken, auth } = require('../middleware/auth');
 const { sendEmail } = require('../services/notifications');
 const { initiatePayment, verifyPayment } = require('../services/payment');
@@ -319,6 +319,45 @@ router.get('/me', auth, (req, res) => {
   if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
   const { password: _, inbox: _inbox, fcmTokens: _fcm, ...safeUser } = user;
   res.json(safeUser);
+});
+
+// DELETE /api/auth/me : suppression definitive du compte connecte
+// (exigee par l'App Store et le Play Store). Mot de passe demande pour confirmer.
+// Les commandes passees restent pour la comptabilite, sans nom ni telephone.
+const FINISHED = ['delivered', 'cancelled', 'refunded', 'rejected'];
+router.delete('/me', auth, async (req, res) => {
+  const role = req.user.role;
+  if (role === 'admin') return res.status(403).json({ error: "Le compte administrateur ne se supprime pas depuis l'appli." });
+  const list = role === 'driver' ? drivers : role === 'merchant' ? merchants : users;
+  const idx = list.findIndex(a => a.id === req.user.id);
+  if (idx < 0) return res.status(404).json({ error: 'Compte introuvable' });
+  const account = list[idx];
+  const password = String((req.body && req.body.password) || '');
+  if (account.password && !(await bcrypt.compare(password, account.password).catch(() => false))) {
+    return res.status(403).json({ error: 'Mot de passe incorrect' });
+  }
+  const active = orders.filter(o => !FINISHED.includes(o.status) && (
+    (role === 'driver' && o.driver?.id === account.id) ||
+    (role === 'merchant' && o.restaurantId === account.restaurantId) ||
+    (role !== 'driver' && role !== 'merchant' && o.userId === account.id)));
+  if (active.length) {
+    return res.status(409).json({ error: 'Une commande est en cours. Le compte pourra etre supprime une fois la commande terminee.' });
+  }
+  for (const o of orders) {
+    if (role === 'driver' && o.driver?.id === account.id) o.driver = { id: 'supprime', name: 'Livreur (compte supprime)' };
+    if (role !== 'driver' && role !== 'merchant' && o.userId === account.id) {
+      o.userId = 'supprime';
+      for (const k of ['customerName', 'customerPhone', 'phone', 'customer', 'mapsLink', 'landmark']) delete o[k];
+      o.address = 'Adresse supprimee';
+    }
+  }
+  if (role === 'merchant') {
+    const r = restaurants.find(x => x.id === account.restaurantId);
+    if (r) { r.active = false; r.isOpen = false; }
+  }
+  list.splice(idx, 1);
+  try { if (typeof persistToDatabase === 'function') await persistToDatabase(); } catch (_) {}
+  res.json({ message: 'Compte supprime definitivement.' });
 });
 
 // PUT /api/auth/me

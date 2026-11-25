@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api.dart';
 
@@ -11,11 +9,10 @@ import 'api.dart';
 /// toutes les quelques secondes et l'affiche sur le telephone.
 ///   restaurant : nouvelle commande   livreur : nouvelle course
 ///   client     : acceptee, en route, livree, annulee
-/// Le livreur en ligne et le restaurant ouvert gardent l'appli active en
-/// arriere-plan (notification permanente), les alertes arrivent ecran eteint.
+/// Le livreur en ligne garde l'appli active en arriere-plan (partage de position),
+/// ses alertes arrivent ecran eteint.
 class Push {
   static const _kSince = 'wayi.notif.since';
-  static const _kRole = 'wayi.role';
   static const _period = Duration(seconds: 10);
 
   static final _plugin = FlutterLocalNotificationsPlugin();
@@ -23,7 +20,6 @@ class Push {
   static Timer? _timer;
   static bool _busy = false;
   static int _since = 0;
-  static StreamSubscription<Position>? _keepAlive;
 
   /// Messages affiches pendant que l'appli est ouverte
   static final messengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -70,15 +66,12 @@ class Push {
     _timer?.cancel();
     _timer = Timer.periodic(_period, (_) => check());
     check();
-    if (p.getString(_kRole) == 'merchant') _startKeepAlive();
   }
 
   /// A la deconnexion : plus d'alertes pour ce compte sur ce telephone
   static Future<void> unregister() async {
     _timer?.cancel();
     _timer = null;
-    await _keepAlive?.cancel();
-    _keepAlive = null;
     final p = await SharedPreferences.getInstance();
     await p.remove(_kSince);
     try {
@@ -138,29 +131,6 @@ class Push {
         ),
         payload: payload,
       );
-    } catch (_) {}
-  }
-
-  /// Restaurant : garde l'appli active en arriere-plan pour ne rater aucune commande
-  static Future<void> _startKeepAlive() async {
-    if (_keepAlive != null || defaultTargetPlatform != TargetPlatform.android) return;
-    try {
-      var perm = await Geolocator.checkPermission();
-      if (perm == LocationPermission.denied) perm = await Geolocator.requestPermission();
-      if (perm == LocationPermission.denied || perm == LocationPermission.deniedForever) return;
-      _keepAlive = Geolocator.getPositionStream(
-        locationSettings: AndroidSettings(
-          accuracy: LocationAccuracy.low,
-          distanceFilter: 5000,
-          intervalDuration: const Duration(minutes: 5),
-          foregroundNotificationConfig: const ForegroundNotificationConfig(
-            notificationTitle: 'WAYI Restaurant ouvert',
-            notificationText: 'À l\'écoute des nouvelles commandes.',
-            enableWakeLock: true,
-            setOngoing: true,
-          ),
-        ),
-      ).listen((_) {}, onError: (_) {});
     } catch (_) {}
   }
 }

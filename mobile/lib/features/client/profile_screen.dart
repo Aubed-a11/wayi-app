@@ -9,6 +9,7 @@ import '../../core/theme.dart';
 import '../../core/ui.dart';
 import 'client_shell.dart';
 import 'map_widgets.dart';
+import '../espaces/delete_account.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -90,6 +91,7 @@ class ProfileScreen extends StatelessWidget {
           _Tile(icon: Ic.yivi, title: 'Ce que Yivi sait de mes goûts', onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const _YiviPrefs()))),
           _Tile(icon: Ic.info, title: "Aide et questions", subtitle: 'Yivi répond à tes questions sur le service', onTap: () => ClientShell.goTab(context, 2)),
           _Tile(icon: Ic.logout, title: 'Se déconnecter', danger: true, onTap: () => s.logout()),
+          _Tile(icon: Ic.trash, title: 'Supprimer mon compte', danger: true, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DeleteAccountScreen()))),
           const SizedBox(height: 26),
           Center(child: Column(children: [
             const BeninStripe(width: 40),

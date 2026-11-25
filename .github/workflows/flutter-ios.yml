@@ -1,0 +1,69 @@
+# Construit l'appli Flutter WAYI pour iPhone sur un Mac de GitHub (pas besoin de Mac).
+# Sans secrets Apple : WAYI-iphone-non-signe.ipa (a installer avec Sideloadly pour tester).
+# Avec les secrets Apple (compte Apple Developer, 99 dollars par an) : l'appli est signee
+# et envoyee automatiquement sur TestFlight, puis publiable sur l'App Store.
+#   APP_STORE_CONNECT_ISSUER_ID       App Store Connect > Utilisateurs et acces > Integrations > Cles API
+#   APP_STORE_CONNECT_KEY_IDENTIFIER  l'ID de la cle API (role Admin ou App Manager)
+#   APP_STORE_CONNECT_PRIVATE_KEY     tout le contenu du fichier AuthKey_XXXX.p8
+#   CERTIFICATE_PRIVATE_KEY           cle RSA creee une fois par 6-PREPARER-APP-STORE.bat
+name: Appli iPhone WAYI
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ['mobile/**']
+
+permissions:
+  contents: read
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+      APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+      CERTIFICATE_PRIVATE_KEY: ${{ secrets.CERTIFICATE_PRIVATE_KEY }}
+      BUNDLE_ID: com.wayibenin.wayi
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generer le dossier iOS
+        run: |
+          flutter create --platforms=ios --org com.wayibenin --project-name wayi .
+          dart run tool/patch_platforms.dart
+          flutter pub get
+
+      - name: Appli non signee (test avec Sideloadly)
+        if: env.APP_STORE_CONNECT_KEY_IDENTIFIER == ''
+        run: |
+          flutter build ios --release --no-codesign --build-number=${{ github.run_number }}
+          mkdir -p Payload && cp -R build/ios/iphoneos/Runner.app Payload/
+          zip -qr WAYI-iphone-non-signe.ipa Payload
+      - uses: actions/upload-artifact@v4
+        if: env.APP_STORE_CONNECT_KEY_IDENTIFIER == ''
+        with:
+          name: WAYI-iphone-non-signe
+          path: mobile/WAYI-iphone-non-signe.ipa
+
+      - name: Signature Apple et envoi sur TestFlight
+        if: env.APP_STORE_CONNECT_KEY_IDENTIFIER != ''
+        run: |
+          pip3 install --quiet --break-system-packages codemagic-cli-tools || pip3 install --quiet codemagic-cli-tools
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
+          flutter build ipa --release --build-number=${{ github.run_number }} --export-options-plist="$HOME/export_options.plist"
+          app-store-connect publish --path "$(ls build/ios/ipa/*.ipa | head -1)"
+      - uses: actions/upload-artifact@v4
+        if: env.APP_STORE_CONNECT_KEY_IDENTIFIER != ''
+        with:
+          name: WAYI-iphone-app-store
+          path: mobile/build/ios/ipa/*.ipa

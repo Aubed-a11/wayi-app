@@ -43,9 +43,9 @@ Notifications (sans Firebase, rien a configurer)
   de donnees. L'appli la consulte toutes les 10 secondes et l'affiche sur le telephone.
   Restaurant : nouvelle commande. Livreur : nouvelle course. Client : acceptee,
   en route, livree, annulee. Toucher la notification ouvre le suivi de la commande.
-  Livreur en ligne et restaurant connecte : l'appli reste active en arriere-plan
-  (notification permanente "WAYI ... en ligne / ouvert"), les alertes arrivent
-  ecran eteint. Si l'appli est completement fermee (balayee), les alertes
+  Livreur en ligne : l'appli reste active en arriere-plan (notification permanente),
+  les alertes arrivent ecran eteint. Restaurant : garder l'appli ouverte ou en
+  arriere-plan pendant le service. Si l'appli est completement fermee (balayee), les alertes
   s'afficheront a la prochaine ouverture.
 
 Mot de passe oublie : marche maintenant pour client, restaurant et livreur.

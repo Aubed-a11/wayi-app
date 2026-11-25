@@ -10,6 +10,25 @@ WAYI : DEMARRER EN 3 ETAPES
 Tester tout sur le PC sans toucher au serveur : LANCER-EN-LOCAL.bat
 Aucun Firebase a configurer : les notifications passent par le serveur WAYI.
 
+PUBLIER SUR LE PLAY STORE ET L'APP STORE
+========================================
+Tout est pret dans le depot : textes, icones et reponses aux questionnaires dans
+stores\FICHE-STORES.txt, pages obligatoires (confidentialite.html et
+suppression-compte.html) dans le site client, suppression de compte dans l'appli.
+Google Play (compte developpeur : 25 dollars, une seule fois) :
+  1. 5-CREER-CLE-PLAY-STORE.bat (une fois, garder le dossier cles en lieu sur).
+  2. GitHub, Settings, Secrets, Actions : WAYI_KEYSTORE_BASE64, WAYI_KEYSTORE_PASSWORD,
+     WAYI_KEY_PASSWORD, WAYI_KEY_ALIAS (voir le haut de .github/workflows/flutter-android.yml).
+  3. Actions, "Appli Flutter WAYI", Run workflow, puis WAYI.aab sur la page Releases.
+  4. play.google.com/console : creer l'appli, remplir la fiche, envoyer WAYI.aab en
+     test interne puis en production.
+App Store (compte Apple Developer : 99 dollars par an, pas besoin de Mac) :
+  1. appstoreconnect.apple.com : creer l'appli WAYI, identifiant com.wayibenin.wayi.
+  2. 6-PREPARER-APP-STORE.bat, puis les 4 secrets indiques.
+  3. Actions, "Appli iPhone WAYI", Run workflow : l'appli arrive sur TestFlight.
+  4. Dans App Store Connect : remplir la fiche, choisir le build, envoyer en verification.
+Avant d'envoyer : 1-DEPLOYER-SERVEUR.bat et 2-DEPLOYER-FRONT.bat (serveur et pages a jour).
+
 WAYI : TOUT EN UN
 =================
 

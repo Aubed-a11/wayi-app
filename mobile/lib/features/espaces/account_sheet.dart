@@ -5,6 +5,7 @@ import '../../core/icons.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
+import 'delete_account.dart';
 
 /// Compte (livreur ou restaurant) : changer de mot de passe, se deconnecter
 Future<void> showAccountSheet(BuildContext context, {required String passwordPath, required Future<void> Function() onLogout, List<Widget> extra = const []}) {
@@ -36,6 +37,15 @@ Future<void> showAccountSheet(BuildContext context, {required String passwordPat
             onTap: () async {
               Navigator.pop(c);
               await onLogout();
+            },
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Ic.trash, color: C.danger),
+            title: Text('Supprimer mon compte', style: font(size: 15, weight: FontWeight.w600, color: C.danger)),
+            onTap: () {
+              Navigator.pop(c);
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DeleteAccountScreen()));
             },
           ),
         ]),

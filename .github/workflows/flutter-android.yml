@@ -1,6 +1,11 @@
-# Construit l'appli Flutter WAYI (dossier mobile/) et fournit l'APK.
-# Onglet Actions > "Appli Flutter WAYI" > Run workflow. Si la compilation echoue,
-# le message d'erreur est dans le journal de l'etape "Construire l'APK".
+# Construit l'appli Flutter WAYI pour Android (dossier mobile/).
+#   WAYI.apk : a installer directement sur un telephone
+#   WAYI.aab : le fichier a envoyer sur le Google Play Store
+# Signature Play Store : ajouter les secrets du depot (Settings > Secrets > Actions)
+#   WAYI_KEYSTORE_BASE64  contenu de cles\wayi.keystore.base64.txt (5-CREER-CLE-PLAY-STORE.bat)
+#   WAYI_KEYSTORE_PASSWORD et WAYI_KEY_PASSWORD  le mot de passe choisi
+#   WAYI_KEY_ALIAS  wayi
+# Sans ces secrets, l'appli est signee avec une cle de test (refusee par le Play Store).
 name: Appli Flutter WAYI
 
 on:
@@ -17,6 +22,8 @@ jobs:
     defaults:
       run:
         working-directory: mobile
+    env:
+      KEYSTORE_B64: ${{ secrets.WAYI_KEYSTORE_BASE64 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -31,25 +38,46 @@ jobs:
         run: |
           flutter create --platforms=android,ios --org com.wayibenin --project-name wayi .
           dart run tool/patch_platforms.dart
+      - name: Cle de signature Play Store
+        if: env.KEYSTORE_B64 != ''
+        env:
+          STORE_PWD: ${{ secrets.WAYI_KEYSTORE_PASSWORD }}
+          KEY_PWD: ${{ secrets.WAYI_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.WAYI_KEY_ALIAS }}
+        run: |
+          echo "$KEYSTORE_B64" | tr -d '\r\n ' | base64 -d > android/app/upload.keystore
+          {
+            echo "storePassword=$STORE_PWD"
+            echo "keyPassword=${KEY_PWD:-$STORE_PWD}"
+            echo "keyAlias=${KEY_ALIAS:-wayi}"
+            echo "storeFile=upload.keystore"
+          } > android/key.properties
+          echo "Appli signee avec la cle WAYI."
       - name: Dependances
         run: flutter pub get
       - name: Verifier le code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
-      - name: Construire l'APK
-        run: flutter build apk --release
+      - name: Construire l'APK et l'AAB (Play Store)
+        run: |
+          flutter build apk --release --build-number=${{ github.run_number }}
+          flutter build appbundle --release --build-number=${{ github.run_number }}
+          cp build/app/outputs/flutter-apk/app-release.apk WAYI.apk
+          cp build/app/outputs/bundle/release/app-release.aab WAYI.aab
 
       - uses: actions/upload-artifact@v4
         with:
-          name: WAYI-flutter-apk
-          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          name: WAYI-android
+          path: |
+            mobile/WAYI.apk
+            mobile/WAYI.aab
 
-      # Lien fixe pour telecharger l'appli : https://github.com/Aubed-a11/wayi-app/releases/latest
-      - name: Publier l'APK (page Releases)
+      # Lien fixe : https://github.com/Aubed-a11/wayi-app/releases/latest
+      - name: Publier (page Releases)
         if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp build/app/outputs/flutter-apk/app-release.apk WAYI.apk
-          TAG=apk-${{ github.run_number }}
-          gh release create "$TAG" WAYI.apk --title "WAYI Android (build ${{ github.run_number }})" \
-            --notes "Appli WAYI (client, restaurant, livreur). Telecharge WAYI.apk sur le telephone et ouvre-le pour l'installer." --latest
+          if [ -n "$KEYSTORE_B64" ]; then SIG="signee avec la cle WAYI, prete pour le Play Store"; else SIG="signee avec une cle de TEST : le .aab sera refuse par le Play Store tant que les secrets WAYI_KEYSTORE_* ne sont pas ajoutes"; fi
+          gh release create "apk-${{ github.run_number }}" WAYI.apk WAYI.aab \
+            --title "WAYI Android 1.0.0 (build ${{ github.run_number }})" \
+            --notes "WAYI.apk : a installer sur un telephone Android. WAYI.aab : a envoyer sur le Google Play Store. Version $SIG." --latest

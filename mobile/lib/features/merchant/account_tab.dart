@@ -7,6 +7,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
 import '../espaces/account_sheet.dart';
+import '../espaces/delete_account.dart';
 
 /// Compte du restaurant : numeros d'encaissement Mobile Money, mot de passe, deconnexion
 class AccountTab extends StatefulWidget {
@@ -88,6 +89,12 @@ class _AccountTabState extends State<AccountTab> {
           leading: const Icon(Ic.logout, color: C.danger),
           title: Text('Se déconnecter', style: font(size: 15, weight: FontWeight.w600, color: C.danger)),
           onTap: () => s.logout(),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Ic.trash, color: C.danger),
+          title: Text('Supprimer mon compte', style: font(size: 15, weight: FontWeight.w600, color: C.danger)),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DeleteAccountScreen())),
         ),
         const SizedBox(height: 20),
         Center(child: Column(children: [const BeninStripe(width: 40), const SizedBox(height: 8), Text('WAYI Pro', style: small())])),

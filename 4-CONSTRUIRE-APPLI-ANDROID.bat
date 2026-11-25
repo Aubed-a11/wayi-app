@@ -26,15 +26,35 @@ echo === 2/3 Installation des paquets ===
 call flutter pub get || goto erreur
 
 echo.
+echo === Signature Play Store ===
+if exist "%~dp0cles\wayi.keystore" (
+  call "%~dp0cles\mots-de-passe.bat"
+  copy /y "%~dp0cles\wayi.keystore" android\app\upload.keystore >nul
+  > android\key.properties (
+    echo storePassword=%WAYI_KEYSTORE_PASSWORD%
+    echo keyPassword=%WAYI_KEY_PASSWORD%
+    echo keyAlias=%WAYI_KEY_ALIAS%
+    echo storeFile=upload.keystore
+  )
+  echo Appli signee avec la cle WAYI.
+) else (
+  if exist android\key.properties del android\key.properties
+  echo Pas de cle : lance 5-CREER-CLE-PLAY-STORE.bat pour une version Play Store.
+)
+for /f %%i in ('powershell -NoProfile -Command "[int]((Get-Date).ToUniversalTime() - [datetime]'2026-01-01').TotalMinutes"') do set BUILD=%%i
+
 echo.
-echo === 3/3 Fabrication de l'APK (quelques minutes la premiere fois) ===
-call flutter build apk --release || goto erreur
+echo === 3/3 Fabrication de l'APK et de l'AAB (quelques minutes la premiere fois) ===
+call flutter build apk --release --build-number=%BUILD% || goto erreur
+call flutter build appbundle --release --build-number=%BUILD% || goto erreur
 
 if not exist "%~dp0APK" mkdir "%~dp0APK"
 copy /y build\app\outputs\flutter-apk\app-release.apk "%~dp0APK\WAYI.apk" >nul
+copy /y build\app\outputs\bundle\release\app-release.aab "%~dp0APK\WAYI.aab" >nul
 echo.
-echo Termine. L'appli est dans le dossier APK : WAYI.apk
-echo Envoie-la sur ton telephone (WhatsApp, cable...) et ouvre-la pour l'installer.
+echo Termine. Dans le dossier APK :
+echo   WAYI.apk : a installer sur un telephone Android
+echo   WAYI.aab : a envoyer sur le Google Play Store
 explorer "%~dp0APK"
 pause
 exit /b 0

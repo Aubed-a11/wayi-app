@@ -42,8 +42,8 @@ class Api {
   Future<Map<String, dynamic>> put(String path, [Object? body]) =>
       _send(() => _client.put(_uri(path), headers: _headers, body: jsonEncode(body ?? {})));
 
-  Future<Map<String, dynamic>> delete(String path) =>
-      _send(() => _client.delete(_uri(path), headers: _headers));
+  Future<Map<String, dynamic>> delete(String path, [Object? body]) =>
+      _send(() => _client.delete(_uri(path), headers: _headers, body: body == null ? null : jsonEncode(body)));
 
   Future<Map<String, dynamic>> _send(Future<http.Response> Function() request) async {
     http.Response res;

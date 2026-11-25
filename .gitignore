@@ -17,3 +17,12 @@ APK/
 serveur/*.tgz
 mobile/build/
 mobile/.dart_tool/
+*.keystore
+*.jks
+key.properties
+*.p8
+mobile/android/
+mobile/ios/
+mobile/Payload/
+mobile/*.ipa
+mobile/WAYI.a*
