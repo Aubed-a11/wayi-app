@@ -80,7 +80,7 @@ if (client) {
   await tap(p, tabX(4, 5), navY); await shot(p, '16-client-profil');
   await tap(p, tabX(0, 5), navY);
   await scroll(p, -3000);
-  await tap(p, W / 2, 560, 4000); await shot(p, '17-client-plat');
+  await scroll(p, 1150); await tap(p, W / 2, 420, 4000); await shot(p, '17-client-plat');
   await p.close();
 }
 if (merchant) {

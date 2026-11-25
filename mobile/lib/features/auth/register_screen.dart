@@ -130,7 +130,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         body: SafeArea(
           child: ListView(padding: const EdgeInsets.fromLTRB(24, 12, 24, 24), children: [
             Row(children: [
-              RoundIcon(Ic.back, bg: C.surface, onTap: _back),
+              RoundIcon(Ic.back, onTap: _back),
               const Spacer(),
               for (var i = 0; i < 3; i++)
                 AnimatedContainer(

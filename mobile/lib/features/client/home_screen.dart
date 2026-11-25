@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: FeatureCard(dish: featured, tag: period == menu.currentPeriod ? 'Servi maintenant' : menu.periodLabel(period)),
+                child: FeatureCard(dish: featured, tag: menu.periodLabel(period).isEmpty ? 'À la une' : menu.periodLabel(period)),
               ),
             ),
           ],

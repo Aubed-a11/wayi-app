@@ -76,7 +76,7 @@ class _MenuTabState extends State<MenuTab> {
           ? null
           : FloatingActionButton.extended(
               onPressed: () => _open(),
-              backgroundColor: C.ink,
+              backgroundColor: C.brand,
               icon: const Icon(Ic.plus, color: Colors.white),
               label: Text('Ajouter un plat', style: font(weight: FontWeight.w700, color: Colors.white)),
             ),

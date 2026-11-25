@@ -232,7 +232,7 @@ class RoundIcon extends StatelessWidget {
         shape: const CircleBorder(),
         elevation: bg == Colors.white ? 1.5 : 0,
         shadowColor: Colors.black26,
-        child: InkWell(customBorder: const CircleBorder(), onTap: onTap, child: SizedBox(width: 44, height: 44, child: Icon(icon, size: 20, color: bg == C.ink ? Colors.white : C.ink))),
+        child: InkWell(customBorder: const CircleBorder(), onTap: onTap, child: SizedBox(width: 44, height: 44, child: Icon(icon, size: 20, color: bg.computeLuminance() < 0.5 ? Colors.white : C.ink))),
       );
 }
 

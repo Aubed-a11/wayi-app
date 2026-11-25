@@ -112,7 +112,7 @@ class _YiviScreenState extends State<YiviScreen> {
                     for (final s in _suggestions)
                       ActionChip(
                         label: Text(s, style: font(size: 13.5, weight: FontWeight.w600)),
-                        backgroundColor: C.surface,
+                        backgroundColor: C.card, side: const BorderSide(color: C.line),
                         side: BorderSide.none,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                         onPressed: () => _send(s),
@@ -140,14 +140,14 @@ class _YiviScreenState extends State<YiviScreen> {
                 decoration: InputDecoration(
                   hintText: 'Écris à Yivi...',
                   hintStyle: font(size: 14.5, color: C.muted),
-                  filled: true, fillColor: C.surface,
+                  filled: true, fillColor: C.bg,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
                 ),
               ),
             ),
             const SizedBox(width: 10),
-            RoundIcon(Ic.send, bg: C.ink, onTap: () => _send()),
+            RoundIcon(Ic.send, bg: C.brand, onTap: () => _send()),
           ]),
         ),
       ]),
@@ -172,11 +172,12 @@ class _Bubble extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: msg.me ? C.ink : C.surface,
+          color: msg.me ? C.brand : C.card,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(20), topRight: const Radius.circular(20),
             bottomLeft: Radius.circular(msg.me ? 20 : 6), bottomRight: Radius.circular(msg.me ? 6 : 20),
           ),
+          boxShadow: msg.me ? null : softShadow,
         ),
         child: Text(msg.text, style: font(size: 14.5, weight: FontWeight.w500, color: msg.me ? Colors.white : C.ink, height: 1.45)),
       ),

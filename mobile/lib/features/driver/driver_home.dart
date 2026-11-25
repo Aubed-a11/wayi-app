@@ -391,7 +391,7 @@ class _OnlineCard extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(color: online ? C.success : C.surface, borderRadius: BorderRadius.circular(R.lg)),
+        decoration: BoxDecoration(color: online ? C.success : C.card, borderRadius: BorderRadius.circular(R.lg), boxShadow: softShadow),
         child: Row(children: [
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(online ? (status == 'busy' ? 'En course' : 'Tu es en ligne') : 'Hors ligne', style: h2(online ? Colors.white : C.ink)),
