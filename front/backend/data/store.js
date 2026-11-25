@@ -437,6 +437,23 @@ function restoreState(saved) {
   replaceContents(callLogs, saved.callLogs); // absent des anciennes sauvegardes : sans effet dans ce cas
   if (saved.demoSeeded) demoSeeded = true;
   purgeDemoAccounts();
+  if (process.env.DEMO_MENU !== '1') purgeDemoRestaurants();
+}
+
+// Restaurants et plats fictifs (menu de demonstration) : retires des donnees au demarrage.
+// Les commandes passees restent dans l'historique.
+function purgeDemoRestaurants() {
+  const isDemo = (r) => r && (r.demo === true || String(r.id || '').startsWith('demo-resto-'));
+  const gone = new Set(restaurants.filter(isDemo).map(r => r.id));
+  if (!gone.size && !dishes.some(d => d.demo === true)) return 0;
+  for (let i = restaurants.length - 1; i >= 0; i--) if (gone.has(restaurants[i].id)) restaurants.splice(i, 1);
+  let n = 0;
+  for (let i = dishes.length - 1; i >= 0; i--) {
+    if (dishes[i].demo === true || gone.has(dishes[i].restaurantId)) { dishes.splice(i, 1); n++; }
+  }
+  for (let i = merchants.length - 1; i >= 0; i--) if (gone.has(merchants[i].restaurantId)) merchants.splice(i, 1);
+  console.log(`[Store] ${gone.size} restaurant(s) fictif(s) et ${n} plat(s) de demonstration supprime(s).`);
+  return gone.size;
 }
 
 // Comptes de demonstration d'origine (Adele, Kokou, Chantal) : retires des
@@ -549,7 +566,10 @@ async function persistToDatabase() {
 // Semé une seule fois, uniquement sur une plateforme encore vide (aucun
 // restaurant, partenaire ni commande). Désactivable avec NO_DEMO_MENU=1.
 function seedDemoMenuIfEmpty() {
-  if (process.env.NO_DEMO_MENU === '1' || demoSeeded) return 0;
+  // Plus de restaurants fictifs sur la plateforme. Menu de demonstration seulement
+  // pour les tests automatiques (DEMO_MENU=1), jamais en ligne.
+  if (process.env.DEMO_MENU !== '1' || process.env.NODE_ENV === 'production') return 0;
+  if (demoSeeded) return 0;
   if (restaurants.length || merchants.length || orders.length || dishes.length) return 0;
   const { DEMO_RESTAURANTS, DEMO_DISHES } = require('./demoMenu');
   for (const r of DEMO_RESTAURANTS) {

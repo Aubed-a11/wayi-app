@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Star, MapPin, ChefHat, X, ChevronRight, ClipboardList, Heart, Crown, HelpCircle, Info, LogOut, Settings, User, ArrowLeft, Bike } from 'lucide-react';
+import { Star, MapPin, ChefHat, X, ClipboardList, Heart, Crown, HelpCircle, Info, LogOut, Settings, User, Bike } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav, Spinner } from '../components/UI';
 import { DishImg, Empty, fcfa, toCartItem } from '../components/Wayi';
@@ -140,8 +140,8 @@ export default function ProfileScreen() {
       <div className="screen">
         <StatusBar />
         <div className="w-topbar">
-          <button className="w-icon-btn" onClick={() => setTab(null)} aria-label="Retour"><ArrowLeft size={22} aria-hidden="true" /></button>
-          <div className="w-topbar-title">{TITLES[tab]}</div><span style={{ width: 40 }} />
+          <button className="ct-back" onClick={() => setTab(null)}>Retour</button>
+          <div className="w-topbar-title">{TITLES[tab]}</div><span style={{ width: 70 }} />
         </div>
         <div className="w-scroll"><div className="w-pad">
 
@@ -286,7 +286,7 @@ export default function ProfileScreen() {
       <div className="w-scroll">
         <div className="w-profile-head">
           <button className="w-icon-btn w-profile-gear" onClick={() => setShowAddresses(true)} aria-label="Réglages de livraison"><Settings size={22} aria-hidden="true" /></button>
-          <div className="w-avatar"><User size={46} strokeWidth={1.6} aria-hidden="true" /></div>
+          <div className="w-avatar">{(user.name || 'W').trim().charAt(0).toUpperCase()}</div>
           <div className="w-profile-name">{user.name}</div>
           <div className="w-profile-mail">{user.email || user.phone}</div>
         </div>
@@ -303,7 +303,6 @@ export default function ProfileScreen() {
               <button key={key} className="w-menu-item" onClick={() => openItem(key)} style={key === 'logout' ? { color: 'var(--danger)' } : undefined}>
                 <span className="ico" style={key === 'logout' ? { color: 'var(--danger)' } : undefined}><Icon size={21} strokeWidth={1.9} aria-hidden="true" /></span>
                 <span>{label}{sub && <small>{sub}</small>}</span>
-                {key !== 'logout' && <span className="chev"><ChevronRight size={18} aria-hidden="true" /></span>}
               </button>
             ))}
           </div>

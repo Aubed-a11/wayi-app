@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowUp, ShoppingBag, MapPin, Bike, ChevronRight, RotateCcw, ChefHat, Sun, Soup, Shuffle } from 'lucide-react';
+import { Send, ShoppingBag, MapPin, Bike, RotateCcw, ChefHat, Sun, Soup, Shuffle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { StatusBar, BackBtn } from '../components/UI';
+import { StatusBar } from '../components/UI';
 import { aiAPI } from '../api';
 import { toCartItem, MenuCard } from '../components/Wayi';
 
@@ -116,7 +116,7 @@ function CheckoutCard({ checkout, onValidate }) {
         <MapPin size={13} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
         <span>{checkout.address || "Adresse à ajouter à l'étape suivante"}{checkout.paymentLabel ? `, ${checkout.paymentLabel.toLowerCase().startsWith('mtn') ? checkout.paymentLabel : checkout.paymentLabel.toLowerCase()}` : ''}</span>
       </div>
-      <button className="yivi-cta" onClick={onValidate}>Valider et payer <ChevronRight size={16} aria-hidden="true" /></button>
+      <button className="yivi-cta" onClick={onValidate}>Valider et payer</button>
     </div>
   );
 }
@@ -203,12 +203,11 @@ export default function AIScreen() {
       <StatusBar />
 
       <div className="yivi-header">
-        <BackBtn />
-        <YiviOrb size={38} thinking={loading} />
+        <YiviOrb size={42} thinking={loading} />
         <div style={{ flex: 1 }}>
           <div className="yivi-title">Yivi</div>
           <div className={`yivi-status${loading ? ' is-thinking' : ''}`}>
-            <span className="yivi-status-dot" /> {loading ? 'Réfléchit...' : 'Assistante IA de WAYI'}
+            <span className="yivi-status-dot" /> {loading ? 'Écrit...' : 'Ton assistante WAYI, en ligne'}
           </div>
         </div>
         {cartCount > 0 && (
@@ -274,7 +273,7 @@ export default function AIScreen() {
               {showAttachments && m.trackingOrders && (
                 <div className="yivi-attach">
                   <button className="yivi-track" onClick={() => track(m.trackingOrders)}>
-                    <Bike size={17} aria-hidden="true" /> Suivre {m.trackingOrders.length > 1 ? `mes ${m.trackingOrders.length} commandes` : 'ma commande'} en direct <ChevronRight size={15} aria-hidden="true" />
+                    <Bike size={17} aria-hidden="true" /> Suivre {m.trackingOrders.length > 1 ? `mes ${m.trackingOrders.length} commandes` : 'ma commande'} en direct
                   </button>
                 </div>
               )}
@@ -305,7 +304,7 @@ export default function AIScreen() {
             aria-label="Message pour Yivi"
           />
           <button type="submit" className="yivi-send" disabled={loading || !input.trim()} aria-label="Envoyer">
-            <ArrowUp size={19} strokeWidth={2.4} aria-hidden="true" />
+            <Send size={18} strokeWidth={2.2} aria-hidden="true" />
           </button>
         </div>
       </form>

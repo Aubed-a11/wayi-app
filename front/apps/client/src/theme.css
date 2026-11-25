@@ -450,3 +450,56 @@ html, body, #root, .app-shell, .screen { background: #FFFFFF; }
 .ct-empty-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 .ct-ghost { height: 50px; border-radius: 16px; border: 1.5px solid #ECEEF1; background: #fff; font-family: var(--font-body); font-weight: 700; font-size: 14.5px; color: #15181F; cursor: pointer; }
 .ct-back { height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid #ECEEF1; background: #fff; font-family: var(--font-body); font-weight: 700; font-size: 13.5px; color: #A8321F; cursor: pointer; }
+
+/* ============================================================
+   Yivi (assistante) : en-tete degrade, idees en cartes
+   ============================================================ */
+.yivi-header { background: linear-gradient(150deg, #FF8A2B 0%, #F2690D 45%, #C2462B 85%, #8E2318 100%) !important; color: #fff;
+  border-radius: 0 0 26px 26px; padding: 14px 16px 18px !important; border-bottom: 0 !important; box-shadow: 0 8px 20px rgba(168, 50, 31, 0.2); }
+.yivi-header .yivi-title { color: #fff !important; font-size: 18px; }
+.yivi-header .yivi-status { color: rgba(255, 255, 255, 0.9) !important; }
+.yivi-header .yivi-status-dot { background: #7CF5B0 !important; }
+.yivi-header .yivi-orb { background: #fff !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+.yivi-header .yivi-orb::before, .yivi-header .yivi-orb::after { display: none; }
+.yivi-header .yivi-orb > svg { color: #F2690D; }
+.yivi-header .yivi-icon-btn { background: rgba(255, 255, 255, 0.2) !important; color: #fff !important; border: 0 !important; }
+.yivi-hero { background: #fff; border: 1px solid #EEF0F3; border-radius: 24px; padding: 24px 18px 18px !important; margin: 18px 4px 0;
+  box-shadow: 0 10px 26px rgba(21, 24, 31, 0.08); }
+.yivi-hero h2 { font-weight: 800 !important; }
+.yivi-starters { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 18px; }
+.yivi-starter { display: flex !important; flex-direction: column; align-items: flex-start !important; gap: 10px; text-align: left;
+  min-height: 92px; padding: 14px !important; border-radius: 18px !important; background: #fff !important;
+  border: 1px solid #EEF0F3 !important; box-shadow: 0 4px 12px rgba(21, 24, 31, 0.06); font-weight: 700 !important; font-size: 13.5px !important; color: #15181F !important; }
+.yivi-starter-ico { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; }
+.yivi-starter:nth-child(1) .yivi-starter-ico { background: #FFEEDF; color: #F2690D; }
+.yivi-starter:nth-child(2) .yivi-starter-ico { background: #E6F6EE; color: #1E9E5A; }
+.yivi-starter:nth-child(3) .yivi-starter-ico { background: #F3ECFC; color: #8B4FD8; }
+.yivi-starter:nth-child(4) .yivi-starter-ico { background: #E8F1FD; color: #2F7BE5; }
+.yivi-bubble.ai { background: #fff !important; border: 1px solid #EEF0F3; box-shadow: 0 4px 12px rgba(21, 24, 31, 0.06); }
+.yivi-bubble.user { background: linear-gradient(90deg, #F2690D, #D85A2E, #A8321F) !important; }
+.yivi-composer { background: #fff !important; box-shadow: 0 -6px 16px rgba(21, 24, 31, 0.06); border-top: 0 !important; }
+.yivi-input-wrap { background: #F4F5F7 !important; border: 0 !important; }
+.yivi-send { width: 44px !important; height: 44px !important; background: linear-gradient(135deg, #F2690D, #A8321F) !important; }
+
+/* ============================================================
+   Profil : en-tete degrade, chiffres en carte, menu en cartes
+   ============================================================ */
+.w-profile-head { position: relative; background: linear-gradient(150deg, #FF8A2B 0%, #F2690D 45%, #C2462B 85%, #8E2318 100%) !important;
+  color: #fff; padding: 30px 20px 74px !important; border-radius: 0 0 30px 30px; text-align: center; }
+.w-profile-head .w-avatar { width: 84px; height: 84px; margin: 0 auto 12px; border-radius: 50%; background: #fff !important; color: #F2690D !important;
+  display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 34px; box-shadow: 0 8px 22px rgba(80, 20, 10, 0.25); border: 0 !important; }
+.w-profile-head .w-profile-name { color: #fff !important; font-size: 21px; font-weight: 800; }
+.w-profile-head .w-profile-mail { color: rgba(255, 255, 255, 0.88) !important; }
+.w-profile-head .w-profile-gear { position: absolute; right: 16px; top: 16px; background: rgba(255, 255, 255, 0.2) !important; color: #fff !important; border-radius: 50%; }
+.w-stats { position: relative; margin: -48px 16px 0 !important; background: #fff; border-radius: 22px; border: 1px solid #EEF0F3;
+  box-shadow: 0 10px 26px rgba(21, 24, 31, 0.09); padding: 16px 6px !important; display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 0 !important; }
+.w-stats .w-stat { background: transparent !important; box-shadow: none !important; border: 0 !important; text-align: center; }
+.w-stats .w-stat + .w-stat { border-left: 1px solid #EEF0F3 !important; }
+.w-stats .w-stat b { color: #15181F; font-size: 19px; }
+.w-menu { display: flex; flex-direction: column; gap: 10px; background: transparent !important; box-shadow: none !important; border: 0 !important; }
+.w-menu-item { background: #fff !important; border: 1px solid #EEF0F3 !important; border-radius: 18px !important; padding: 12px 14px !important;
+  box-shadow: 0 4px 12px rgba(21, 24, 31, 0.05); display: flex; align-items: center; gap: 12px; }
+.w-menu-item .ico { width: 40px; height: 40px; border-radius: 12px; background: #FFEEDF; color: #F2690D; display: grid; place-items: center; flex-shrink: 0; }
+.w-menu-item:last-child .ico { background: #FDECEC; }
+.w-menu-item small { display: block; color: #8A909C; font-size: 12px; font-weight: 500; margin-top: 2px; }
+.w-order-row { background: #fff; border: 1px solid #EEF0F3; border-radius: 18px; padding: 12px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(21, 24, 31, 0.05); }

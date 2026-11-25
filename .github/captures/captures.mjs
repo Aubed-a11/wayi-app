@@ -98,6 +98,10 @@ await p.close();
     await clickText('Ajouter'); await sleep(800); await clickText('Ajouter'); await sleep(1200);
     await clickText('Panier'); await sleep(3000);
     await w.screenshot({ path: `${OUT}/46-site-panier.png` }); console.log('  capture 46-site-panier');
+    await clickText('Yivi'); await sleep(3000);
+    await w.screenshot({ path: `${OUT}/47-site-yivi.png` }); console.log('  capture 47-site-yivi');
+    await clickText('Profil'); await sleep(3000);
+    await w.screenshot({ path: `${OUT}/48-site-profil.png` }); console.log('  capture 48-site-profil');
   }
   await w.close();
 }

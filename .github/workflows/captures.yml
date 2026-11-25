@@ -22,7 +22,7 @@ jobs:
         working-directory: front/backend
         run: |
           npm ci --omit=dev --no-audit --no-fund
-          NODE_ENV=development PORT=3001 FRONTEND_URLS=http://localhost:8080,http://localhost:8081 nohup node server.js > /tmp/serveur.log 2>&1 &
+          DEMO_MENU=1 NODE_ENV=development PORT=3001 FRONTEND_URLS=http://localhost:8080,http://localhost:8081 nohup node server.js > /tmp/serveur.log 2>&1 &
           sleep 6 && curl -s localhost:3001/health | head -c 200
       - name: Test du parcours complet d'une commande
         working-directory: front/backend
