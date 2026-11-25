@@ -195,7 +195,7 @@ class _Bubble extends StatelessWidget {
           padding: const EdgeInsets.only(top: 4, bottom: 8),
           child: SizedBox(
             width: 240,
-            child: PrimaryButton(label: 'Valider et payer', icon: Ic.next, dark: false, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CartScreen()))),
+            child: PrimaryButton(label: 'Valider et payer', dark: false, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CartScreen()))),
           ),
         ),
       if (quick.isNotEmpty)

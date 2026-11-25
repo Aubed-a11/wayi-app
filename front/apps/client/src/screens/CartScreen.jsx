@@ -1,6 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import toast from 'react-hot-toast';
-import { MapPin, LocateFixed, Trash2, ArrowRight, ArrowLeft, ChevronRight, Plus, Check, Smartphone, CreditCard, Banknote, ShoppingCart } from 'lucide-react';
+import { MapPin, LocateFixed, Trash2, ArrowLeft, ChevronRight, Plus, Check, Smartphone, CreditCard, Banknote, ShoppingCart } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav, Spinner, launchConfetti } from '../components/UI';
 import { DishImg, Qty, Empty, fcfa } from '../components/Wayi';
@@ -288,7 +288,7 @@ export default function CartScreen() {
         </div>
 
         <div className="w-sheet-bottom">
-          <button className="w-btn" onClick={() => setStep('checkout')}>Passer la commande <ArrowRight size={18} aria-hidden="true" /></button>
+          <button className="w-btn" onClick={() => setStep('checkout')}>Passer la commande</button>
         </div>
         <BottomNav />
       </div>
@@ -410,7 +410,7 @@ export default function CartScreen() {
       <div className="w-sheet-bottom">
         {error && <div className="w-error" style={{ marginBottom: 10 }}>{error}</div>}
         <button className="w-btn" onClick={placeOrder} disabled={loading || !!outOfZone}>
-          {loading ? <Spinner size={20} color="#fff" /> : <>Confirmer la commande · {fcfa(total)} <ArrowRight size={18} aria-hidden="true" /></>}
+          {loading ? <Spinner size={20} color="#fff" /> : <>Confirmer la commande · {fcfa(total)}</>}
         </button>
       </div>
 

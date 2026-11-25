@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { Search, MapPin, ChevronDown, Bell, CalendarDays, ArrowRight, Check, RefreshCw, UtensilsCrossed } from 'lucide-react';
+import { Search, MapPin, ChevronDown, Bell, CalendarDays, Check, RefreshCw, UtensilsCrossed } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav } from '../components/UI';
 import { PERIODS, MenuCard, toCartItem, Empty } from '../components/Wayi';
@@ -97,7 +97,7 @@ export default function HomeScreen() {
               <span className="w-banner-tag"><CalendarDays size={14} aria-hidden="true" /> Menu du jour</span>
               <h3>Les menus du jour, préparés par nos restaurants partenaires</h3>
               <button className="w-banner-cta" onClick={() => gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
-                Voir les menus <ArrowRight size={14} aria-hidden="true" />
+                Voir les menus
               </button>
             </div>
             {bannerImg && <div className="w-banner-img" style={{ backgroundImage: `url("${bannerImg}")` }} />}
@@ -119,7 +119,7 @@ export default function HomeScreen() {
           {/* Menus du jour */}
           <div className="w-section-head" ref={gridRef} style={{ scrollMarginTop: 12 }}>
             <span className="w-section-title">Menus du jour</span>
-            <button className="w-link" onClick={() => navigate('explore')}>Voir tout <ArrowRight size={14} aria-hidden="true" /></button>
+            <button className="w-link" onClick={() => navigate('explore')}>Voir tout</button>
           </div>
 
           {loading ? (

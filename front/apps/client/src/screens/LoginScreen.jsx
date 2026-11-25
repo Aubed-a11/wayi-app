@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, ArrowRight, AlertCircle, CheckCircle2, MailCheck, KeyRound, Store, Bike, Phone, MapPin, Hash, ShieldCheck, UtensilsCrossed, BadgePercent } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, AlertCircle, CheckCircle2, MailCheck, KeyRound, Store, Bike, Phone, MapPin, Hash, ShieldCheck, UtensilsCrossed, BadgePercent } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Spinner } from '../components/UI';
 import { authAPI, signupAPI, menuAPI } from '../api';
@@ -362,7 +362,6 @@ export default function LoginScreen() {
                     <button key={acc.role} type="button" className="a7-space" onClick={() => enter(acc)}>
                       <span className="a7-role-ico"><Ico size={20} strokeWidth={1.8} aria-hidden="true" /></span>
                       <span><strong>Espace {ROLE_LABEL[acc.role].toLowerCase()}</strong><small>{acc.name}</small></span>
-                      <ArrowRight size={18} aria-hidden="true" />
                     </button>
                   );
                 })}
@@ -422,7 +421,6 @@ export default function LoginScreen() {
                     : mode === 'verify' ? 'Valider le code'
                     : mode === 'forgot' ? 'Recevoir mon code'
                     : 'Changer mon mot de passe'}
-                  <ArrowRight size={18} aria-hidden="true" />
                 </>
               )}
             </button>}

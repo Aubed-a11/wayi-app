@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           if (_error != null) ...[const SizedBox(height: 4), Notice(_error!), const SizedBox(height: 16)] else const SizedBox(height: 12),
-          PrimaryButton(label: 'Se connecter', icon: Ic.next, loading: _loading, onPressed: _submit),
+          PrimaryButton(label: 'Se connecter', loading: _loading, onPressed: _submit),
           const SizedBox(height: 18),
           Center(
             child: TextButton(

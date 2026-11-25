@@ -76,7 +76,7 @@ class CartScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Align(alignment: Alignment.centerLeft, child: Text('Frais de livraison calculés à l\'étape suivante', style: small())),
                 const SizedBox(height: 14),
-                PrimaryButton(label: 'Choisir la livraison', icon: Ic.next, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CheckoutScreen()))),
+                PrimaryButton(label: 'Choisir la livraison', onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CheckoutScreen()))),
               ]),
             ),
     );

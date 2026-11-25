@@ -88,7 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 0), child: _YiviBanner(onTap: () => ClientShell.goTab(context, 2)))),
         const SliverToBoxAdapter(child: TopRestaurants()),
         if (menu.loading && menu.dishes.isEmpty)
           const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.all(48), child: Center(child: CircularProgressIndicator(color: C.brand))))
@@ -219,43 +218,4 @@ class _Header extends StatelessWidget {
       ]),
     );
   }
-}
-
-/// Bandeau Yivi (assistant)
-class _YiviBanner extends StatelessWidget {
-  final VoidCallback onTap;
-  const _YiviBanner({required this.onTap});
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(18, 16, 12, 16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFF2A1F45), Color(0xFF4B2E83)]),
-            borderRadius: BorderRadius.circular(R.lg),
-            boxShadow: softShadow,
-          ),
-          child: Row(children: [
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text("Pas d'idée pour ce repas ?", style: h3(Colors.white)),
-                const SizedBox(height: 4),
-                Text('Dis à Yivi ce qui te fait envie, il te trouve le bon plat.', style: font(size: 13, color: Colors.white.withValues(alpha: 0.8), height: 1.4)),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
-                  child: Text('Demander à Yivi', style: font(size: 13, weight: FontWeight.w800, color: const Color(0xFF4B2E83))),
-                ),
-              ]),
-            ),
-            const SizedBox(width: 10),
-            Container(
-              width: 70, height: 70,
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.12), shape: BoxShape.circle),
-              child: const Icon(Ic.yivi, size: 34, color: Color(0xFFFFC66E)),
-            ),
-          ]),
-        ),
-      );
 }

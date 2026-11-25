@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { menuAPI } from '../api';
 
@@ -55,7 +54,7 @@ export default function WelcomeScreen() {
         <h1>Les bons plats de Cotonou, livrés chez toi.</h1>
         <p>Un menu choisi chez des restaurants vérifiés, au bon moment de la journée. Client, restaurant ou livreur : un seul espace.</p>
         <button className="wl-btn" onClick={() => open('register')}>
-          Créer un compte <ArrowRight size={18} strokeWidth={2.4} />
+          Créer un compte
         </button>
         <button className="wl-btn-ghost" onClick={() => open('login')}>J'ai déjà un compte</button>
       </section>

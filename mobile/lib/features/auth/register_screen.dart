@@ -190,7 +190,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         const SizedBox(height: 14),
-        PrimaryButton(label: 'Continuer', icon: Ic.next, onPressed: () => setState(() => _step = 1)),
+        PrimaryButton(label: 'Continuer', onPressed: () => setState(() => _step = 1)),
         const SizedBox(height: 16),
         Center(
           child: TextButton(
@@ -240,7 +240,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (_error != null) ...[Notice(_error!), const SizedBox(height: 16)],
       PrimaryButton(
         label: _role == Role.merchant ? 'Créer mon restaurant' : _role == Role.driver ? 'Devenir livreur' : 'Créer mon compte',
-        icon: Ic.next, loading: _loading, onPressed: _sendCode,
+        loading: _loading, onPressed: _sendCode,
       ),
       const SizedBox(height: 14),
       Text("En continuant, tu acceptes les conditions d'utilisation de WAYI.", style: small(), textAlign: TextAlign.center),

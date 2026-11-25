@@ -74,7 +74,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               const SizedBox(height: 10),
               Text('Un menu choisi chez des restaurants vérifiés, au bon moment de la journée. Client, restaurant ou livreur : une seule appli.', style: body(C.muted)),
               const SizedBox(height: 24),
-              PrimaryButton(label: 'Créer un compte', icon: Ic.next, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RegisterScreen()))),
+              PrimaryButton(label: 'Créer un compte', onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RegisterScreen()))),
               const SizedBox(height: 12),
               GhostButton(label: "J'ai déjà un compte", onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen()))),
             ]),
