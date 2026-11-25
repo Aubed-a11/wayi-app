@@ -5,6 +5,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { users, drivers, merchants, admins, orders, restaurants, persistToDatabase, createPendingRegistration, getPendingRegistration, deletePendingRegistration, PLATFORM_CONFIG } = require('../data/store');
 const { signToken, auth } = require('../middleware/auth');
 const { sendEmail } = require('../services/notifications');
+const mails = require('../services/email/templates');
 const { initiatePayment, verifyPayment } = require('../services/payment');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
@@ -89,7 +90,7 @@ router.post('/register/start', async (req, res) => {
     const emailResult = await sendEmail({
       to: email,
       subject: 'Ton code de vérification WAYI',
-      html: `<p>Bonjour ${name},</p><p>Voici ton code de vérification WAYI :</p><h2>${code}</h2><p>Ce code expire dans 10 minutes.</p>`,
+      html: mails.verificationCode({ name, code }),
     });
 
     // L'e-mail peut échouer soit parce qu'aucun service n'est configuré (mode simulation),
@@ -164,7 +165,7 @@ router.post('/register/resend', async (req, res) => {
     const emailResult = await sendEmail({
       to: email,
       subject: 'Ton nouveau code de vérification WAYI',
-      html: `<p>Voici ton nouveau code : <h2>${code}</h2></p>`,
+      html: mails.verificationCode({ name: pending.data?.name, code, context: 'pour finir de créer ton compte WAYI' }),
     });
     const emailFailed = !emailResult?.success;
     res.json({
@@ -209,7 +210,7 @@ router.post('/forgot-password', async (req, res) => {
     const result = await sendEmail({
       to: user.email,
       subject: 'Ton code pour changer de mot de passe WAYI',
-      html: `<p>Bonjour ${first},</p><p>Voici ton code pour choisir un nouveau mot de passe WAYI :</p><h2>${code}</h2><p>Ce code expire dans 10 minutes. Si tu n'as rien demandé, ignore simplement ce message : ton mot de passe reste inchangé.</p>`,
+      html: mails.passwordReset({ name: user.name, code }),
     });
     if (!result?.success) console.warn('[Auth] Envoi du code de réinitialisation impossible pour', email);
     res.json({ ...generic, emailUnavailable: !result?.success || undefined });

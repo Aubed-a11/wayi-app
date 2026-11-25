@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const { merchants, restaurants, dishes, orders, PLATFORM_CONFIG, reviews, getUserById, drivers, calcDistance, addDish, updateDish, deleteDish, enrichDish, getDishById, PERIODS, CATEGORIES, addRestaurant, createPendingRegistration, getPendingRegistration, deletePendingRegistration } = require('../data/store');
 const { auth, signToken } = require('../middleware/auth');
 const { notify, sendEmail } = require('../services/notifications');
+const mails = require('../services/email/templates');
 
 const { normalizeBeninMomo } = require('../utils/phone');
 const { settleManualPayment } = require('../services/payment/manual');
@@ -56,7 +57,7 @@ router.post('/register/start', async (req, res) => {
     const emailResult = await sendEmail({
       to: email,
       subject: 'Ton code de vérification WAYI',
-      html: `<p>Bonjour ${contactName},</p><p>Voici ton code de vérification pour créer le compte de <b>${restaurantName}</b> sur WAYI :</p><h2>${code}</h2><p>Ce code expire dans 10 minutes.</p>`,
+      html: mails.verificationCode({ name: contactName, code, context: `pour créer le compte de <b>${restaurantName}</b> sur WAYI` }),
     });
     // Même filet de sécurité que côté client : si l'envoi échoue vraiment, on ne
     // bloque pas l'inscription, le code est renvoyé au front pour affichage direct.
@@ -84,7 +85,7 @@ router.post('/register/resend', async (req, res) => {
     const emailResult = await sendEmail({
       to: email,
       subject: 'Ton nouveau code de vérification WAYI',
-      html: `<p>Voici ton nouveau code : <h2>${code}</h2></p>`,
+      html: mails.verificationCode({ name: pending?.data?.contactName, code, context: 'pour finir de créer ton compte restaurant WAYI' }),
     });
     const emailFailed = !emailResult?.success;
     res.json({

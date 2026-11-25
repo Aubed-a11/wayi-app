@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 const { drivers, orders, enrichUserProfile, setOrderStatus, generateReceipt, createPendingRegistration, getPendingRegistration, deletePendingRegistration } = require('../data/store');
 const { v4: uuidv4 } = require('uuid');
 const { sendEmail } = require('../services/notifications');
+const mails = require('../services/email/templates');
 const { auth, signToken } = require('../middleware/auth');
 const { declineByDriver } = require('../services/dispatch');
 const { notify } = require('../services/notifications');
@@ -61,7 +62,7 @@ router.post('/register/start', async (req, res) => {
     const emailResult = await sendEmail({
       to: data.email,
       subject: 'Ton code de vérification WAYI Livreur',
-      html: `<p>Bonjour ${data.name},</p><p>Voici ton code pour créer ton compte livreur WAYI :</p><h2>${code}</h2><p>Ce code expire dans 10 minutes.</p>`,
+      html: mails.verificationCode({ name: data.name, code, context: 'pour créer ton compte livreur WAYI' }),
     });
     const emailFailed = !emailResult?.success;
     res.json({ message: `Code envoyé à ${data.email}`, email: data.email, emailSimulated: !!emailResult?.simulated || emailFailed, devCode: (emailFailed || (emailResult?.simulated && process.env.NODE_ENV !== 'production')) ? code : undefined });
@@ -75,7 +76,7 @@ router.post('/register/resend', async (req, res) => {
     const pending = getPendingRegistration(pendingKey(req.body.email));
     if (!pending) return res.status(404).json({ error: 'Aucune inscription en attente pour cet e-mail' });
     const code = createPendingRegistration(pendingKey(req.body.email), pending.data);
-    const emailResult = await sendEmail({ to: pending.data.email, subject: 'Ton nouveau code WAYI Livreur', html: `<p>Voici ton nouveau code : <h2>${code}</h2></p>` });
+    const emailResult = await sendEmail({ to: pending.data.email, subject: 'Ton nouveau code WAYI Livreur', html: mails.verificationCode({ name: pending.data.name, code, context: 'pour créer ton compte livreur WAYI' }) });
     const emailFailed = !emailResult?.success;
     res.json({ message: 'Code renvoyé', emailSimulated: !!emailResult?.simulated || emailFailed, devCode: (emailFailed || (emailResult?.simulated && process.env.NODE_ENV !== 'production')) ? code : undefined });
   } catch {

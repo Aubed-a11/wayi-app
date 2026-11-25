@@ -7,6 +7,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const { sendEmail } = require('../services/notifications');
+const mails = require('../services/email/templates');
 const {
   admins, restaurants, dishes, drivers, merchants, orders, users, callLogs,
   PERIODS, CATEGORIES, TASTES, PLATFORM_CONFIG,
@@ -247,7 +248,7 @@ router.post('/drivers', auth, adminAuth, async (req, res) => {
   const emailResult = await sendEmail({
     to: email,
     subject: 'Bienvenue chez WAYI, ton compte livreur',
-    html: `<p>Bonjour ${name},</p><p>Ton compte livreur WAYI vient d'être créé. Voici tes identifiants pour te connecter sur l'application Livreur :</p><p><b>E-mail :</b> ${email}<br/><b>Mot de passe temporaire :</b> ${tempPassword}</p><p>Connecte-toi dès que possible.</p>`,
+    html: mails.welcomeAccount({ name, role: 'livreur', email, password: tempPassword, url: 'https://driver.wayibenin.com', extra: "Connecte-toi, passe « En ligne » et les courses arrivent directement dans ton espace livreur." }),
   });
   // Même filet de sécurité qu'à l'inscription client : si l'envoi échoue vraiment,
   // on ne bloque pas la création du compte, on renvoie le mot de passe à l'admin
@@ -332,7 +333,7 @@ router.post('/merchants', auth, adminAuth, async (req, res) => {
   const emailResult = await sendEmail({
     to: email,
     subject: 'Bienvenue chez WAYI, ton compte restaurant',
-    html: `<p>Bonjour ${contactName},</p><p>Le compte de <b>${restaurant.name}</b> vient d'être créé sur WAYI. Voici tes identifiants pour te connecter sur l'espace restaurant :</p><p><b>E-mail :</b> ${email}<br/><b>Mot de passe temporaire :</b> ${tempPassword}</p><p>Une fois connecté, tu pourras ajouter les plats de ton menu du jour.</p>`,
+    html: mails.welcomeAccount({ name: contactName, role: `restaurant de ${restaurant.name}`, email, password: tempPassword, url: 'https://admin.wayibenin.com', extra: 'Une fois connecté, tu pourras gérer ton menu, tes prix et recevoir tes commandes.' }),
   });
   const emailFailed = !emailResult?.success;
 

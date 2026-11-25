@@ -166,6 +166,8 @@ function getSmtpTransporter() {
 }
 
 async function sendEmail({ to, subject, html }) {
+  // Tous les e-mails portent la mise en page WAYI (logo, couleurs)
+  html = require('../email/templates').wrap(html, subject);
   // 1. SMTP (compte e-mail classique) — prioritaire si configuré
   if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
     try {
@@ -245,29 +247,11 @@ const EMAIL_SUBJECTS = {
   order_cancelled:  (d) => `Commande annulée · ${d.orderId}`,
 };
 function emailBody(event, d) {
-  const rows = (d.itemsHtml || '');
-  switch (event) {
-    case 'order_confirmed':
-      return `<div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-        <h2 style="color:#6B3A16">Commande passée avec succès</h2>
-        <p>Bonjour ${d.userName || ''},</p>
-        <p>Ta commande <strong>${d.orderId}</strong> chez <strong>${d.shopName}</strong> a bien été reçue et confirmée.</p>
-        ${rows}
-        <p><strong>Total : ${d.total} FCFA</strong></p>
-        <p>Livraison estimée : ${d.estimatedTime}</p>
-        <p>Tu peux suivre ta commande en direct dans l'application WAYI.</p>
-        <p style="color:#888;font-size:12px">Merci de faire confiance à WAYI.</p>
-      </div>`;
-    case 'order_delivered':
-      return `<div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-        <h2 style="color:#6B3A16">Livré, bon appétit !</h2>
-        <p>Bonjour ${d.userName || ''},</p>
-        <p>Ta commande chez <strong>${d.shopName}</strong> est arrivée.</p>
-        <p>N'hésite pas à noter ta commande dans l'application.</p>
-      </div>`;
-    default:
-      return `<p>${d.userName || ''}, ${event}</p>`;
-  }
+  const mails = require('../email/templates');
+  if (event === 'order_confirmed') return mails.orderConfirmed(d);
+  if (event === 'order_delivered') return mails.orderDelivered(d);
+  if (event === 'order_cancelled') return mails.orderCancelled(d);
+  return mails.wrap(`<p>${d.userName || ''}</p>`, 'WAYI');
 }
 async function sendOrderEmail({ email, event, data }) {
   const subjectFn = EMAIL_SUBJECTS[event];
