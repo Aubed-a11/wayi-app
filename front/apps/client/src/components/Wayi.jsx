@@ -20,6 +20,7 @@ export const fcfa = (n) => `${fmtNum(n)}\u00a0FCFA`;
 export const toCartItem = (dish) => ({
   id: dish.id, name: dish.name, icon: dish.icon, image: dish.image || null, price: dish.price,
   restaurantId: dish.restaurantId, restaurantName: dish.restaurant?.name, restaurantIcon: dish.restaurant?.icon,
+  restaurantLogo: dish.restaurant?.logo || null,
 });
 
 export function DishImg({ src, className = '', style, iconSize = 28 }) {

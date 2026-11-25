@@ -18,7 +18,7 @@ SOUS-TITRE (App Store, 30 caracteres max)
   Le bon plat, au bon moment
 
 DESCRIPTION COURTE (Play Store, 80 caracteres max)
-  Les meilleurs plats de Cotonou, choisis pour toi et livres chez toi.
+  Les meilleurs plats, choisis pour toi et livres chez toi.
 
 DESCRIPTION COMPLETE
   WAYI, c'est la livraison de repas a Cotonou, autrement. Au lieu de te perdre dans des

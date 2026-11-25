@@ -1,11 +1,11 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import toast from 'react-hot-toast';
-import { MapPin, LocateFixed, Trash2, ArrowLeft, ChevronRight, Plus, Check, Smartphone, CreditCard, Banknote, ShoppingCart } from 'lucide-react';
+import { MapPin, LocateFixed, Trash2, Plus, Check, Smartphone, CreditCard, Banknote, ShoppingCart, Bike, BadgePercent, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav, Spinner, launchConfetti } from '../components/UI';
-import { DishImg, Qty, Empty, fcfa } from '../components/Wayi';
+import { DishImg, Qty, fcfa, RestoLogo, MenuCard, toCartItem } from '../components/Wayi';
 import AddressSheet from '../components/AddressSheet';
-import { ordersAPI, paymentsAPI, authAPI } from '../api';
+import { ordersAPI, paymentsAPI, authAPI, menuAPI } from '../api';
 
 // Carte chargee seulement a l'etape livraison (Leaflet est lourd)
 const PickLocationMap = lazy(() => import('../components/LiveMap').then(m => ({ default: m.PickLocationMap })));
@@ -55,6 +55,11 @@ export default function CartScreen() {
   const viaKkiapay = payMode === 'kkiapay';
 
   const cart = state.cart;
+  const [ideas, setIdeas] = useState([]);
+  useEffect(() => {
+    if (state.cart.length) return;
+    menuAPI.get({}).then(r => setIdeas((r.data?.dishes || []).filter(d => d.image).slice(0, 4))).catch(() => {});
+  }, [state.cart.length]);
   const user = state.user;
   const restaurantCount = cartByRestaurant.length;
   const defaultAddress = user?.addresses?.find(a => a.isDefault) || user?.addresses?.[0];
@@ -230,8 +235,31 @@ export default function CartScreen() {
     return (
       <div className="screen">
         <StatusBar />
-        <div className="w-topbar"><span style={{ width: 40 }} /><div className="w-topbar-title">Mon panier</div><span style={{ width: 40 }} /></div>
-        <Empty Icon={ShoppingCart} title="Ton panier est vide" text="Ajoute des plats du menu du jour, ou demande à Yivi de choisir pour toi." action={() => navigate('home')} actionLabel="Voir les menus du jour" />
+        <div className="w-scroll" style={{ paddingBottom: 110 }}>
+          <div className="ct-hero">
+            <h1>Mon panier</h1>
+            <p>Il est encore vide.</p>
+          </div>
+          <div className="w-pad">
+            <div className="ct-empty">
+              <span className="ct-empty-ico"><ShoppingCart size={34} strokeWidth={1.8} aria-hidden="true" /></span>
+              <strong>Ton panier attend ses premiers plats</strong>
+              <small>Choisis dans le menu du jour, ou laisse Yivi te proposer le plat qu'il te faut.</small>
+              <div className="ct-empty-actions">
+                <button className="w-btn" onClick={() => navigate('home')}>Voir le menu du jour</button>
+                <button className="ct-ghost" onClick={() => navigate('ai')}>Demander à Yivi</button>
+              </div>
+            </div>
+            {ideas.length > 0 && (
+              <>
+                <div className="w-section-head" style={{ marginTop: 22 }}><span className="w-section-title">Envie d'une idée ?</span></div>
+                <div className="w-grid">
+                  {ideas.map(d => <MenuCard key={d.id} dish={d} onOpen={(x) => { dispatch({ type: 'SET_ACTIVE_DISH', payload: x }); navigate('dish'); }} onAdd={(x) => dispatch({ type: 'CART_ADD', payload: { item: toCartItem(x) } })} />)}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
         <BottomNav />
       </div>
     );
@@ -256,39 +284,69 @@ export default function CartScreen() {
 
   // ── Etape 1 : panier ───────────────────────────────────────
   if (step === 'cart') {
+    const count = cart.reduce((n, i) => n + i.qty, 0);
     return (
       <div className="screen">
         <StatusBar />
-        <div className="w-topbar">
-          <button className="w-icon-btn" onClick={() => navigate('home')} aria-label="Retour"><ArrowLeft size={22} aria-hidden="true" /></button>
-          <div className="w-topbar-title">Mon panier</div>
-          <button className="w-icon-btn" style={{ color: 'var(--brand)' }} onClick={() => { if (window.confirm('Vider le panier ?')) dispatch({ type: 'CART_CLEAR' }); }} aria-label="Vider le panier"><Trash2 size={21} aria-hidden="true" /></button>
-        </div>
+        <div className="w-scroll" style={{ paddingBottom: 250 }}>
+          <div className="ct-hero">
+            <div className="ct-hero-row">
+              <div>
+                <h1>Mon panier</h1>
+                <p>{count} plat{count > 1 ? 's' : ''} · {restaurantCount} restaurant{restaurantCount > 1 ? 's' : ''}</p>
+              </div>
+              <button className="ct-clear" onClick={() => { if (window.confirm('Vider le panier ?')) dispatch({ type: 'CART_CLEAR' }); }} aria-label="Vider le panier">
+                <Trash2 size={18} aria-hidden="true" /> Vider
+              </button>
+            </div>
+          </div>
 
-        <div className="w-scroll" style={{ paddingBottom: 240 }}>
-          <div className="w-pad">
+          <div className="w-pad ct-body">
             {restaurantCount > 1 && (
-              <div className="w-note" style={{ marginBottom: 14 }}>Tes plats viennent de {restaurantCount} restaurants : {restaurantCount} livraisons séparées, chacune avec son livreur.</div>
+              <div className="ct-note"><Bike size={16} aria-hidden="true" /> {restaurantCount} restaurants : {restaurantCount} livraisons séparées, chacune avec son livreur.</div>
             )}
-            {cart.map(item => (
-              <div key={item.id} className="w-cart-item">
-                <DishImg src={item.image} iconSize={22} />
-                <div className="w-cart-info">
-                  <div className="w-cart-name">{item.name}</div>
-                  <div className="w-cart-resto">{item.restaurantName}</div>
-                  <div className="w-price">{fcfa(item.price * item.qty)}</div>
+
+            {cartByRestaurant.map(group => (
+              <div key={group.restaurantId} className="ct-group">
+                <div className="ct-group-head">
+                  <RestoLogo restaurant={{ name: group.restaurantName, logo: group.items.find(i => i.restaurantLogo)?.restaurantLogo }} size={38} />
+                  <div>
+                    <strong>{group.restaurantName}</strong>
+                    <small>{group.items.reduce((n, i) => n + i.qty, 0)} plat{group.items.reduce((n, i) => n + i.qty, 0) > 1 ? 's' : ''}</small>
+                  </div>
                 </div>
-                <Qty small value={item.qty}
-                  onMinus={() => dispatch({ type: 'CART_REMOVE', payload: item.id })}
-                  onPlus={() => dispatch({ type: 'CART_ADD', payload: { item } })} />
+                {group.items.map(item => (
+                  <div key={item.id} className="ct-item">
+                    <DishImg src={item.image} iconSize={22} />
+                    <div className="ct-item-info">
+                      <div className="ct-item-name">{item.name}</div>
+                      <div className="ct-item-unit">{fcfa(item.price)} l'unité</div>
+                      <div className="ct-item-price">{fcfa(item.price * item.qty)}</div>
+                    </div>
+                    <Qty small value={item.qty}
+                      onMinus={() => dispatch({ type: 'CART_REMOVE', payload: item.id })}
+                      onPlus={() => dispatch({ type: 'CART_ADD', payload: { item } })} />
+                  </div>
+                ))}
               </div>
             ))}
-            <div style={{ borderTop: '1px solid var(--border)', marginTop: 18, paddingTop: 10 }}>{summary}</div>
+
+            <button className="ct-more" onClick={() => navigate('home')}><Plus size={16} aria-hidden="true" /> Ajouter d'autres plats</button>
+
+            <div className="ct-perks">
+              <span><Bike size={16} aria-hidden="true" /> Livraison au kilomètre</span>
+              <span><ShieldCheck size={16} aria-hidden="true" /> Restaurants vérifiés</span>
+              {discount > 0 && <span className="on"><BadgePercent size={16} aria-hidden="true" /> {quote.promoCode} appliqué</span>}
+            </div>
+
+            <div className="ct-summary">{summary}</div>
           </div>
         </div>
 
-        <div className="w-sheet-bottom">
-          <button className="w-btn" onClick={() => setStep('checkout')}>Passer la commande</button>
+        <div className="w-sheet-bottom ct-bottom">
+          <button className="w-btn ct-cta" onClick={() => setStep('checkout')}>
+            <span>Passer la commande</span><span className="ct-cta-total">{fcfa(total)}</span>
+          </button>
         </div>
         <BottomNav />
       </div>
@@ -300,7 +358,7 @@ export default function CartScreen() {
     <div className="screen">
       <StatusBar />
       <div className="w-topbar">
-        <button className="w-icon-btn" onClick={() => setStep('cart')} aria-label="Retour au panier"><ArrowLeft size={22} aria-hidden="true" /></button>
+        <button className="ct-back" onClick={() => setStep('cart')}>Retour</button>
         <div className="w-topbar-title">Livraison et paiement</div>
         <span style={{ width: 40 }} />
       </div>
@@ -315,7 +373,6 @@ export default function CartScreen() {
               <span style={{ display: 'block', fontSize: 12.5, color: 'var(--gray)', marginTop: 2 }}>{defaultAddress?.address || 'Adresse, repère et position Google Maps'}</span>
               {defaultAddress?.landmark && <span style={{ display: 'block', fontSize: 12, color: 'var(--gray)' }}>Repère : {defaultAddress.landmark}</span>}
             </span>
-            <ChevronRight size={20} color="#B5AAA3" aria-hidden="true" />
           </button>
           <button className="w-link" style={{ margin: '10px auto 0', display: 'flex' }} onClick={() => setShowAddressPicker(true)}>
             <Plus size={16} aria-hidden="true" /> Changer ou ajouter une adresse

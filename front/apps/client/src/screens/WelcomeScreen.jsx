@@ -51,7 +51,7 @@ export default function WelcomeScreen() {
       </header>
 
       <section className="wl-sheet">
-        <h1>Les bons plats de Cotonou, livrés chez toi.</h1>
+        <h1>Les bons plats, livrés chez toi.</h1>
         <p>Un menu choisi chez des restaurants vérifiés, au bon moment de la journée. Client, restaurant ou livreur : un seul espace.</p>
         <button className="wl-btn" onClick={() => open('register')}>
           Créer un compte

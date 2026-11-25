@@ -70,7 +70,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             padding: EdgeInsets.fromLTRB(24, 28, 24, MediaQuery.of(context).padding.bottom + 22),
             decoration: const BoxDecoration(color: C.card, borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Les bons plats de Cotonou, livrés chez toi.', style: h1()),
+              Text('Les bons plats, livrés chez toi.', style: h1()),
               const SizedBox(height: 10),
               Text('Un menu choisi chez des restaurants vérifiés, au bon moment de la journée. Client, restaurant ou livreur : une seule appli.', style: body(C.muted)),
               const SizedBox(height: 24),
