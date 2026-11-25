@@ -263,3 +263,5 @@
 .a7 .a7-card { background: #FFFFFF; }
 .a7 .a7-tabs button.on { color: #FFFFFF !important; }
 .a7 .a7-role { background: #FFFFFF; border-color: #ECEEF1; }
+
+.a7 .a7-back.a7-back-txt { width: auto; height: 36px; padding: 0 16px; border-radius: 999px; font-family: var(--font-body); font-size: 13.5px; font-weight: 700; color: #A8321F; }

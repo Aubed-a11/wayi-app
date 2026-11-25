@@ -31,7 +31,18 @@ class AuthHeader extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
           child: Row(children: [
-            RoundIcon(Ic.back, onTap: onBack ?? () => Navigator.of(context).maybePop()),
+            Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: onBack ?? () => Navigator.of(context).maybePop(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                  child: Text('Retour', style: font(size: 13.5, weight: FontWeight.w700, color: C.brandDark)),
+                ),
+              ),
+            ),
             const Spacer(),
             trailing ?? ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.asset('assets/logo.png', width: 36, height: 36)),
           ]),
@@ -104,7 +115,6 @@ Future<Account?> chooseAccount(BuildContext context, List<Account> accounts) => 
                             if (a.name.isNotEmpty) Text(a.name, style: small()),
                           ]),
                         ),
-                        const Icon(Ic.chevron, size: 20, color: C.muted),
                       ]),
                     ),
                   ),

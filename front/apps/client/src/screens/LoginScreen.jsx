@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, AlertCircle, CheckCircle2, MailCheck, KeyRound, Store, Bike, Phone, MapPin, Hash, ShieldCheck, UtensilsCrossed, BadgePercent } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle2, MailCheck, KeyRound, Store, Bike, Phone, MapPin, Hash, ShieldCheck, UtensilsCrossed, BadgePercent } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Spinner } from '../components/UI';
 import { authAPI, signupAPI, menuAPI } from '../api';
@@ -280,7 +280,7 @@ export default function LoginScreen() {
         {/* En-tete : logo, photos du menu du jour, titre */}
         <header className={`a7-hero${full ? '' : ' small'}`}>
           <div className="a7-top">
-            {!full && <button className="a7-back" onClick={back} aria-label="Retour"><ArrowLeft size={20} aria-hidden="true" /></button>}
+            {!full && <button className="a7-back a7-back-txt" onClick={back}>Retour</button>}
             <img src="/icon-192.png" alt="WAYI" className="a7-logo" />
             <span className="a7-brand">WAYI<small>Bénin</small></span>
           </div>
