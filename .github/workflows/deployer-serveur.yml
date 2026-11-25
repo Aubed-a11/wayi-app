@@ -57,6 +57,7 @@ jobs:
             sed -i '/^ANTHROPIC_API_KEY=/d;/^ANTHROPIC_MODEL=/d;/^CLAUDE_MODEL=/d' .env
             printf '\nANTHROPIC_API_KEY=%s\nANTHROPIC_MODEL=claude-sonnet-5-5\n' "$1" >> .env
           fi
+          grep -q '^PUBLIC_API_URL=' .env || printf '\nPUBLIC_API_URL=https://api.wayibenin.com\n' >> .env
           chmod 600 .env
           npm install --omit=dev --no-audit --no-fund --silent
           chown -R wayi:wayi "$B"
