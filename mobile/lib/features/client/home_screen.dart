@@ -164,7 +164,7 @@ class _Header extends StatelessWidget {
     return Container(
       padding: EdgeInsets.fromLTRB(20, top + 14, 20, 22),
       decoration: const BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF9A15A), C.brand, Color(0xFFB8402A)]),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFF8A2B), C.brand, Color(0xFFB8402A)]),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

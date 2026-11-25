@@ -50,7 +50,7 @@ class _StatsTabState extends State<StatsTab> {
           if (_dash != null) ...[
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF9A15A), C.brand, Color(0xFFB8402A)]), borderRadius: BorderRadius.circular(R.lg), boxShadow: softShadow),
+              decoration: BoxDecoration(gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFF8A2B), C.brand, Color(0xFFB8402A)]), borderRadius: BorderRadius.circular(R.lg), boxShadow: softShadow),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text("Aujourd'hui", style: small(Colors.white70)),
                 const SizedBox(height: 6),

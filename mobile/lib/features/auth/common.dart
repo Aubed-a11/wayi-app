@@ -22,7 +22,7 @@ class AuthHeader extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF9A15A), C.brand, Color(0xFFC2462B), Color(0xFF8E2318)], stops: [0, 0.35, 0.8, 1]),
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFF8A2B), C.brand, Color(0xFFC2462B), Color(0xFF8E2318)], stops: [0, 0.35, 0.8, 1]),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [BoxShadow(color: C.brandDark.withValues(alpha: 0.25), blurRadius: 22, offset: const Offset(0, 10))],
       ),

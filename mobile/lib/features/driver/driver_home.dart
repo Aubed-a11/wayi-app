@@ -153,7 +153,7 @@ class _DriverHomeState extends State<DriverHome> with WidgetsBindingObserver {
             Container(
               padding: const EdgeInsets.fromLTRB(16, 16, 6, 16),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF9A15A), C.brand, Color(0xFFB8402A)]),
+                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFF8A2B), C.brand, Color(0xFFB8402A)]),
                 borderRadius: BorderRadius.circular(R.lg),
                 boxShadow: softShadow,
               ),

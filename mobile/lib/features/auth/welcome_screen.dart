@@ -30,7 +30,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       backgroundColor: C.brandDark,
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFF9A15A), C.brand, Color(0xFFC2462B), Color(0xFF8E2318)], stops: [0, 0.4, 0.78, 1]),
+          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFF8A2B), C.brand, Color(0xFFC2462B), Color(0xFF8E2318)], stops: [0, 0.4, 0.78, 1]),
         ),
         child: Column(children: [
           Expanded(
