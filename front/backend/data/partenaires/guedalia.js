@@ -19,6 +19,15 @@ const RESTAURANT = {
   prepTime: '25-35',
 };
 
+// Compte de connexion de l'espace restaurant (mot de passe transmis au proprietaire,
+// seule son empreinte chiffree est ici ; a changer depuis l'espace restaurant)
+const ACCOUNT = {
+  id: 'merchant-guedalia',
+  email: 'guedalia@wayibenin.com',
+  name: 'Guédalia Restaurant',
+  passwordHash: '$2a$10$MG0VKUtsqgcdMzTRdnu7R.stm0GQxArd3kZSzTdM017g6YYJlUN0C',
+};
+
 const ACC = "Accompagnement au choix : frites, alloco, attiéké, riz, pâte, akassa, piron, couscous, pommes vapeur ou purée.";
 
 // [slug, periode, categorie, nom, prix, gout, label, description]
@@ -39,4 +48,4 @@ const DISHES = PLATS.map(([slug, period, category, name, price, taste, label, de
   id: `guedalia-${slug}`, restaurantId: RESTAURANT.id, period, category, name, price, taste, label, desc, image: IMG(slug),
 }));
 
-module.exports = { RESTAURANT, DISHES };
+module.exports = { RESTAURANT, DISHES, ACCOUNT };

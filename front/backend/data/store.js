@@ -596,8 +596,21 @@ function seedPartners() {
   if (!fs.existsSync(dir)) return 0;
   let added = 0;
   for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js'))) {
-    const { RESTAURANT, DISHES } = require(path.join(dir, f));
+    const { RESTAURANT, DISHES, ACCOUNT } = require(path.join(dir, f));
     const known = restaurants.find(r => r.id === RESTAURANT.id);
+    // Compte de l'espace restaurant, cree une seule fois
+    const accKey = `compte:${RESTAURANT.id}`;
+    if (ACCOUNT && !partnersSeeded.includes(accKey) && !merchants.some(m => m.restaurantId === RESTAURANT.id || m.email === ACCOUNT.email)) {
+      merchants.push({
+        id: ACCOUNT.id, role: 'merchant', restaurantId: RESTAURANT.id, name: ACCOUNT.name, email: ACCOUNT.email,
+        phone: null, password: ACCOUNT.passwordHash,
+        subscription: { plan: 'free', monthlyFee: 0, active: true },
+        stats: { monthlyOrders: 0, monthlyRevenue: 0, totalOrders: 0, totalRevenue: 0 },
+        createdAt: new Date().toISOString(),
+      });
+      partnersSeeded.push(accKey);
+      console.log(`[Store] Compte restaurant cree : ${ACCOUNT.email}`);
+    }
     if (known && (RESTAURANT.oldTaglines || []).includes(known.tagline)) known.tagline = RESTAURANT.tagline;
     if (partnersSeeded.includes(RESTAURANT.id)) continue;
     if (!restaurants.find(r => r.id === RESTAURANT.id)) {
