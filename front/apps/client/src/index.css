@@ -977,11 +977,11 @@ button { font-family: var(--font-body); }
    Ces règles complètent / surchargent celles du dessus.
    ============================================================ */
 :root {
-  --grad-brand: linear-gradient(135deg, #F58A3D 0%, #DC3D1F 48%, #B02C12 100%);
+  --grad-brand: linear-gradient(135deg, #F2690D 0%, #DC3D1F 48%, #B02C12 100%);
   --grad-sun:   linear-gradient(135deg, #FF9248 0%, #F9710D 100%);
   --grad-ink:   linear-gradient(135deg, #3A2218 0%, #14100E 100%);
   --grad-soft:  linear-gradient(135deg, #FFE9DE 0%, #FFD2BC 100%);
-  --ring:       0 0 0 4px rgba(245, 138, 61, 0.14);
+  --ring:       0 0 0 4px rgba(242, 105, 13, 0.14);
   --r-card:     20px;
 }
 
@@ -1750,7 +1750,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--emerald); box-sh
 .confetti-box i { position: absolute; top: 0; display: block; }
 
 /* Teintes des plats sans photo */
-.shop-card-hero.tint-0:not(.has-img), .mini-hero.tint-0:not(.has-img) { background: radial-gradient(circle at 18% 18%, rgba(255,255,255,.55), rgba(255,255,255,0) 50%), linear-gradient(135deg, #FFB27A, #F58A3D); }
+.shop-card-hero.tint-0:not(.has-img), .mini-hero.tint-0:not(.has-img) { background: radial-gradient(circle at 18% 18%, rgba(255,255,255,.55), rgba(255,255,255,0) 50%), linear-gradient(135deg, #FFB27A, #F2690D); }
 .shop-card-hero.tint-1:not(.has-img), .mini-hero.tint-1:not(.has-img) { background: radial-gradient(circle at 18% 18%, rgba(255,255,255,.55), rgba(255,255,255,0) 50%), linear-gradient(135deg, #FFD27A, #F59E0B); }
 .shop-card-hero.tint-2:not(.has-img), .mini-hero.tint-2:not(.has-img) { background: radial-gradient(circle at 18% 18%, rgba(255,255,255,.5), rgba(255,255,255,0) 50%), linear-gradient(135deg, #F59E8B, #B83A12); }
 .shop-card-hero.tint-3:not(.has-img), .mini-hero.tint-3:not(.has-img) { background: radial-gradient(circle at 18% 18%, rgba(255,255,255,.5), rgba(255,255,255,0) 50%), linear-gradient(135deg, #B7D58A, #4E8A2F); }
@@ -1832,7 +1832,7 @@ html, body, #root { position: fixed; inset: 0; width: 100%; height: 100%; height
 .auth-scroll::-webkit-scrollbar { display: none; }
 
 .auth-hero { position: relative; overflow: hidden; flex-shrink: 0; color: #fff;
-  background: linear-gradient(160deg, #F58A3D 0%, #C23314 55%, #8E200B 100%); }
+  background: linear-gradient(160deg, #F2690D 0%, #C23314 55%, #8E200B 100%); }
 .auth-hero.compact { min-height: 120px; }
 .auth-backdrop { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 10px; opacity: .55; transform: rotate(-6deg) scale(1.25); }
 .auth-hero::after { content: ''; position: absolute; inset: 0; pointer-events: none;
@@ -1841,7 +1841,7 @@ html, body, #root { position: fixed; inset: 0; width: 100%; height: 100%; height
 .bd-track { display: flex; gap: 10px; width: max-content; animation: bdScroll 40s linear infinite; }
 .bd-row.rev .bd-track { animation-direction: reverse; animation-duration: 46s; }
 @keyframes bdScroll { from { transform: translateX(0); } to { transform: translateX(calc(-50% - 5px)); } }
-.bd-tile { position: relative; flex: 0 0 auto; width: 104px; height: 104px; border-radius: 22px; overflow: hidden; display: block; background: linear-gradient(135deg, #FFB27A, #F58A3D); }
+.bd-tile { position: relative; flex: 0 0 auto; width: 104px; height: 104px; border-radius: 22px; overflow: hidden; display: block; background: linear-gradient(135deg, #FFB27A, #F2690D); }
 .bd-tile:nth-child(3n+2) { background: linear-gradient(135deg, #FFD27A, #F59E0B); }
 .bd-tile:nth-child(3n) { background: linear-gradient(135deg, #E8B27D, #A8460D); }
 .bd-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; max-width: none; }
@@ -2001,7 +2001,7 @@ html, body, #root { position: fixed; inset: 0; width: 100%; height: 100%; height
   display: grid; place-items: center;
   background: conic-gradient(from var(--yivi-angle), #F2690D, #FFB27A, #F2690D, #C9520A, #F2690D);
   animation: yiviSpin 9s linear infinite, yiviBreath 4.5s ease-in-out infinite;
-  box-shadow: 0 6px 18px rgba(245, 138, 61, 0.22);
+  box-shadow: 0 6px 18px rgba(242, 105, 13, 0.22);
 }
 .yivi-orb::before {
   content: ''; position: absolute; inset: 3px; border-radius: 50%;
@@ -2009,7 +2009,7 @@ html, body, #root { position: fixed; inset: 0; width: 100%; height: 100%; height
 }
 .yivi-orb::after {
   content: ''; position: absolute; inset: -6px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 138, 61, 0.18), rgba(245, 138, 61, 0) 70%);
+  background: radial-gradient(circle, rgba(242, 105, 13, 0.18), rgba(242, 105, 13, 0) 70%);
   opacity: 0; transition: opacity .4s ease;
 }
 .yivi-orb > svg { position: relative; z-index: 1; color: #C2462B; }
@@ -2027,7 +2027,7 @@ html, body, #root { position: fixed; inset: 0; width: 100%; height: 100%; height
 .yivi-title { font-family: var(--font-display); font-weight: 900; font-size: 17px; line-height: 1.1; }
 .yivi-status { font-size: 11.5px; color: var(--gray); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
 .yivi-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #2E9E6A; box-shadow: 0 0 0 3px rgba(46, 158, 106, 0.15); }
-.yivi-status.is-thinking .yivi-status-dot { background: var(--emerald); box-shadow: 0 0 0 3px rgba(245, 138, 61, 0.15); animation: yiviHalo 1.2s ease-in-out infinite; }
+.yivi-status.is-thinking .yivi-status-dot { background: var(--emerald); box-shadow: 0 0 0 3px rgba(242, 105, 13, 0.15); animation: yiviHalo 1.2s ease-in-out infinite; }
 .yivi-icon-btn {
   width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: #fff;
   display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); position: relative;
@@ -2049,7 +2049,7 @@ html, body, #root { position: fixed; inset: 0; width: 100%; height: 100%; height
   border-radius: 18px; word-wrap: break-word;
 }
 .yivi-bubble.ai { background: #fff; color: var(--ink); border: 1px solid var(--border); border-bottom-left-radius: 6px; box-shadow: 0 3px 10px rgba(120, 45, 20, 0.05); }
-.yivi-bubble.user { background: var(--grad-brand); color: #fff; border-bottom-right-radius: 6px; box-shadow: 0 6px 14px rgba(245, 138, 61, 0.2); }
+.yivi-bubble.user { background: var(--grad-brand); color: #fff; border-bottom-right-radius: 6px; box-shadow: 0 6px 14px rgba(242, 105, 13, 0.2); }
 .yivi-caret { display: inline-block; width: 2px; height: 1em; background: var(--emerald); margin-left: 2px; vertical-align: -2px; animation: yiviBlink .9s steps(2) infinite; }
 @keyframes yiviBlink { to { opacity: 0; } }
 
@@ -2065,7 +2065,7 @@ html, body, #root { position: fixed; inset: 0; width: 100%; height: 100%; height
 .yivi-thinking { display: flex; align-items: center; gap: 10px; margin: 2px 0 16px; animation: yiviIn .3s ease both; }
 .yivi-thinking-text {
   font-size: 13px; font-weight: 600;
-  background: linear-gradient(90deg, var(--gray) 0%, var(--gray) 35%, #F58A3D 50%, var(--gray) 65%, var(--gray) 100%);
+  background: linear-gradient(90deg, var(--gray) 0%, var(--gray) 35%, #F2690D 50%, var(--gray) 65%, var(--gray) 100%);
   background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
   animation: yiviSheen 1.8s linear infinite;
 }
@@ -2104,7 +2104,7 @@ html, body, #root { position: fixed; inset: 0; width: 100%; height: 100%; height
 
 .yivi-composer { display: flex; gap: 8px; align-items: center; padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--border); background: var(--cream); }
 .yivi-input-wrap { flex: 1; display: flex; align-items: center; background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 0 6px 0 16px; transition: border-color .2s ease, box-shadow .2s ease; }
-.yivi-input-wrap:focus-within { border-color: var(--emerald-mid); box-shadow: 0 0 0 3px rgba(245, 138, 61, 0.08); }
+.yivi-input-wrap:focus-within { border-color: var(--emerald-mid); box-shadow: 0 0 0 3px rgba(242, 105, 13, 0.08); }
 .yivi-input-wrap input { flex: 1; border: none !important; background: transparent !important; box-shadow: none !important; outline: none; padding: 12px 0 !important; font-size: 14.5px; min-width: 0; }
 .yivi-send { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--grad-brand); color: #fff; display: grid; place-items: center; cursor: pointer; transition: transform .2s ease, opacity .2s ease; flex-shrink: 0; }
 .yivi-send:disabled { opacity: .4; cursor: default; }

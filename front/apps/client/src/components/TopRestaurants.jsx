@@ -4,7 +4,7 @@ import { menuAPI } from '../api';
 import { MenuCard } from './Wayi';
 
 // Initiales du restaurant (quand il n'a pas encore envoye son logo)
-const COLORS = ['#F58A3D', '#1E9E5A', '#2F7BE5', '#8B4FD8', '#D9467A', '#E59A00', '#0F8A8A'];
+const COLORS = ['#F2690D', '#1E9E5A', '#2F7BE5', '#8B4FD8', '#D9467A', '#E59A00', '#0F8A8A'];
 function Logo({ url, name, size = 44 }) {
   const words = String(name || '').split(/\s+/).filter(w => w.length > 2);
   const initials = (words.length ? words.slice(0, 2).map(w => w[0]) : [String(name || 'W')[0]]).join('').toUpperCase();

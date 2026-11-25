@@ -363,7 +363,7 @@ export default function MerchantScreen() {
                 background: 'var(--white)',
                 border: `2px solid ${order.status === 'ready' ? 'var(--emerald)' : order.status === 'preparing' ? 'var(--sun)' : order.status === 'pending' ? '#c45012' : 'var(--border)'}`,
                 borderRadius: 'var(--r-lg)', padding: '14px', marginBottom: 12,
-                boxShadow: order.status === 'ready' || order.status === 'pending' ? '0 4px 16px rgba(245, 138, 61, 0.12)' : 'none',
+                boxShadow: order.status === 'ready' || order.status === 'pending' ? '0 4px 16px rgba(242, 105, 13, 0.12)' : 'none',
                 transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>

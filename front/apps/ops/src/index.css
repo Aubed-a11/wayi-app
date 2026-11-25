@@ -5,11 +5,11 @@
 
 /* ── TOKENS ──────────────────────────────────────────────── */
 :root {
-  --emerald:      #F58A3D;
+  --emerald:      #F2690D;
   --emerald-dark: #A8321F;
   --emerald-light:#F7ECE3;
   --emerald-mid:  #E9C8AE;
-  --sun:          #F58A3D;
+  --sun:          #F2690D;
   --sun-light:    #F7ECE3;
   --cream:        #FBF7F1;
   --ink:          #0F1419;
@@ -1005,11 +1005,11 @@ button { font-family: var(--font-body); }
    Ces règles complètent / surchargent celles du dessus.
    ============================================================ */
 :root {
-  --grad-brand: linear-gradient(135deg, #F9A15A 0%, #F58A3D 55%, #C2462B 100%);
-  --grad-sun:   linear-gradient(135deg, #F9A15A 0%, #F58A3D 100%);
+  --grad-brand: linear-gradient(135deg, #FF8A2B 0%, #F2690D 55%, #C2462B 100%);
+  --grad-sun:   linear-gradient(135deg, #FF8A2B 0%, #F2690D 100%);
   --grad-ink:   linear-gradient(135deg, #3A2218 0%, #14100E 100%);
   --grad-soft:  linear-gradient(135deg, #FFE9DE 0%, #FFD2BC 100%);
-  --ring:       0 0 0 4px rgba(245, 138, 61, 0.14);
+  --ring:       0 0 0 4px rgba(242, 105, 13, 0.14);
   --r-card:     20px;
 }
 
@@ -1044,13 +1044,13 @@ button { font-family: var(--font-body); }
 .btn-primary {
   background: var(--grad-brand);
   border-radius: 16px; font-size: 16px; min-height: 54px;
-  box-shadow: 0 10px 22px rgba(245, 138, 61, 0.30);
+  box-shadow: 0 10px 22px rgba(242, 105, 13, 0.30);
 }
 .btn-primary:active { background: var(--emerald-dark); }
 .btn-sun {
   background: var(--grad-sun);
   border-radius: 16px; font-size: 16px; min-height: 54px;
-  box-shadow: 0 10px 22px rgba(245, 138, 61, 0.34);
+  box-shadow: 0 10px 22px rgba(242, 105, 13, 0.34);
 }
 .btn-ghost { font-size: 14px; }
 
@@ -1077,7 +1077,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--emerald); box-sh
 .tab-item { font-size: 13px; }
 .stat-box { border-radius: 18px; box-shadow: 0 3px 12px rgba(120,45,20,0.06); }
 .stat-label { font-size: 11.5px; }
-.chat-bubble-user { background: var(--grad-brand); box-shadow: 0 6px 14px rgba(245, 138, 61, 0.24); }
+.chat-bubble-user { background: var(--grad-brand); box-shadow: 0 6px 14px rgba(242, 105, 13, 0.24); }
 .chat-bubble-ai { box-shadow: 0 3px 10px rgba(120,45,20,0.06); }
 
 .toast { background: var(--grad-brand); }
