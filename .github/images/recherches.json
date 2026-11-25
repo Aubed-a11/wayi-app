@@ -1,33 +1,7 @@
 {
-  "salade-nicoise": ["salade niçoise", "nicoise salad"],
-  "salade-guedalia": ["chicken avocado corn salad", "avocado chicken salad"],
-  "salade-avocat-crevettes": ["avocado shrimp salad", "shrimp avocado salad"],
-  "salade-du-chef": ["chef salad", "chef salad ham cheese"],
-  "chawarma-poulet": ["chicken shawarma wrap", "shawarma wrap"],
-  "chawarma-guedalia": ["shawarma sandwich", "beef shawarma"],
-  "croque-monsieur": ["croque monsieur", "croque-monsieur"],
-  "philadelphia": ["philly cheesesteak", "cheesesteak sandwich"],
-  "cheese-burger": ["cheeseburger", "cheeseburger fries"],
-  "burger-guedalia": ["burger ham cheese", "hamburger"],
-  "brochette-guedalia": ["chicken beef skewers vegetables", "brochettes"],
-  "demi-poulet-grille": ["grilled half chicken", "grilled chicken"],
-  "poulet-bicyclette": ["poulet bicyclette", "grilled whole chicken"],
-  "choukouya-mouton": ["choukouya", "suya meat"],
-  "poisson-grille": ["grilled tilapia", "grilled whole fish"],
-  "crevettes-ail": ["garlic shrimp", "gambas al ajillo"],
-  "assiette-chawarma": ["shawarma plate", "shawarma platter fries"],
-  "pizza-marguerita": ["pizza margherita", "margherita pizza"],
-  "pizza-guedalia": ["pizza chicken ham", "pizza supreme"],
-  "pizza-quatre-fromages": ["four cheese pizza", "pizza quattro formaggi"],
-  "poulet-yassa": ["poulet yassa", "chicken yassa"],
-  "poulet-kedjenou": ["kedjenou", "poulet kedjenou"],
-  "sauce-arachide": ["sauce arachide", "groundnut soup chicken"],
-  "couscous-royal": ["couscous royal", "couscous lamb vegetables"],
-  "sauce-gombo": ["sauce gombo", "okra soup"],
-  "spaghetti-bolognaise": ["spaghetti bolognese", "spaghetti bolognaise"],
-  "crepe-chocolat": ["crêpe chocolat", "chocolate crepe"],
-  "degue-raisin": ["dêguê", "degue millet yogurt"],
-  "jus-ananas": ["pineapple juice glass", "pineapple juice"],
-  "jus-gingembre": ["ginger juice", "ginger drink"],
-  "jus-citron": ["lemonade glass", "lemon juice"]
+ "jus-citron": [
+  "citronnade",
+  "lemonade",
+  "fresh lemonade glass"
+ ]
 }

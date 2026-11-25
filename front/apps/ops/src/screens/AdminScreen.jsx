@@ -14,7 +14,7 @@ const PERIODS = [
 const CATEGORIES = [
   { id: 'plats_locaux', label: 'Plats locaux', icon: 'soup' },
   { id: 'healthy',      label: 'Healthy',       icon: 'salad' },
-  { id: 'burgers',      label: 'Burgers',       icon: 'sandwich' },
+  { id: 'burgers',      label: 'Fast-food',       icon: 'sandwich' },
   { id: 'grillades',    label: 'Grillades',     icon: 'flame' },
   { id: 'boissons',     label: 'Boissons',      icon: 'cup-soda' },
 ];

@@ -21,7 +21,7 @@ const paymentRoutes     = require('./routes/payments');
 
 const { initSocket, getRealtimeStats } = require('./services/realtime');
 const { getPool: getDb }                = require('./services/database/postgres');
-const { hydrateFromDatabase, persistToDatabase, applySecurityOverrides, seedDemoMenuIfEmpty } = require('./data/store');
+const { hydrateFromDatabase, persistToDatabase, applySecurityOverrides, seedDemoMenuIfEmpty, seedPartners } = require('./data/store');
 
 const app    = express();
 // Nécessaire car le trafic passe par un reverse proxy Nginx (X-Forwarded-For) :
@@ -147,6 +147,7 @@ async function start() {
   // Menu de démonstration (Cotonou) : uniquement si la plateforme est encore vide.
   const seeded = seedDemoMenuIfEmpty();
   if (seeded) console.log(`  Menu de démonstration : ${seeded} plats ajoutés`);
+  seedPartners();
   // Mots de passe administrateur/démo définis dans le .env : appliqués après la restauration de l'état.
   applySecurityOverrides();
 

@@ -8,7 +8,7 @@ import '../../models/models.dart';
 import 'dish_form_screen.dart';
 
 const periodLabels = {'petit_dejeuner': 'Petit-déjeuner', 'dejeuner': 'Déjeuner', 'gouter': 'Goûter', 'diner': 'Dîner'};
-const categoryLabels = {'plats_locaux': 'Plats locaux', 'healthy': 'Healthy', 'burgers': 'Burgers', 'grillades': 'Grillades', 'boissons': 'Boissons'};
+const categoryLabels = {'plats_locaux': 'Plats locaux', 'healthy': 'Healthy', 'burgers': 'Fast-food', 'grillades': 'Grillades', 'boissons': 'Boissons'};
 
 /// Le menu du restaurant : ajouter, modifier, retirer des plats
 class MenuTab extends StatefulWidget {

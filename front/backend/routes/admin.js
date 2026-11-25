@@ -300,15 +300,19 @@ router.put('/drivers/:id/reactivate', auth, adminAuth, (req, res) => {
 // POST /api/admin/merchants — créer le compte d'un restaurant partenaire
 // (crée à la fois le restaurant et son compte de connexion, avec e-mail de bienvenue)
 router.post('/merchants', auth, adminAuth, async (req, res) => {
-  const { restaurantName, tagline, icon, zone, lat, lng, contactName, email, phone } = req.body;
-  if (!restaurantName || lat === undefined || lng === undefined) {
+  const { restaurantName, tagline, icon, zone, lat, lng, contactName, email, phone, restaurantId } = req.body;
+  // Restaurant deja present sur la plateforme (ex. Guedalia) : on lui cree seulement son compte
+  const existing = restaurantId ? restaurants.find(r => r.id === restaurantId) : null;
+  if (restaurantId && !existing) return res.status(404).json({ error: 'Restaurant introuvable' });
+  if (existing && merchants.some(m => m.restaurantId === existing.id)) return res.status(409).json({ error: 'Ce restaurant a deja un compte' });
+  if (!existing && (!restaurantName || lat === undefined || lng === undefined)) {
     return res.status(400).json({ error: 'restaurantName, lat et lng requis' });
   }
   if (!contactName || !email) return res.status(400).json({ error: 'contactName et e-mail requis' });
   if (merchants.find(m => m.email === email)) return res.status(409).json({ error: 'Cet e-mail est déjà utilisé' });
 
   // 1. Le restaurant lui-même (fiche publique : nom, position, menu à venir)
-  const restaurant = addRestaurant({
+  const restaurant = existing || addRestaurant({
     name: restaurantName, tagline: tagline || '', icon: icon || 'utensils',
     zone: zone || '', lat, lng, verified: false,
   });
@@ -328,7 +332,7 @@ router.post('/merchants', auth, adminAuth, async (req, res) => {
   const emailResult = await sendEmail({
     to: email,
     subject: 'Bienvenue chez WAYI, ton compte restaurant',
-    html: `<p>Bonjour ${contactName},</p><p>Le compte de <b>${restaurantName}</b> vient d'être créé sur WAYI. Voici tes identifiants pour te connecter sur l'espace restaurant :</p><p><b>E-mail :</b> ${email}<br/><b>Mot de passe temporaire :</b> ${tempPassword}</p><p>Une fois connecté, tu pourras ajouter les plats de ton menu du jour.</p>`,
+    html: `<p>Bonjour ${contactName},</p><p>Le compte de <b>${restaurant.name}</b> vient d'être créé sur WAYI. Voici tes identifiants pour te connecter sur l'espace restaurant :</p><p><b>E-mail :</b> ${email}<br/><b>Mot de passe temporaire :</b> ${tempPassword}</p><p>Une fois connecté, tu pourras ajouter les plats de ton menu du jour.</p>`,
   });
   const emailFailed = !emailResult?.success;
 

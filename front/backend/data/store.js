@@ -44,7 +44,7 @@ const PERIODS = [
 const CATEGORIES = [
   { id: 'plats_locaux', label: 'Plats locaux', icon: 'soup' },
   { id: 'healthy',      label: 'Healthy',       icon: 'salad' },
-  { id: 'burgers',      label: 'Burgers',       icon: 'sandwich' },
+  { id: 'burgers',      label: 'Fast-food',       icon: 'sandwich' },
   { id: 'grillades',    label: 'Grillades',     icon: 'flame' },
   { id: 'boissons',     label: 'Boissons',      icon: 'cup-soda' },
 ];
@@ -95,6 +95,8 @@ const DISH_LABELS = [
 // Le menu de démonstration n'est semé qu'une seule fois (drapeau persisté),
 // pour ne pas réapparaître si l'équipe supprime les restaurants de démo.
 let demoSeeded = false;
+// Restaurants partenaires deja inseres une fois (ne reviennent pas s'ils sont supprimes depuis l'admin)
+const partnersSeeded = [];
 
 function enrichDish(dish) {
   const r = restaurants.find(x => x.id === dish.restaurantId);
@@ -412,7 +414,7 @@ function deleteDish(id) {
 // Voir services/database/supabase.js pour le détail de l'approche et ses limites.
 
 function snapshotState() {
-  return { users, drivers, merchants, admins, restaurants, dishes, reviews, orders, receipts, callLogs, demoSeeded };
+  return { users, drivers, merchants, admins, restaurants, dishes, reviews, orders, receipts, callLogs, demoSeeded, partnersSeeded };
 }
 
 // Remplace le CONTENU des tableaux existants (sans changer leur référence,
@@ -436,6 +438,7 @@ function restoreState(saved) {
   replaceContents(receipts, saved.receipts);
   replaceContents(callLogs, saved.callLogs); // absent des anciennes sauvegardes : sans effet dans ce cas
   if (saved.demoSeeded) demoSeeded = true;
+  replaceContents(partnersSeeded, saved.partnersSeeded || []);
   purgeDemoAccounts();
   if (process.env.DEMO_MENU !== '1') purgeDemoRestaurants();
 }
@@ -565,6 +568,30 @@ async function persistToDatabase() {
 // ─── MENU DE DÉMONSTRATION (Cotonou) ──────────────────────────
 // Semé une seule fois, uniquement sur une plateforme encore vide (aucun
 // restaurant, partenaire ni commande). Désactivable avec NO_DEMO_MENU=1.
+// Vrais restaurants partenaires (data/partenaires) : inseres une seule fois, avec leurs plats.
+function seedPartners() {
+  const fs = require('fs'), path = require('path');
+  const dir = path.join(__dirname, 'partenaires');
+  if (!fs.existsSync(dir)) return 0;
+  let added = 0;
+  for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js'))) {
+    const { RESTAURANT, DISHES } = require(path.join(dir, f));
+    if (partnersSeeded.includes(RESTAURANT.id)) continue;
+    if (!restaurants.find(r => r.id === RESTAURANT.id)) {
+      restaurants.push({ icon: 'utensils', rating: null, verified: true, priorityScore: 60, momoMtn: null, momoMoov: null,
+        createdAt: new Date().toISOString(), ...RESTAURANT });
+    }
+    for (const d of DISHES) {
+      if (dishes.find(x => x.id === d.id)) continue;
+      dishes.push({ icon: 'utensils', characteristics: '', advantages: '', benefits: '', ...d });
+      added++;
+    }
+    partnersSeeded.push(RESTAURANT.id);
+    console.log(`[Store] Restaurant partenaire ajoute : ${RESTAURANT.name} (${DISHES.length} plats)`);
+  }
+  return added;
+}
+
 function seedDemoMenuIfEmpty() {
   // Plus de restaurants fictifs sur la plateforme. Menu de demonstration seulement
   // pour les tests automatiques (DEMO_MENU=1), jamais en ligne.
@@ -594,7 +621,7 @@ function seedDemoMenuIfEmpty() {
 }
 
 module.exports = { snapshotState, restoreState, outOfZone, outOfZoneMessage,
-  PLATFORM_CONFIG, PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, beninHour, seedDemoMenuIfEmpty,
+  PLATFORM_CONFIG, PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, beninHour, seedDemoMenuIfEmpty, seedPartners,
   restaurants, dishes, users, drivers, merchants, admins, reviews, orders, receipts, callLogs,
   enrichDish, getMenu, getDishById, getRestaurantById, getDishesByRestaurant,
   getUserById, getOrdersByUser, addOrder, updateOrder,
