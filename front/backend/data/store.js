@@ -644,7 +644,25 @@ function seedPartners() {
     partnersSeeded.push(RESTAURANT.id);
     console.log(`[Store] Restaurant partenaire ajoute : ${RESTAURANT.name} (${DISHES.length} plats)`);
   }
+  seedReviewAccount();
   return added;
+}
+
+// Compte de test pour la verification des stores (cree une seule fois)
+function seedReviewAccount() {
+  const A = require('./comptes-revue');
+  const key = 'compte:revue-stores';
+  if (partnersSeeded.includes(key) || users.some(u => u.email === A.email)) return;
+  users.push({
+    id: A.id, name: A.name, phone: A.phone, email: A.email, password: A.passwordHash, avatar: 'T',
+    city: 'Abomey-Calavi', addresses: [], favoriteDishes: [],
+    location: { lat: 6.441, lng: 2.352, zone: 'Abomey-Calavi' },
+    emailVerified: true, loyaltyPoints: 0, ordersCount: 0, savedTotal: 0,
+    wayiPlus: { count: 0, target: 10, active: false }, reviewAccount: true,
+    createdAt: new Date().toISOString(),
+  });
+  partnersSeeded.push(key);
+  console.log('[Store] Compte de test des stores cree : ' + A.email);
 }
 
 function seedDemoMenuIfEmpty() {

@@ -1,0 +1,56 @@
+WAYI : PUBLIER L'APPLI SUR LE GOOGLE PLAY STORE
+================================================
+
+A. CE QUI EST DEJA PRET
+  Fichier a envoyer : WAYI.aab (page Releases du depot GitHub, apres la compilation signee)
+  Identifiant : com.wayibenin.wayi
+  Textes de la fiche : FICHE-STORES.txt
+  Icone 512 : icone-play-store-512.png
+  Image de presentation 1024 x 500 : banniere-play-store-1024x500.png
+  6 captures de telephone : captures-play-store/
+  Politique de confidentialite : https://www.wayibenin.com/confidentialite.html
+  Suppression de compte : https://www.wayibenin.com/suppression-compte.html
+  Compte de test pour Google : revue@wayibenin.com (mot de passe dans le dossier des cles)
+
+B. LA CLE DE SIGNATURE (une seule fois)
+  Ajouter 2 secrets sur GitHub (Settings > Secrets and variables > Actions) :
+    WAYI_KEYSTORE_BASE64   = tout le contenu de WAYI_KEYSTORE_BASE64.txt
+    WAYI_KEYSTORE_PASSWORD = le contenu de WAYI_KEYSTORE_PASSWORD.txt
+  Puis relancer la compilation Android. Le nouveau WAYI.aab est signe pour le Play Store.
+  Garder le fichier wayi-upload.keystore et son mot de passe en lieu sur.
+  Avec la signature des applis par Google (activee par defaut), une cle perdue peut etre
+  remplacee depuis la Play Console.
+
+C. COMPTE DEVELOPPEUR
+  play.google.com/console : 25 dollars, une seule fois. Piece d'identite demandee.
+  Compte personnel cree apres novembre 2023 : Google impose d'abord un test ferme avec au
+  moins 12 testeurs pendant 14 jours avant la mise en production.
+  Compte organisation (entreprise, numero D-U-N-S) : pas de test ferme obligatoire.
+
+D. CREER L'APPLI DANS LA CONSOLE
+  Nom : WAYI   Langue : francais   Appli   Gratuite
+
+E. QUESTIONNAIRES (rubrique "Contenu de l'appli")
+  Acces a l'appli : certaines fonctions demandent une connexion. Donner le compte de test.
+  Publicites : non.
+  Classification du contenu : categorie Utilitaire/Autre, aucune violence, aucun contenu
+    sexuel, pas de jeux d'argent ; achats de biens reels (repas) : oui.
+  Public cible : 18 ans et plus.
+  Appli d'actualites : non.  Appli gouvernementale : non.  Fonctions financieres : non.
+  Securite des donnees :
+    Donnees collectees : nom, adresse e-mail, numero de telephone, adresse de livraison,
+      position precise (livraison et suivi du livreur), historique des commandes,
+      messages ecrits a Yivi.
+    Usage : fonctionnement de l'appli, gestion du compte, assistance.
+    Donnees partagees avec des tiers : non (les prestataires qui traitent les donnees pour
+      WAYI ne comptent pas comme un partage).
+    Chiffrement pendant le transfert : oui (https).
+    Suppression des donnees : oui, depuis l'appli (Profil > Supprimer mon compte) et sur
+      https://www.wayibenin.com/suppression-compte.html
+  Autorisation de position : expliquer qu'elle sert a l'adresse de livraison et au suivi
+    du livreur en direct.
+
+F. ENVOYER UNE VERSION
+  Test ferme (ou Production pour un compte organisation) > Creer une version >
+  envoyer WAYI.aab > notes de version (texte "Nouveautes" de FICHE-STORES.txt) >
+  pays : Benin > Envoyer pour examen. Delai habituel : quelques jours.

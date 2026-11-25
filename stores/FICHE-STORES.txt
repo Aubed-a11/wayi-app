@@ -21,13 +21,13 @@ DESCRIPTION COURTE (Play Store, 80 caracteres max)
   Les meilleurs plats, choisis pour toi et livres chez toi.
 
 DESCRIPTION COMPLETE
-  WAYI, c'est la livraison de repas a Cotonou, autrement. Au lieu de te perdre dans des
+  WAYI, c'est la livraison de repas a Abomey-Calavi et Cotonou, autrement. Au lieu de te perdre dans des
   centaines de menus, WAYI selectionne pour toi les meilleurs plats des restaurants de la
   ville, au bon moment de la journee : petit-dejeuner, dejeuner, gouter ou diner.
 
   Commande en quelques secondes
-  Choisis ton plat, indique ton adresse ou un point de repere, et paie par Mobile Money,
-  carte ou a la livraison. Tu suis ton livreur en direct sur la carte jusqu'a ta porte.
+  Choisis ton plat, indique ton adresse ou un point de repere, et paie par Mobile Money
+  ou en especes a la livraison. Tu suis ton livreur en direct sur la carte jusqu'a ta porte.
 
   Yivi, ton assistant gourmand
   Dis a Yivi ce qui te fait envie ou ce que tu ne manges pas : il te propose les plats qui
@@ -42,7 +42,7 @@ DESCRIPTION COMPLETE
   Commande acceptee, en route, livree : tu es prevenu a chaque etape.
 
 MOTS-CLES (App Store, 100 caracteres max, separes par des virgules)
-  livraison,repas,Cotonou,Benin,restaurant,plats,manger,commande,maquis,Mobile Money
+  livraison,repas,Calavi,Cotonou,Benin,restaurant,plats,manger,commande,maquis,Mobile Money
 
 TEXTE "NOUVEAUTES" (premiere version)
   Premiere version de WAYI : commande, paiement, suivi du livreur en direct, assistant Yivi,
@@ -52,8 +52,7 @@ VISUELS (dossier stores)
   icone-app-store-1024.png        icone App Store (1024 x 1024, sans transparence)
   icone-play-store-512.png        icone Play Store (512 x 512)
   banniere-play-store-1024x500.png  image de presentation Play Store
-  Captures d'ecran : a faire sur ton telephone (4 a 6 ecrans : accueil, plat, panier,
-  suivi sur la carte, Yivi, espace restaurant).
+  captures-play-store/01 a 06-wayi.png  6 captures de telephone pretes (1080 x 1920)
     Play Store : au moins 2 captures de telephone.
     App Store : captures d'un iPhone 6,7 ou 6,9 pouces (1290 x 2796 par exemple).
     Sans iPhone de cette taille : simulateur ou outil en ligne de mise au format.
