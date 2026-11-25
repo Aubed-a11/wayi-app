@@ -1,0 +1,39 @@
+name: Creer un compte livreur
+on:
+  workflow_dispatch:
+    inputs:
+      nom:
+        description: 'Nom du livreur'
+        required: true
+      email:
+        description: 'E-mail du livreur (il y recoit ses identifiants)'
+        required: true
+      telephone:
+        description: 'Telephone (facultatif)'
+        required: false
+permissions:
+  contents: read
+jobs:
+  livreur:
+    runs-on: ubuntu-latest
+    env:
+      HOST: ${{ secrets.VPS_HOST || '76.13.37.17' }}
+      SSHPASS: ${{ secrets.VPS_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Envoyer le script et creer le compte
+        env:
+          NOM: ${{ inputs.nom }}
+          EMAIL: ${{ inputs.email }}
+          TEL: ${{ inputs.telephone }}
+        run: |
+          sudo apt-get install -y -qq sshpass > /dev/null
+          sshpass -e scp -o StrictHostKeyChecking=accept-new front/backend/scripts/creer-livreur.js root@$HOST:/home/wayi/wayi-backend/scripts/creer-livreur.js
+          ARGS=$(printf '%s\n%s\n%s' "$NOM" "$EMAIL" "$TEL" | base64 -w0)
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new root@$HOST bash -s -- "$ARGS" <<'SCRIPT'
+          set -e
+          mapfile -t A < <(echo "$1" | base64 -d)
+          cd /home/wayi/wayi-backend
+          chown wayi:wayi scripts/creer-livreur.js 2>/dev/null || true
+          node scripts/creer-livreur.js "${A[0]}" "${A[1]}" "${A[2]}"
+          SCRIPT
