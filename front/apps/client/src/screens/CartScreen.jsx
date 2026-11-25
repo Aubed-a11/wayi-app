@@ -17,7 +17,8 @@ const PAYMENT_METHODS = [
   { id: 'cash', label: 'Espèces à la livraison', Icon: Banknote },
 ];
 
-const DELIVERY_FEE_ESTIMATE = 800; // par restaurant, estimation avant confirmation serveur
+const DELIVERY_FEE_ESTIMATE = 300; // par restaurant, estimation avant confirmation serveur (75 FCFA par km)
+const MAX_FEE_PER_RESTAURANT = 3500; // au-dela, le point de livraison est forcement hors zone
 
 export default function CartScreen() {
   const { state, dispatch, navigate, cartTotal, cartByRestaurant } = useApp();
@@ -97,7 +98,12 @@ export default function CartScreen() {
     return () => { alive = false; clearTimeout(t); };
   }, [cartKey, orderPos?.lat, orderPos?.lng, defaultAddress?.id, user?.subscription?.active]); // eslint-disable-line react-hooks/exhaustive-deps
   const exact = quote && quote.key === cartKey;
-  const outOfZone = step === 'checkout' && exact && quote.outOfZone ? quote.outOfZoneMessage : '';
+  // Point de livraison trop loin (ex : telephone a l'etranger) : jamais de frais absurdes,
+  // a l'etape panier comme a l'etape paiement. Garde-fou si le serveur ne le signale pas.
+  const absurdFee = exact && !quote.outOfZone && Number(quote.deliveryFee) > restaurantCount * MAX_FEE_PER_RESTAURANT;
+  const outOfZone = exact && (quote.outOfZone || absurdFee)
+    ? (quote.outOfZoneMessage || "Ta position actuelle est hors de la zone de livraison (Cotonou, Calavi et environs). Choisis le point de livraison sur la carte à l'étape suivante.")
+    : '';
   const estimatedDeliveryFee = outOfZone ? 0 : exact ? quote.deliveryFee : restaurantCount * DELIVERY_FEE_ESTIMATE;
   const total = cartTotal + estimatedDeliveryFee;
 
@@ -237,7 +243,8 @@ export default function CartScreen() {
         <span>Livraison{restaurantCount > 1 ? ` (${restaurantCount} restaurants)` : ''}</span>
         <span>{outOfZone ? 'Hors zone' : exact ? (estimatedDeliveryFee ? fcfa(estimatedDeliveryFee) : 'Offerte') : `env. ${fcfa(estimatedDeliveryFee)}`}</span>
       </div>
-      <div className="w-sum-total"><span>{exact ? 'Total' : 'Total estimé'}</span><span>{fcfa(total)}</span></div>
+      <div className="w-sum-total"><span>{exact && !outOfZone ? 'Total' : 'Total estimé'}</span><span>{fcfa(total)}</span></div>
+      {outOfZone && step === 'cart' && <p className="w-hint" style={{ marginTop: 8, fontSize: 12.5, color: '#8A909C' }}>Ta position actuelle est hors zone. Tu choisiras le point de livraison à l'étape suivante, les frais seront calculés à ce moment.</p>}
     </div>
   );
 

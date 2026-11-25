@@ -121,7 +121,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _placeOrder() async {
     final cart = context.read<Cart>();
     if (_pos == null) { setState(() => _error = 'Indique où te livrer : ta position actuelle ou un point sur la carte.'); return; }
-    if (_quote?['outOfZone'] == true) { setState(() => _error = (_quote?['outOfZoneMessage'] ?? 'Point hors zone de livraison.').toString()); return; }
+    if (_quote?['outOfZone'] == true || asNum(_quote?['deliveryFee']) > 3500 * (((_quote?['restaurants'] as List?)?.length ?? 1).clamp(1, 10))) { setState(() => _error = (_quote?['outOfZoneMessage'] ?? 'Point hors zone de livraison.').toString()); return; }
     if ((_method == 'mtn_momo' || _method == 'moov') && _phone.text.replaceAll(RegExp(r'\D'), '').length < 8) {
       setState(() => _error = 'Entre le numéro Mobile Money qui va payer.');
       return;
@@ -187,7 +187,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     final cart = context.watch<Cart>();
     final fee = _quote?['deliveryFee'];
-    final outOfZone = _quote?['outOfZone'] == true;
+    final nResto = ((_quote?['restaurants'] as List?)?.length ?? 1).clamp(1, 10);
+    // Garde-fou : des frais au-dela de 3 500 FCFA par restaurant veulent dire un point hors zone
+    final outOfZone = _quote?['outOfZone'] == true || (_quote != null && asNum(_quote!['deliveryFee']) > 3500 * nResto);
     final total = _quote != null && !outOfZone ? asNum(_quote!['total']) : cart.subtotal;
     return Scaffold(
       appBar: AppBar(leading: IconButton(icon: const Icon(Ic.back), onPressed: () => Navigator.of(context).pop()), title: Text('Livraison et paiement', style: h3())),
@@ -222,7 +224,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ]),
         const SizedBox(height: 14),
         Field(label: 'Repère pour le livreur', icon: Ic.navigation, controller: _landmark, hint: 'Portail bleu, à côté de la pharmacie...'),
-        if (outOfZone) ...[const SizedBox(height: 14), Notice((_quote?['outOfZoneMessage'] ?? '').toString())],
+        if (outOfZone) ...[const SizedBox(height: 14), Notice((_quote?['outOfZoneMessage'] ?? "Ce point est hors de la zone de livraison (Cotonou, Calavi et environs). Touche la carte à l'endroit où tu veux être livré.").toString())],
         const SizedBox(height: 28),
         Text('Paiement', style: h2()),
         const SizedBox(height: 12),
