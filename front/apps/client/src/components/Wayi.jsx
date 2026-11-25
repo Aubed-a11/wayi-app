@@ -2,6 +2,7 @@
 // WAYI - composants du theme v7 (cartes de plats, logos, quantite)
 // ============================================================
 import { ChefHat, Clock, Plus, Minus, UtensilsCrossed, ConciergeBell, Sun, Moon, CakeSlice } from 'lucide-react';
+import { useState } from 'react';
 
 export const PERIODS = [
   { id: 'all',            label: 'Tous',      Icon: ConciergeBell },
@@ -30,15 +31,26 @@ export function DishImg({ src, className = '', style, iconSize = 28 }) {
 }
 
 // Logo rond du restaurant ; sans logo, une toque et le nom
+// Logo du restaurant ; sans logo envoye : ses initiales sur une couleur fixe (comme dans l'appli)
+const LOGO_COLORS = ['#F2690D', '#1E9E5A', '#2F7BE5', '#8B4FD8', '#D9467A', '#E59A00', '#0F8A8A'];
+export function restoInitials(name = '') {
+  const words = String(name).trim().split(/\s+/).filter(w => w.length > 2);
+  return (words.length ? words.slice(0, 2).map(w => w[0]) : [String(name || 'W')[0]]).join('').toUpperCase();
+}
+export function restoColor(name = '') {
+  return LOGO_COLORS[[...String(name)].reduce((a, c) => a + c.charCodeAt(0), 0) % LOGO_COLORS.length];
+}
 export function RestoLogo({ restaurant, size = 56, className = '', style }) {
   const name = restaurant?.name || '';
+  const [broken, setBroken] = useState(false);
+  const showImg = restaurant?.logo && !broken;
   return (
-    <span className={`w-logo ${className}`} style={{ width: size, height: size, fontSize: size * 0.32, ...style }} title={name}>
-      {restaurant?.logo
-        ? <img src={restaurant.logo} alt={name} onError={e => { e.currentTarget.style.display = 'none'; }} />
+    <span className={`w-logo ${className}`} style={{ width: size, height: size, fontSize: size * 0.34, ...style }} title={name}>
+      {showImg
+        ? <img src={restaurant.logo} alt={name} onError={() => setBroken(true)} />
         : (
-          <span className="w-logo-fallback">
-            <ChefHat size={size * 0.38} strokeWidth={1.7} aria-hidden="true" />
+          <span className="w-logo-fallback" style={{ background: restoColor(name), color: '#fff', fontWeight: 800, letterSpacing: 0.5 }}>
+            {restoInitials(name)}
           </span>
         )}
     </span>
