@@ -45,7 +45,7 @@ async function open(session) {
   const page = await browser.newPage();
   await page.setViewport({ width: W, height: H, deviceScaleFactor: 2, isMobile: true, hasTouch: false });
   page.on('pageerror', (e) => console.log('  erreur page :', String(e).slice(0, 200)));
-  await page.goto(APP, { waitUntil: 'networkidle2' });
+  await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: 60000 }); await sleep(2000);
   await page.evaluate((sess) => {
     localStorage.clear();
     if (sess) {
@@ -54,7 +54,7 @@ async function open(session) {
       localStorage.setItem('flutter.wayi.name', JSON.stringify(sess.name || ''));
     }
   }, session);
-  await page.goto(APP, { waitUntil: 'networkidle2' });
+  await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: 60000 }); await sleep(2000);
   await sleep(9000);
   return page;
 }
@@ -78,7 +78,7 @@ await p.close();
   const w = await browser.newPage();
   await w.setViewport({ width: W, height: H, deviceScaleFactor: 2, isMobile: true });
   w.on('pageerror', (e) => console.log('  erreur site :', String(e).slice(0, 200)));
-  await w.goto('http://localhost:8081', { waitUntil: 'networkidle2' });
+  await w.goto('http://localhost:8081', { waitUntil: 'domcontentloaded', timeout: 60000 });
   await sleep(5000);
   await w.screenshot({ path: `${OUT}/40-site-accueil.png` }); console.log('  capture 40-site-accueil');
   const clickText = async (txt) => w.evaluate((t) => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.includes(t)); if (b) b.click(); return !!b; }, txt);
