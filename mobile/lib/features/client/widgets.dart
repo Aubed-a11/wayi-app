@@ -62,27 +62,47 @@ class FeatureCard extends StatelessWidget {
       );
 }
 
-/// Carte verticale (carrousel)
+/// Carte verticale (carrousel) : carte blanche, photo en haut
 class TallCard extends StatelessWidget {
   final Dish dish;
   final double width;
-  const TallCard({super.key, required this.dish, this.width = 210});
+  const TallCard({super.key, required this.dish, this.width = 176});
   @override
   Widget build(BuildContext context) => GestureDetector(
         onTap: () => openDish(context, dish),
-        child: SizedBox(
+        child: Container(
           width: width,
+          decoration: cardBox(radius: R.lg),
+          clipBehavior: Clip.antiAlias,
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Stack(children: [
-              AspectRatio(aspectRatio: 1, child: Photo(dish.image, radius: R.md)),
-              Positioned(right: 10, bottom: 10, child: AddButton(dish: dish)),
+              AspectRatio(aspectRatio: 1.1, child: Photo(dish.image, radius: 0)),
+              Positioned(
+                left: 8, top: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Ic.clock, size: 12, color: C.ink2),
+                    const SizedBox(width: 4),
+                    Text('${dish.prepTime} min', style: font(size: 11, weight: FontWeight.w700, color: C.ink2)),
+                  ]),
+                ),
+              ),
             ]),
-            const SizedBox(height: 10),
-            Text(dish.name, style: h3(), maxLines: 1, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 3),
-            Text(dish.restaurantName, style: small(), maxLines: 1, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 6),
-            Text(fcfa(dish.price), style: font(size: 14, weight: FontWeight.w800)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 10, 12),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(dish.name, style: font(size: 14.5, weight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(dish.restaurantName, style: small(), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 8),
+                Row(children: [
+                  Expanded(child: Text(fcfa(dish.price), style: font(size: 14, weight: FontWeight.w800, color: C.brandDark))),
+                  AddButton(dish: dish, size: 32),
+                ]),
+              ]),
+            ),
           ]),
         ),
       );
@@ -99,7 +119,7 @@ class DishRow extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(children: [
-            Photo(dish.image, width: 96, height: 96, radius: R.md),
+            Photo(dish.image, width: 84, height: 84, radius: 14),
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -108,7 +128,7 @@ class DishRow extends StatelessWidget {
                 Text(dish.desc, style: small(), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 8),
                 Row(children: [
-                  Text(fcfa(dish.price), style: font(size: 14, weight: FontWeight.w800)),
+                  Text(fcfa(dish.price), style: font(size: 14, weight: FontWeight.w800, color: C.brandDark)),
                   const SizedBox(width: 10),
                   const Icon(Ic.clock, size: 13, color: C.muted),
                   const SizedBox(width: 4),
@@ -126,12 +146,13 @@ class DishRow extends StatelessWidget {
 /// Petit bouton + (ajout au panier), affiche la quantite si deja dans le panier
 class AddButton extends StatelessWidget {
   final Dish dish;
-  const AddButton({super.key, required this.dish});
+  final double size;
+  const AddButton({super.key, required this.dish, this.size = 36});
   @override
   Widget build(BuildContext context) {
     final qty = context.select<Cart, int>((c) => c.qtyOf(dish.id));
     return Material(
-      color: qty > 0 ? C.brand : C.ink,
+      color: qty > 0 ? C.ink : C.brand,
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -140,7 +161,7 @@ class AddButton extends StatelessWidget {
           toast(context, '${dish.name} ajouté au panier');
         },
         child: SizedBox(
-          width: 38, height: 38,
+          width: size, height: size,
           child: Center(child: qty > 0 ? Text('$qty', style: font(size: 14, weight: FontWeight.w800, color: Colors.white)) : const Icon(Ic.plus, size: 18, color: Colors.white)),
         ),
       ),
@@ -163,7 +184,7 @@ class QtyStepper extends StatelessWidget {
           child: SizedBox(width: s, height: s, child: Icon(i, size: compact ? 15 : 18, color: C.ink)),
         );
     return Container(
-      decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(999)),
+      decoration: BoxDecoration(color: C.card, borderRadius: BorderRadius.circular(999), border: Border.all(color: C.line)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         btn(qty <= 1 && compact ? Ic.trash : Ic.minus, qty - 1),
         SizedBox(width: compact ? 22 : 30, child: Text('$qty', textAlign: TextAlign.center, style: font(size: compact ? 14 : 16, weight: FontWeight.w800))),
@@ -179,11 +200,13 @@ class SectionTitle extends StatelessWidget {
   final String? action;
   final VoidCallback? onAction;
   const SectionTitle(this.title, {super.key, this.action, this.onAction});
+  /// Version a placer directement dans un CustomScrollView
+  Widget get sliver => SliverToBoxAdapter(child: this);
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 26, 12, 12),
+        padding: const EdgeInsets.fromLTRB(20, 24, 10, 10),
         child: Row(children: [
-          Expanded(child: Text(title, style: h2())),
+          Expanded(child: Text(title, style: font(size: 18, weight: FontWeight.w800, spacing: -0.2))),
           if (action != null) TextButton(onPressed: onAction, child: Text(action!, style: font(size: 13.5, weight: FontWeight.w700, color: C.brandDark))),
         ]),
       );

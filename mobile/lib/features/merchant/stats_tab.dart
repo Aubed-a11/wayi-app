@@ -106,7 +106,7 @@ class _Box extends StatelessWidget {
   Widget build(BuildContext context) => Expanded(
         child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(R.md)),
+          decoration: cardBox(radius: R.md),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(value, style: h3(), maxLines: 1, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 2),

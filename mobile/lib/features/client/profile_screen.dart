@@ -61,7 +61,7 @@ class ProfileScreen extends StatelessWidget {
             Container(
               margin: const EdgeInsets.only(top: 10),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(R.md)),
+              decoration: cardBox(radius: R.md),
               child: Row(children: [
                 Icon(Ic.pin, size: 18, color: a['isDefault'] == true ? C.brandDark : C.muted),
                 const SizedBox(width: 12),
@@ -156,7 +156,7 @@ class _Stat extends StatelessWidget {
   Widget build(BuildContext context) => Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(R.md)),
+          decoration: cardBox(radius: R.md),
           child: Column(children: [Text(value, style: h3()), const SizedBox(height: 2), Text(label, style: small())]),
         ),
       );
@@ -170,13 +170,18 @@ class _Tile extends StatelessWidget {
   final bool danger;
   const _Tile({required this.icon, required this.title, required this.onTap, this.subtitle, this.danger = false});
   @override
-  Widget build(BuildContext context) => ListTile(
-        contentPadding: EdgeInsets.zero,
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: cardBox(radius: R.md),
+        child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(R.md)),
         onTap: onTap,
-        leading: Container(width: 42, height: 42, decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(14)), child: Icon(icon, size: 19, color: danger ? C.danger : C.ink2)),
+        leading: Container(width: 40, height: 40, decoration: BoxDecoration(color: danger ? const Color(0xFFFDECEC) : C.brandSoft, borderRadius: BorderRadius.circular(12)), child: Icon(icon, size: 19, color: danger ? C.danger : C.brand)),
         title: Text(title, style: font(size: 15, weight: FontWeight.w600, color: danger ? C.danger : C.ink)),
         subtitle: subtitle == null ? null : Text(subtitle!, style: small()),
         trailing: danger ? null : const Icon(Ic.chevron, size: 18, color: C.muted),
+      ),
       );
 }
 

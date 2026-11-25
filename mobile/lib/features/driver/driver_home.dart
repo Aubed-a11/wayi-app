@@ -150,27 +150,39 @@ class _DriverHomeState extends State<DriverHome> with WidgetsBindingObserver {
           color: C.brand,
           onRefresh: _load,
           child: ListView(padding: const EdgeInsets.fromLTRB(20, 14, 20, 40), children: [
-            Row(children: [
-              Container(
-                width: 50, height: 50, alignment: Alignment.center,
-                decoration: const BoxDecoration(color: C.brandSoft, shape: BoxShape.circle),
-                child: Text(asStr(_driver['name']).isEmpty ? 'L' : asStr(_driver['name']).substring(0, 1).toUpperCase(), style: h3(C.brandDark)),
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 16, 6, 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF57A1F), C.brand, Color(0xFFE05A06)]),
+                borderRadius: BorderRadius.circular(R.lg),
+                boxShadow: softShadow,
               ),
-              const SizedBox(width: 14),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(asStr(_driver['name']), style: h3(), overflow: TextOverflow.ellipsis),
-                Text([_vehicleLabel(asStr(v['type'])), asStr(v['plate'])].where((x) => x.isNotEmpty).join(' · '), style: small()),
-              ])),
-              Row(children: [
-                const Icon(Ic.star, size: 15, color: C.brand),
-                const SizedBox(width: 4),
-                Text(asNum(_stats['rating'], 5).toStringAsFixed(1), style: font(weight: FontWeight.w700)),
+              child: Row(children: [
+                Container(
+                  width: 50, height: 50, alignment: Alignment.center,
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle, border: Border.all(color: Colors.white.withValues(alpha: 0.4))),
+                  child: Text(asStr(_driver['name']).isEmpty ? 'L' : asStr(_driver['name']).substring(0, 1).toUpperCase(), style: h3(Colors.white)),
+                ),
+                const SizedBox(width: 14),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(asStr(_driver['name']), style: h3(Colors.white), overflow: TextOverflow.ellipsis),
+                  Text([_vehicleLabel(asStr(v['type'])), asStr(v['plate'])].where((x) => x.isNotEmpty).join(' · '), style: small(Colors.white.withValues(alpha: 0.85))),
+                ])),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
+                  child: Row(children: [
+                    const Icon(Ic.star, size: 14, color: C.brand),
+                    const SizedBox(width: 4),
+                    Text(asNum(_stats['rating'], 5).toStringAsFixed(1), style: font(size: 13, weight: FontWeight.w800)),
+                  ]),
+                ),
+                IconButton(
+                  icon: const Icon(Ic.user, color: Colors.white),
+                  onPressed: () => showAccountSheet(context, passwordPath: '/drivers/me/password', onLogout: _logout),
+                ),
               ]),
-              IconButton(
-                icon: const Icon(Ic.user, color: C.ink2),
-                onPressed: () => showAccountSheet(context, passwordPath: '/drivers/me/password', onLogout: _logout),
-              ),
-            ]),
+            ),
             const SizedBox(height: 20),
             _OnlineCard(online: _online, busy: _busy, status: _status, disabled: suspended, onTap: _toggleOnline),
             if (_gpsError != null) ...[const SizedBox(height: 10), Notice(_gpsError!)],
@@ -186,7 +198,7 @@ class _DriverHomeState extends State<DriverHome> with WidgetsBindingObserver {
               const SizedBox(height: 18),
               Container(
                 padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(R.md)),
+                decoration: cardBox(radius: R.md),
                 child: Row(children: [
                   const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.2, color: C.brand)),
                   const SizedBox(width: 14),
@@ -406,7 +418,7 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) => Expanded(
         child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(R.md)),
+          decoration: cardBox(radius: R.md),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(value, style: h3(), maxLines: 1, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 2),

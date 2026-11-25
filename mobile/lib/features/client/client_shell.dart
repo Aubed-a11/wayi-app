@@ -51,7 +51,7 @@ class _ClientShellState extends State<ClientShell> {
             Positioned(
               left: 16, right: 16, bottom: 12,
               child: Material(
-                color: C.ink,
+                color: C.brand,
                 borderRadius: BorderRadius.circular(R.md),
                 elevation: 6,
                 shadowColor: Colors.black38,
@@ -63,8 +63,8 @@ class _ClientShellState extends State<ClientShell> {
                     child: Row(children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                        decoration: BoxDecoration(color: C.brand, borderRadius: BorderRadius.circular(999)),
-                        child: Text('${cart.count}', style: font(size: 13, weight: FontWeight.w800, color: Colors.white)),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
+                        child: Text('${cart.count}', style: font(size: 13, weight: FontWeight.w800, color: C.brandDark)),
                       ),
                       const SizedBox(width: 12),
                       Text('Voir le panier', style: font(size: 15, weight: FontWeight.w700, color: Colors.white)),
@@ -77,11 +77,15 @@ class _ClientShellState extends State<ClientShell> {
             ),
         ]),
         bottomNavigationBar: Container(
-          decoration: const BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: C.line))),
+          decoration: const BoxDecoration(
+            color: C.card,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+            boxShadow: [BoxShadow(color: Color(0x1415181F), blurRadius: 20, offset: Offset(0, -4))],
+          ),
           child: SafeArea(
             top: false,
             child: SizedBox(
-              height: 64,
+              height: 68,
               child: Row(children: [
                 for (var i = 0; i < _items.length; i++)
                   Expanded(
@@ -91,14 +95,23 @@ class _ClientShellState extends State<ClientShell> {
                         if (i == 2)
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: _tab == 2 ? C.ink : C.brandSoft, shape: BoxShape.circle),
-                            child: Icon(_items[i].$1, size: 20, color: _tab == 2 ? Colors.white : C.brandDark),
+                            width: 48, height: 48,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(colors: [Color(0xFFF57A1F), C.brandDark]),
+                              shape: BoxShape.circle,
+                              boxShadow: [BoxShadow(color: C.brand.withValues(alpha: _tab == 2 ? 0.45 : 0.25), blurRadius: 12, offset: const Offset(0, 4))],
+                            ),
+                            child: Icon(_items[i].$1, size: 22, color: Colors.white),
                           )
                         else ...[
-                          Icon(_items[i].$1, size: 22, color: _tab == i ? C.ink : C.muted),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                            decoration: BoxDecoration(color: _tab == i ? C.brandSoft : Colors.transparent, borderRadius: BorderRadius.circular(999)),
+                            child: Icon(_items[i].$1, size: 21, color: _tab == i ? C.brand : C.muted),
+                          ),
                           const SizedBox(height: 4),
-                          Text(_items[i].$2, style: font(size: 11, weight: _tab == i ? FontWeight.w700 : FontWeight.w500, color: _tab == i ? C.ink : C.muted)),
+                          Text(_items[i].$2, style: font(size: 11, weight: _tab == i ? FontWeight.w800 : FontWeight.w500, color: _tab == i ? C.brand : C.muted)),
                         ],
                       ]),
                     ),

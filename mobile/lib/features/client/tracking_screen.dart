@@ -260,7 +260,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
               if (driver != null && activeStatuses.contains(status)) ...[
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(R.md)),
+                  decoration: cardBox(radius: R.md),
                   child: Row(children: [
                     Container(width: 46, height: 46, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Ic.bike, color: C.success, size: 22)),
                     const SizedBox(width: 14),

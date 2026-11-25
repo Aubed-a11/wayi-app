@@ -13,11 +13,11 @@ class AuthHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          RoundIcon(Ic.back, bg: C.surface, onTap: () => Navigator.of(context).maybePop()),
+          RoundIcon(Ic.back, onTap: () => Navigator.of(context).maybePop()),
           const Spacer(),
-          const BeninStripe(width: 34),
+          ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.asset('assets/logo.png', width: 36, height: 36)),
         ]),
-        const SizedBox(height: 28),
+        const SizedBox(height: 26),
         Text(title, style: h1()),
         const SizedBox(height: 10),
         Text(subtitle, style: body(C.muted)),
@@ -54,7 +54,7 @@ Future<Account?> chooseAccount(BuildContext context, List<Account> accounts) => 
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Material(
-                  color: C.surface,
+                  color: C.bg,
                   borderRadius: BorderRadius.circular(R.md),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(R.md),

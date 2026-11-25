@@ -77,7 +77,7 @@ class _DishScreenState extends State<DishScreen> {
                 const SizedBox(height: 22),
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(R.md)),
+                  decoration: cardBox(radius: R.md),
                   child: Row(children: [
                     Container(width: 44, height: 44, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)), child: const Icon(Ic.store, size: 20, color: C.brandDark)),
                     const SizedBox(width: 14),

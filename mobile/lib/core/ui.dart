@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import 'icons.dart';
 import 'theme.dart';
 
-/// Bouton principal : pleine largeur, arrondi, sombre ou terre cuite
+/// Bouton principal : pleine largeur, orange WAYI (ou sombre avec dark: true)
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final bool loading;
   final IconData? icon;
   final bool dark;
-  const PrimaryButton({super.key, required this.label, this.onPressed, this.loading = false, this.icon, this.dark = true});
+  const PrimaryButton({super.key, required this.label, this.onPressed, this.loading = false, this.icon, this.dark = false});
 
   @override
   Widget build(BuildContext context) {
     final bg = dark ? C.ink : C.brand;
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 54,
       child: FilledButton(
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
@@ -50,7 +50,7 @@ class GhostButton extends StatelessWidget {
         child: OutlinedButton(
           onPressed: onPressed,
           style: OutlinedButton.styleFrom(
-            foregroundColor: C.ink, side: const BorderSide(color: C.line, width: 1.5),
+            foregroundColor: C.ink, backgroundColor: C.card, side: const BorderSide(color: C.line, width: 1.5),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(R.md)),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -100,9 +100,10 @@ class _FieldState extends State<Field> {
               ? IconButton(icon: Icon(_hidden ? Ic.eye : Ic.eyeOff, size: 19, color: C.muted), onPressed: () => setState(() => _hidden = !_hidden))
               : null,
           filled: true,
-          fillColor: C.surface,
-          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(R.md), borderSide: BorderSide.none),
+          fillColor: C.card,
+          contentPadding: const EdgeInsets.symmetric(vertical: 17, horizontal: 16),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(R.md), borderSide: const BorderSide(color: C.line)),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(R.md), borderSide: const BorderSide(color: C.line)),
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(R.md), borderSide: const BorderSide(color: C.brand, width: 1.6)),
         ),
       ),
@@ -184,8 +185,9 @@ class Chip2 extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? C.ink : C.surface,
+            color: selected ? C.brand : C.card,
             borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: selected ? C.brand : C.line),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             if (icon != null) ...[Icon(icon, size: 16, color: selected ? Colors.white : C.ink2), const SizedBox(width: 7)],
@@ -207,7 +209,7 @@ class EmptyState extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(width: 76, height: 76, decoration: const BoxDecoration(color: C.surface, shape: BoxShape.circle), child: Icon(icon, size: 30, color: C.ink2)),
+            Container(width: 84, height: 84, decoration: const BoxDecoration(color: C.brandSoft, shape: BoxShape.circle), child: Icon(icon, size: 34, color: C.brand)),
             const SizedBox(height: 18),
             Text(title, style: h3(), textAlign: TextAlign.center),
             const SizedBox(height: 8),
@@ -238,4 +240,67 @@ void toast(BuildContext context, String message) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(message)));
+}
+
+/// Carte blanche arrondie avec ombre douce (style super-appli)
+class CardBox extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final VoidCallback? onTap;
+  final double radius;
+  const CardBox({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.onTap, this.radius = R.lg});
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration: cardBox(radius: radius),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(radius),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(onTap: onTap, child: Padding(padding: padding, child: child)),
+        ),
+      );
+}
+
+/// Tuile de service : icone dans un carre colore + libelle (grille d'accueil)
+class ServiceTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final Color tint;
+  final VoidCallback onTap;
+  final bool selected;
+  const ServiceTile({super.key, required this.icon, required this.label, required this.color, required this.tint, required this.onTap, this.selected = false});
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: 62, height: 62,
+            decoration: BoxDecoration(
+              color: selected ? color : tint,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: selected ? color : Colors.transparent, width: 2),
+            ),
+            child: Icon(icon, size: 26, color: selected ? Colors.white : color),
+          ),
+          const SizedBox(height: 8),
+          Text(label, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: font(size: 12, weight: selected ? FontWeight.w800 : FontWeight.w600, color: selected ? C.ink : C.ink2)),
+        ]),
+      );
+}
+
+/// Pastille d'etat (Livree, En route...)
+class StatusPill extends StatelessWidget {
+  final String label;
+  final Color color;
+  const StatusPill(this.label, {super.key, this.color = C.brand});
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
+        child: Text(label, style: font(size: 11.5, weight: FontWeight.w700, color: color)),
+      );
 }

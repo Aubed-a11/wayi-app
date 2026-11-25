@@ -235,7 +235,7 @@ class _TypingState extends State<_Typing> with SingleTickerProviderStateMixin {
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-          decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(20)),
+          decoration: cardBox(radius: 20),
           child: AnimatedBuilder(
             animation: _c,
             builder: (_, __) => Row(mainAxisSize: MainAxisSize.min, children: [

@@ -22,6 +22,9 @@ class Ic {
   static const IconData back = LucideIcons.arrowLeft;
   static const IconData next = LucideIcons.arrowRight;
   static const IconData chevron = LucideIcons.chevronRight;
+  static const IconData chevronDown = LucideIcons.chevronDown;
+  static const IconData bell = LucideIcons.bell;
+  static const IconData ticket = LucideIcons.ticket;
   static const IconData plus = LucideIcons.plus;
   static const IconData minus = LucideIcons.minus;
   static const IconData trash = LucideIcons.trash2;

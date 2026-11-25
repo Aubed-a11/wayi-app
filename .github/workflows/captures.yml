@@ -1,0 +1,50 @@
+# Captures d'ecran de l'appli WAYI (version web, serveur de test local) pour
+# verifier le design. Les images sont publiees sur la branche "captures".
+name: Captures d'ecran WAYI
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ['mobile/lib/**', '.github/captures/**', '.github/workflows/captures.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  captures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Serveur WAYI de test
+        working-directory: front/backend
+        run: |
+          npm ci --omit=dev --no-audit --no-fund
+          NODE_ENV=development PORT=3001 FRONTEND_URLS=http://localhost:8080 nohup node server.js > /tmp/serveur.log 2>&1 &
+          sleep 6 && curl -s localhost:3001/health | head -c 200
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Appli web
+        working-directory: mobile
+        run: |
+          flutter create --platforms=web --org com.wayibenin --project-name wayi .
+          flutter pub get
+          flutter build web --release --dart-define=API_URL=http://localhost:3001
+          nohup python3 -m http.server 8080 -d build/web > /tmp/web.log 2>&1 &
+      - name: Captures
+        working-directory: .github/captures
+        run: |
+          npm install --no-audit --no-fund
+          node captures.mjs /tmp/captures
+          tail -20 /tmp/serveur.log
+      - name: Publier sur la branche captures
+        run: |
+          cd /tmp/captures
+          git init -q -b captures
+          git add .
+          git -c user.name="WAYI CI" -c user.email="ci@wayibenin.com" commit -q -m "Captures ${{ github.sha }}"
+          git push -f -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" captures

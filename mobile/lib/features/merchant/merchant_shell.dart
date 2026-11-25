@@ -24,20 +24,29 @@ class _MerchantShellState extends State<MerchantShell> {
         child: Scaffold(
           body: IndexedStack(index: _tab, children: const [OrdersTab(), MenuTab(), StatsTab(), AccountTab()]),
           bottomNavigationBar: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: C.line))),
+            decoration: const BoxDecoration(
+              color: C.card,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+              boxShadow: [BoxShadow(color: Color(0x1415181F), blurRadius: 20, offset: Offset(0, -4))],
+            ),
             child: SafeArea(
               top: false,
               child: SizedBox(
-                height: 64,
+                height: 68,
                 child: Row(children: [
                   for (var i = 0; i < _items.length; i++)
                     Expanded(
                       child: InkWell(
                         onTap: () => setState(() => _tab = i),
                         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Icon(_items[i].$1, size: 22, color: _tab == i ? C.ink : C.muted),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                            decoration: BoxDecoration(color: _tab == i ? C.brandSoft : Colors.transparent, borderRadius: BorderRadius.circular(999)),
+                            child: Icon(_items[i].$1, size: 21, color: _tab == i ? C.brand : C.muted),
+                          ),
                           const SizedBox(height: 4),
-                          Text(_items[i].$2, style: font(size: 11, weight: _tab == i ? FontWeight.w700 : FontWeight.w500, color: _tab == i ? C.ink : C.muted)),
+                          Text(_items[i].$2, style: font(size: 11, weight: _tab == i ? FontWeight.w800 : FontWeight.w500, color: _tab == i ? C.brand : C.muted)),
                         ]),
                       ),
                     ),

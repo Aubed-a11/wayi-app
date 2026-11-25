@@ -1,0 +1,1 @@
+{ "name": "wayi-captures", "private": true, "type": "module", "dependencies": { "puppeteer": "^23.0.0" } }
