@@ -141,43 +141,12 @@ function getRestaurantById(id) { return restaurants.find(r => r.id === id); }
 function getDishesByRestaurant(id) { return dishes.filter(d => d.restaurantId === id).map(enrichDish); }
 
 // ─── USERS (clients) ────────────────────────────────────────────
-const users = [
-  {
-    id: 'u1', role: 'buyer',
-    name: 'Adèle Bossou', phone: '+229 96 34 12 78', email: 'adele@gmail.com', password: DEMO_PASSWORD_HASH,
-    avatar: 'A', city: 'Abomey-Calavi',
-    location: { lat: 6.3702, lng: 2.3824, zone: 'Cité GBÉTO', address: 'Cité GBÉTO, Imm. B, Appt 5' },
-    addresses: [
-      { id: 'a1', label: 'Domicile', address: 'Cité GBÉTO, Calavi, Imm. B, Appt 5', lat: 6.3702, lng: 2.3824, isDefault: true },
-    ],
-    loyaltyPoints: 240, ordersCount: 24, savedTotal: 12400,
-    wayiPlus: { count: 6, target: 10, active: true },
-    favoriteRestaurants: [],
-    favoriteDishes: [],
-    subscription: null,
-    createdAt: '2026-01-15T10:00:00Z',
-  },
-];
+// Plus de compte client de demonstration : chaque client s'inscrit dans l'appli.
+const users = [];
 
 // ─── DRIVERS ──────────────────────────────────────────────────
-const drivers = [
-  {
-    id: 'dr1', role: 'driver', name: 'Kokou Zannou', phone: '+229 97 11 22 33', email: 'kokou@wayi.bj',
-    password: DEMO_PASSWORD_HASH,
-    avatar: 'K', vehicle: { type: 'moto', plate: 'AB 1234 RB' }, status: 'offline', suspended: false,
-    location: { lat: 6.3710, lng: 2.3830, updatedAt: null },
-    stats: { totalDeliveries: 340, monthlyEarnings: 185000, rating: 4.8, ratingCount: 340, completionRate: 97 },
-    fieldCaptures: [],
-  },
-  {
-    id: 'dr2', role: 'driver', name: 'Chantal Houssou', phone: '+229 96 55 44 33', email: 'chantal@wayi.bj',
-    password: DEMO_PASSWORD_HASH,
-    avatar: 'C', vehicle: { type: 'moto', plate: 'AC 5678 RB' }, status: 'offline', suspended: false,
-    location: { lat: 6.3730, lng: 2.3810, updatedAt: null },
-    stats: { totalDeliveries: 210, monthlyEarnings: 132000, rating: 4.9, ratingCount: 210, completionRate: 99 },
-    fieldCaptures: [],
-  },
-];
+// Plus de livreur de demonstration : les livreurs s'inscrivent et sont valides par l'admin.
+const drivers = [];
 
 // ─── SUPER ADMIN (gère le menu du jour, les restaurants, le backoffice) ──
 const admins = [
@@ -462,6 +431,32 @@ function restoreState(saved) {
   replaceContents(receipts, saved.receipts);
   replaceContents(callLogs, saved.callLogs); // absent des anciennes sauvegardes : sans effet dans ce cas
   if (saved.demoSeeded) demoSeeded = true;
+  purgeDemoAccounts();
+}
+
+// Comptes de demonstration d'origine (Adele, Kokou, Chantal) : retires des
+// donnees sauvegardees au demarrage, ils ne doivent plus exister en ligne.
+const DEMO_ACCOUNTS = [
+  ['users', 'u1', 'adele@gmail.com'],
+  ['drivers', 'dr1', 'kokou@wayi.bj'],
+  ['drivers', 'dr2', 'chantal@wayi.bj'],
+];
+function purgeDemoAccounts() {
+  const lists = { users, drivers };
+  let removed = 0;
+  for (const [kind, id, email] of DEMO_ACCOUNTS) {
+    const list = lists[kind];
+    const i = list.findIndex(a => a.id === id && String(a.email || '').toLowerCase() === email);
+    if (i < 0) continue;
+    list.splice(i, 1);
+    removed++;
+    for (const o of orders) {
+      if (kind === 'users' && o.userId === id) { o.userId = 'supprime'; o.address = 'Adresse supprimee'; }
+      if (kind === 'drivers' && o.driver?.id === id) o.driver = { id: 'supprime', name: 'Livreur (compte supprime)' };
+    }
+  }
+  if (removed) console.log(`[Store] ${removed} compte(s) de demonstration supprime(s).`);
+  return removed;
 }
 
 // Appelée une fois au démarrage du serveur, avant d'accepter des requêtes.

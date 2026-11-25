@@ -58,16 +58,16 @@ VISUELS (dossier stores)
     App Store : captures d'un iPhone 6,7 ou 6,9 pouces (1290 x 2796 par exemple).
     Sans iPhone de cette taille : simulateur ou outil en ligne de mise au format.
 
-COMPTES DE DEMONSTRATION (obligatoires pour la verification Apple, conseilles pour Google)
-  Client  : adele@gmail.com / wayi2026
-  Livreur : kokou@wayi.bj / wayi2026
-  Restaurant : creer un compte restaurant de test avant l'envoi et le mettre ici.
-  Verifier qu'ils marchent sur le serveur en ligne avant d'envoyer l'appli.
+COMPTES POUR LES VERIFICATEURS (obligatoires pour Apple, conseilles pour Google)
+  Les anciens comptes de demonstration ont ete supprimes. Juste avant l'envoi, cree dans
+  l'appli trois comptes reserves a la verification (un client, un restaurant valide par
+  l'admin, un livreur valide par l'admin), par exemple review.client@wayibenin.com,
+  et note ici leurs e-mails et mots de passe. Supprime-les apres l'acceptation.
 
 NOTE POUR LES VERIFICATEURS (App Review / Google)
   WAYI is a food delivery app for Cotonou, Benin. One app serves three roles: customers,
   partner restaurants and delivery drivers; the role is chosen at sign up and the app opens
-  the matching space at login. Demo accounts are provided above. Payments are for physical
+  the matching space at login. Review accounts are provided in the review notes. Payments are for physical
   goods (meals) delivered outside the app, processed by Kkiapay (Mobile Money and cards).
   Drivers share their location in the background only while online, so customers can track
   their delivery. Accounts can be deleted in the app: Profile > Supprimer mon compte.
