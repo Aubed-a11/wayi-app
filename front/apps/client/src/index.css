@@ -1263,7 +1263,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--emerald); box-sh
 
 /* ── Squelette de chargement ───────────────────────────────── */
 .skeleton {
-  background: linear-gradient(90deg, #f3ebe1 25%, #fbf4ec 50%, #f3ebe1 75%);
+  background: linear-gradient(90deg, #F4F5F7 25%, #fbf4ec 50%, #F4F5F7 75%);
   background-size: 200% 100%;
 }
 
@@ -1683,7 +1683,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--emerald); box-sh
 .btn-primary:not(:disabled)::after { content: ''; position: absolute; top: 0; bottom: 0; width: 30%; left: -50%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent); animation: chipShine 3.6s ease-in-out infinite; pointer-events: none; }
 
 /* ── Squelettes de chargement plus vivants ─────────────────── */
-.skeleton { background: linear-gradient(100deg, #f2e8dc 30%, #fff7ee 50%, #f2e8dc 70%); background-size: 200% 100%; animation: shimmer 1.3s linear infinite; }
+.skeleton { background: linear-gradient(100deg, #F4F5F7 30%, #fff7ee 50%, #F4F5F7 70%); background-size: 200% 100%; animation: shimmer 1.3s linear infinite; }
 
 /* ── Écran de démarrage ────────────────────────────────────── */
 .splash-stage { position: relative; width: 190px; height: 190px; display: flex; align-items: center; justify-content: center; }

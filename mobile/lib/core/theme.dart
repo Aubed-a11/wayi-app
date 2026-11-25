@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Palette WAYI, style super-appli : fond gris tres clair, cartes blanches,
+/// Palette WAYI, style super-appli : fond blanc pur, cartes blanches avec ombre,
 /// orange clair pour les actions, avec une touche de rouge sombre.
 class C {
-  static const bg = Color(0xFFF5F6F8);
+  static const bg = Color(0xFFFFFFFF);
   static const card = Color(0xFFFFFFFF);
-  static const surface = Color(0xFFF1F2F5);
+  static const surface = Color(0xFFF4F5F7);
   static const surface2 = Color(0xFFE9EBEF);
   static const line = Color(0xFFE6E8EC);
   static const ink = Color(0xFF15181F);
@@ -41,7 +41,7 @@ const LinearGradient brandGradient = LinearGradient(begin: Alignment.topLeft, en
 const LinearGradient buttonGradient = LinearGradient(colors: [C.brand, Color(0xFFD85A2E), C.brandDark]);
 
 BoxDecoration cardBox({double radius = R.lg, Color color = C.card}) =>
-    BoxDecoration(color: color, borderRadius: BorderRadius.circular(radius), boxShadow: softShadow);
+    BoxDecoration(color: color, borderRadius: BorderRadius.circular(radius), boxShadow: softShadow, border: Border.all(color: const Color(0xFFEEF0F3)));
 
 TextStyle font({double size = 14, FontWeight weight = FontWeight.w500, Color color = C.ink, double? height, double? spacing}) =>
     GoogleFonts.plusJakartaSans(fontSize: size, fontWeight: weight, color: color, height: height, letterSpacing: spacing);

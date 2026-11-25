@@ -27,13 +27,13 @@
   --sun-light:     var(--brand-light);
   --grad-brand:    linear-gradient(135deg, #F9A15A 0%, #F58A3D 50%, #C2462B 100%);
   --grad-sun:      var(--grad-brand);
-  --grad-soft:     linear-gradient(135deg, #FAF2EB 0%, #F1E2D5 100%);
+  --grad-soft:     linear-gradient(135deg, #F7F8FA 0%, #EEF0F3 100%);
   --ring:          0 0 0 4px rgba(245, 138, 61, 0.16);
 
-  --cream:  #FBF7F2;
+  --cream:  #FFFFFF;
   --ink:    #1E1916;
   --gray:   #8B8079;
-  --border: #F2E7DE;
+  --border: #ECEEF1;
   --danger: #B9584C;
 
   --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -246,7 +246,7 @@ body { font-family: var(--font-body); color: var(--ink); -webkit-font-smoothing:
 .w-step-title { font-weight: 600; font-size: 15px; }
 .w-step:not(.done):not(.now) .w-step-title { color: #9C928B; font-weight: 500; }
 .w-step-sub { font-size: 12.5px; color: var(--gray); margin-top: 2px; line-height: 1.4; }
-.w-help { display: flex; align-items: center; gap: 14px; background: #F3EEEA; border-radius: 18px; padding: 14px 16px; }
+.w-help { display: flex; align-items: center; gap: 14px; background: #F4F5F7; border-radius: 18px; padding: 14px 16px; }
 .w-help-call { margin-left: auto; width: 46px; height: 46px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; flex-shrink: 0; border: none; cursor: pointer; text-decoration: none; box-shadow: 0 8px 16px rgba(245, 138, 61, 0.3); }
 
 /* Profil */
@@ -261,12 +261,12 @@ body { font-family: var(--font-body); color: var(--ink); -webkit-font-smoothing:
 .w-stat span { font-size: 10.5px; color: var(--gray); }
 .w-menu { background: #fff; border-radius: 18px; box-shadow: var(--card-shadow); overflow: hidden; }
 .w-menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 16px; width: 100%; border: none; background: #fff; font-family: var(--font-body); font-size: 14.5px; color: var(--ink); cursor: pointer; text-align: left; }
-.w-menu-item + .w-menu-item { border-top: 1px solid #F6EEE8; }
+.w-menu-item + .w-menu-item { border-top: 1px solid #F4F5F7; }
 .w-menu-item .ico { color: var(--brand); display: flex; flex-shrink: 0; }
 .w-menu-item .chev { margin-left: auto; color: #B5AAA3; display: flex; }
 .w-menu-item small { display: block; font-size: 11.5px; color: var(--gray); margin-top: 1px; }
 .w-order-row { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 16px; box-shadow: var(--card-shadow); padding: 12px 14px; margin-bottom: 10px; cursor: pointer; }
-.w-status { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #F3EEEA; color: #6B605A; white-space: nowrap; }
+.w-status { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #F4F5F7; color: #6B605A; white-space: nowrap; }
 .w-status.ok { background: #E6F0EA; color: var(--bj-green); }
 .w-status.live { background: var(--brand-light); color: var(--brand-dark); }
 .w-status.ko { background: #F6E7E4; color: var(--danger); }
@@ -290,7 +290,7 @@ body { font-family: var(--font-body); color: var(--ink); -webkit-font-smoothing:
 .w-empty p { font-size: 13.5px; margin: 0 0 18px; }
 
 /* Squelettes de chargement */
-.w-skel { background: linear-gradient(90deg, #F5ECE5 0%, #FBF5F0 50%, #F5ECE5 100%); background-size: 200% 100%; animation: shimmer 1.3s linear infinite; border-radius: 12px; }
+.w-skel { background: linear-gradient(90deg, #F4F5F7 0%, #FBF5F0 50%, #F4F5F7 100%); background-size: 200% 100%; animation: shimmer 1.3s linear infinite; border-radius: 12px; }
 
 @media (min-width: 700px) {
   .w-grid { grid-template-columns: 1fr 1fr 1fr; }
@@ -365,3 +365,6 @@ input[type="checkbox"] { -webkit-appearance: auto !important; appearance: auto !
 .wl-btn-ghost { width: 100%; height: 52px; margin-top: 12px; border-radius: 16px; background: #fff; border: 1.5px solid #E6E8EC;
   font-family: var(--font-body); font-size: 14.5px; font-weight: 700; color: #15181F; cursor: pointer; }
 @media (min-width: 700px) { .wl-sheet { max-width: 560px; margin: auto auto 0; } }
+
+/* Fond blanc pur partout (pas de blanc casse) */
+html, body, #root, .app-shell, .screen { background: #FFFFFF; }

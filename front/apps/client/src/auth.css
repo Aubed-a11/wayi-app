@@ -9,7 +9,7 @@
 
 .a7-hero {
   position: relative; padding: calc(env(safe-area-inset-top, 0px) + 18px) 24px 64px;
-  background: linear-gradient(180deg, #F6E6D8 0%, #FAF1E9 70%, var(--cream) 100%);
+  background: linear-gradient(180deg, #F4F5F7 0%, #F4F5F7 70%, var(--cream) 100%);
   text-align: center; overflow: hidden;
 }
 .a7-hero.small { padding-bottom: 54px; }
@@ -40,7 +40,7 @@
 
 /* Carte du formulaire */
 .a7-card { position: relative; margin: -38px 16px 0; background: #fff; border-radius: 26px; padding: 18px 18px 20px; box-shadow: 0 18px 40px rgba(150, 80, 30, 0.10); }
-.a7-tabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; background: #F6EFE9; border-radius: 999px; padding: 4px; margin-bottom: 18px; }
+.a7-tabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; background: #F4F5F7; border-radius: 999px; padding: 4px; margin-bottom: 18px; }
 .a7-tabs-pill { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; background: #fff; box-shadow: 0 3px 10px rgba(150, 80, 30, 0.12); transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
 .a7-tabs-pill.register { transform: translateX(100%); }
 .a7-tabs button { position: relative; z-index: 1; border: none; background: none; padding: 11px 0; font-family: var(--font-body); font-size: 14px; font-weight: 600; color: var(--gray); cursor: pointer; transition: color .2s ease; }
@@ -122,7 +122,7 @@
 @media (prefers-reduced-motion: reduce) { .bp-steam path { animation: none; opacity: .5; } }
 
 /* Version simple : en-tete sobre, sans illustration */
-.a7-hero { padding-top: calc(env(safe-area-inset-top, 0px) + 34px); padding-bottom: 58px; background: linear-gradient(180deg, #F7EADF 0%, var(--cream) 100%); }
+.a7-hero { padding-top: calc(env(safe-area-inset-top, 0px) + 34px); padding-bottom: 58px; background: linear-gradient(180deg, #F4F5F7 0%, var(--cream) 100%); }
 .a7-hero.small { padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
 .a7-hero:not(.small) .a7-top { flex-direction: column; gap: 12px; }
 .a7-hero:not(.small) .a7-logo { width: 68px; height: 68px; border-radius: 20px; }
@@ -158,7 +158,7 @@
 /* Fin liseré vert-jaune-rouge en haut de la carte */
 .a7-card-stripe { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 64px; height: 4px; border-radius: 0 0 4px 4px; background: var(--bj-stripe); }
 
-.a7-tabs { background: #F5EEE8; box-shadow: inset 0 1px 3px rgba(120, 70, 35, 0.08); }
+.a7-tabs { background: #F4F5F7; box-shadow: inset 0 1px 3px rgba(120, 70, 35, 0.08); }
 .a7-tabs-pill { box-shadow: 0 4px 12px rgba(150, 80, 30, 0.14), 0 1px 2px rgba(150, 80, 30, 0.08); }
 
 .a7-box { background: #fff; border-color: #EEE3DA; box-shadow: 0 1px 2px rgba(120, 70, 35, 0.04); }
@@ -173,7 +173,7 @@
 }
 .a7-cta:hover { box-shadow: 0 14px 28px rgba(201, 110, 58, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
 
-.a7-switch { padding-top: 14px; margin-top: 4px; border-top: 1px solid #F3EAE2; }
+.a7-switch { padding-top: 14px; margin-top: 4px; border-top: 1px solid #F4F5F7; }
 .a7-legal { margin-top: 18px; }
 
 .a7-step-ico { background: #fff; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.7), 0 14px 28px rgba(150, 80, 30, 0.14); animation: a7In .6s cubic-bezier(.2, .8, .2, 1) both; }
@@ -233,7 +233,7 @@
 /* ============================================================
    v8 : en-tete vivant (degrade orange -> rouge sombre, plats qui defilent)
    ============================================================ */
-.a7 { background: #F5F6F8; }
+.a7 { background: #FFFFFF; }
 .a7 .a7-hero, .a7 .a7-hero.small { background: linear-gradient(165deg, #F9A15A 0%, #F58A3D 40%, #C2462B 82%, #8E2318 100%) !important; color: #fff;
   padding-bottom: 70px; border-radius: 0 0 32px 32px; }
 .a7 .a7-hero .a7-title h1, .a7 .a7-hero .a7-title h1 span { color: #fff; }
@@ -258,3 +258,8 @@
 .a7 .a7-tabs-pill { background: linear-gradient(90deg, #F58A3D, #C2462B) !important; }
 .a7 .a7-cta { background: linear-gradient(90deg, #F58A3D 0%, #D85A2E 60%, #A8321F 100%) !important; border: 0 !important; }
 .a7 .a7-hero .a7-title h1 span::after { background: rgba(255, 255, 255, 0.28); }
+
+.a7 { background: #FFFFFF !important; }
+.a7 .a7-card { background: #FFFFFF; }
+.a7 .a7-tabs button.on { color: #FFFFFF !important; }
+.a7 .a7-role { background: #FFFFFF; border-color: #ECEEF1; }
