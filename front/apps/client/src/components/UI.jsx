@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Home, Search, Sparkles, ShoppingCart, User, ChevronLeft, ChevronRight, Heart, Star, Check, Plus, Minus, LayoutGrid, Soup, Leaf, Sandwich, Flame, CupSoda, Wheat, Fish, Cookie, Tag } from 'lucide-react';
+import { Home, Search, ChefHat, ShoppingCart, User, ChevronLeft, ChevronRight, Heart, Star, Check, Plus, Minus, LayoutGrid, Soup, Leaf, Sandwich, Flame, CupSoda, Wheat, Fish, Cookie, Tag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { TASTE_META } from './DynamicIcon';
 
@@ -44,7 +44,7 @@ function NavIcon({ name }) {
   const p = { size: 22, strokeWidth: 1.9, 'aria-hidden': true };
   if (name === 'home') return <Home {...p} />;
   if (name === 'explore') return <Search {...p} />;
-  if (name === 'ai') return <Sparkles {...p} />;
+  if (name === 'ai') return <ChefHat {...p} />;
   if (name === 'cart') return <ShoppingCart {...p} />;
   return <User {...p} />;
 }

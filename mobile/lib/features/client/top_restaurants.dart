@@ -144,7 +144,7 @@ class _Card extends StatelessWidget {
                   Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: h3(Colors.white)),
                   const SizedBox(height: 2),
                   Text(
-                    top['name'] != null ? 'Le plus commandé : ${top['name']}' : asStr(r['tagline']),
+                    top['name'] != null ? '${sold > 0 ? 'Le plus commandé' : 'Spécialité'} : ${top['name']}' : asStr(r['tagline']),
                     maxLines: 1, overflow: TextOverflow.ellipsis,
                     style: font(size: 12.5, weight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.9)),
                   ),

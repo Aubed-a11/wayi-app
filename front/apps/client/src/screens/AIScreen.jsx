@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowUp, ShoppingBag, MapPin, Bike, ChevronRight, RotateCcw, Sparkles, Sun, Soup, Wand2 } from 'lucide-react';
+import { ArrowUp, ShoppingBag, MapPin, Bike, ChevronRight, RotateCcw, ChefHat, Sun, Soup, Shuffle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BackBtn } from '../components/UI';
 import { aiAPI } from '../api';
@@ -8,7 +8,7 @@ import { toCartItem, MenuCard } from '../components/Wayi';
 const STARTERS = [
   { Icon: Sun, text: 'Un truc léger pour ce midi' },
   { Icon: Soup, text: 'Un plat local pas trop épicé' },
-  { Icon: Wand2, text: 'Surprends-moi' },
+  { Icon: Shuffle, text: 'Surprends-moi' },
   { Icon: Bike, text: 'Où en est ma commande ?' },
 ];
 
@@ -51,7 +51,7 @@ function saveChat(user, messages) {
 export function YiviOrb({ size = 36, thinking = false, still = false }) {
   return (
     <span className={`yivi-orb${thinking ? ' is-thinking' : ''}`} style={{ width: size, height: size, ...(still ? { animation: 'none' } : {}) }} aria-hidden="true">
-      <Sparkles size={Math.round(size * 0.44)} strokeWidth={2.1} />
+      <ChefHat size={Math.round(size * 0.44)} strokeWidth={2.1} />
     </span>
   );
 }

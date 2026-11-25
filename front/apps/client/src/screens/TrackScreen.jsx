@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Star, Check, CheckCircle2, X, ArrowLeft, Bike, Headphones, Phone, Sparkles, Receipt, ClipboardList } from 'lucide-react';
+import { Star, Check, CheckCircle2, X, ArrowLeft, Bike, Headphones, Phone, ChefHat, Receipt, ClipboardList } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav, Spinner, launchConfetti } from '../components/UI';
 import { Empty, fcfa } from '../components/Wayi';
@@ -446,7 +446,7 @@ export default function TrackScreen() {
             </div>
             {order.driver?.phone && !isDelivered
               ? <a className="w-help-call" href={`tel:${order.driver.phone}`} aria-label="Appeler le livreur"><Phone size={20} aria-hidden="true" /></a>
-              : <button className="w-help-call" onClick={() => navigate('ai')} aria-label="Ouvrir Yivi"><Sparkles size={20} aria-hidden="true" /></button>}
+              : <button className="w-help-call" onClick={() => navigate('ai')} aria-label="Ouvrir Yivi"><ChefHat size={20} aria-hidden="true" /></button>}
           </div>
 
           {/* Le serveur n'autorise l'annulation que tant que le restaurant n'a pas repondu */}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Star, MapPin, Sparkles, X, ChevronRight, ClipboardList, Heart, Crown, HelpCircle, Info, LogOut, Settings, User, ArrowLeft, Bike } from 'lucide-react';
+import { Star, MapPin, ChefHat, X, ChevronRight, ClipboardList, Heart, Crown, HelpCircle, Info, LogOut, Settings, User, ArrowLeft, Bike } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav, Spinner } from '../components/UI';
 import { DishImg, Empty, fcfa, toCartItem } from '../components/Wayi';
@@ -121,7 +121,7 @@ export default function ProfileScreen() {
     { key: 'addresses', Icon: MapPin, label: 'Mes adresses', sub: `${user.addresses?.length || 0} adresse(s)` },
     { key: 'subscription', Icon: Crown, label: 'Abonnement livraison', sub: subActive ? `Actif jusqu'au ${new Date(user.subscription.expiresAt).toLocaleDateString('fr-FR')}` : 'Livraison gratuite pendant 7 ou 30 jours' },
     { key: 'favorites', Icon: Heart, label: 'Favoris' },
-    { key: 'prefs', Icon: Sparkles, label: 'Mes goûts retenus par Yivi' },
+    { key: 'prefs', Icon: ChefHat, label: 'Mes goûts retenus par Yivi' },
     { key: 'help', Icon: HelpCircle, label: 'Aide & Support' },
     { key: 'about', Icon: Info, label: 'À propos de WAYI' },
     { key: 'logout', Icon: LogOut, label: 'Se déconnecter' },

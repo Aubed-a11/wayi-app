@@ -70,7 +70,7 @@ export default function TopRestaurants({ dishes = [], onOpenDish, onAdd }) {
                 <Logo url={r.logo} name={r.name} size={46} />
                 <span className="tr-text">
                   <strong>{r.name}</strong>
-                  <small>{item.topDish?.name ? `Le plus commandé : ${item.topDish.name}` : r.tagline}</small>
+                  <small>{item.topDish?.name ? `${sold > 0 ? 'Le plus commandé' : 'Spécialité'} : ${item.topDish.name}` : r.tagline}</small>
                 </span>
               </span>
             </button>

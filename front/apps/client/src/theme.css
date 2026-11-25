@@ -136,8 +136,8 @@ body { font-family: var(--font-body); color: var(--ink); -webkit-font-smoothing:
 
 /* Banniere "Menu du jour" (accueil) */
 .w-banner {
-  position: relative; overflow: hidden; border-radius: 22px; background: #46705A; color: #fff; padding: 20px 20px 18px;
-  display: flex; min-height: 150px; box-shadow: 0 10px 24px rgba(70, 112, 90, 0.18);
+  position: relative; overflow: hidden; border-radius: 22px; background: linear-gradient(135deg, #F9A15A 0%, #F58A3D 45%, #C2462B 85%, #8E2318 100%); color: #fff; padding: 20px 20px 18px;
+  display: flex; min-height: 150px; box-shadow: 0 10px 24px rgba(168, 50, 31, 0.22);
 }
 .w-banner-txt { position: relative; z-index: 1; max-width: 62%; display: flex; flex-direction: column; align-items: flex-start; }
 .w-banner-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--brand); color: #fff; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 999px; margin-bottom: 10px; }
@@ -312,7 +312,7 @@ body { font-family: var(--font-body); color: var(--ink); -webkit-font-smoothing:
 .w-splash::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: var(--bj-stripe); opacity: .85; }
 .auth-hero::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--bj-stripe); opacity: .85; z-index: 3; }
 /* Banniere : etiquette jaune douce, comme le jaune du drapeau */
-.w-banner-tag { background: var(--bj-yellow) !important; color: #3D3420 !important; }
+.w-banner-tag { background: rgba(255, 255, 255, 0.22) !important; color: #fff !important; }
 /* Etats : vert du Benin pour ce qui est fait */
 .w-step.done .w-step-dot { background: var(--bj-green) !important; }
 .w-step.done::before { background: var(--bj-green) !important; }
