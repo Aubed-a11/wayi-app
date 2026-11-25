@@ -14,8 +14,11 @@ const RESTAURANT = {
   // Ancienne phrase remplacee au demarrage si elle n'a pas ete modifiee depuis
   oldTaglines: ['Salades, chawarmas, grillades, pizzas et spécialités africaines'],
   logo: `${SITE}/restaurants/guedalia.jpg`,
-  zone: 'Cotonou',
-  lat: 6.3654, lng: 2.4183,
+  zone: 'Abomey-Calavi, face Université Le Faucon',
+  // Position approchee (secteur du campus d'Abomey-Calavi), a affiner avec le point GPS exact
+  lat: 6.441, lng: 2.352,
+  // Ancienne position par defaut, remplacee au demarrage si elle n'a pas ete modifiee depuis
+  oldPositions: [[6.3654, 2.4183]],
   prepTime: '25-35',
 };
 

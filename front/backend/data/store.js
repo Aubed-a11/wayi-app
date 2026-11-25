@@ -628,10 +628,13 @@ function seedPartners() {
       console.log(`[Store] Compte restaurant cree : ${ACCOUNT.email}`);
     }
     if (known && (RESTAURANT.oldTaglines || []).includes(known.tagline)) known.tagline = RESTAURANT.tagline;
+    if (known && (RESTAURANT.oldPositions || []).some(([a, b]) => known.lat === a && known.lng === b)) {
+      known.lat = RESTAURANT.lat; known.lng = RESTAURANT.lng; known.zone = RESTAURANT.zone;
+    }
     if (partnersSeeded.includes(RESTAURANT.id)) continue;
     if (!restaurants.find(r => r.id === RESTAURANT.id)) {
       restaurants.push({ icon: 'utensils', rating: null, verified: true, priorityScore: 60, momoMtn: null, momoMoov: null,
-        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined });
+        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined, oldPositions: undefined });
     }
     for (const d of DISHES) {
       if (dishes.find(x => x.id === d.id)) continue;
