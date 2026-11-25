@@ -1,11 +1,11 @@
 # Captures d'ecran de l'appli WAYI (version web, serveur de test local) pour
 # verifier le design. Les images sont publiees sur la branche "captures".
-name: Captures d'ecran WAYI
+name: Captures d'ecran et test du parcours WAYI
 
 on:
   workflow_dispatch:
   push:
-    paths: ['mobile/lib/**', 'front/apps/client/src/**', '.github/captures/**', '.github/workflows/captures.yml']
+    paths: ['mobile/lib/**', 'front/apps/client/src/**', 'front/backend/**', '.github/captures/**', '.github/workflows/captures.yml']
 
 permissions:
   contents: write
@@ -24,6 +24,9 @@ jobs:
           npm ci --omit=dev --no-audit --no-fund
           NODE_ENV=development PORT=3001 FRONTEND_URLS=http://localhost:8080,http://localhost:8081 nohup node server.js > /tmp/serveur.log 2>&1 &
           sleep 6 && curl -s localhost:3001/health | head -c 200
+      - name: Test du parcours complet d'une commande
+        working-directory: front/backend
+        run: node scripts/parcours-commande.js
       - uses: subosito/flutter-action@v2
         with:
           channel: stable

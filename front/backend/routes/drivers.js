@@ -255,6 +255,8 @@ router.put('/orders/:orderId/accept', auth, driverAuth, (req, res) => {
     emitOrderStatusChange(order.id, order.status, { driver: order.driver, pingStatus: 'accepted' });
   } catch {}
 
+  try { const push = require('../services/push'); push.toRestaurant(order, 'driver_assigned'); push.driverAssignedToClient(order); } catch {}
+
   res.json({ message: 'Commande acceptée !', order, estimatedEarnings: Math.round((order.deliveryFee || 0) * 0.80) });
 });
 
@@ -284,6 +286,7 @@ router.put('/orders/:orderId/pickup', auth, driverAuth, (req, res) => {
     emitOrderStatusChange(order.id, 'on_the_way', { driver: order.driver });
   } catch {}
 
+  try { require('../services/push').toRestaurant(order, 'picked_up'); } catch {}
   res.json({ message: 'Commande récupérée, en route vers le client', order });
 });
 
@@ -297,6 +300,7 @@ router.put('/orders/:orderId/complete', auth, driverAuth, (req, res) => {
   }
 
   setOrderStatus(order.id, 'delivered');
+  try { require('../services/push').toRestaurant(order, 'delivered'); } catch {}
 
   // Paiement cash : encaissé à la livraison par le livreur
   if (order.paymentMethod === 'cash') {

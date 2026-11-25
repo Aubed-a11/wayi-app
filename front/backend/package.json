@@ -8,7 +8,8 @@
     "dev": "nodemon server.js",
     "essai-yivi": "node scripts/essai-yivi.js",
     "configurer": "node scripts/configurer.js",
-    "verifier": "node scripts/verifier.js"
+    "verifier": "node scripts/verifier.js",
+    "parcours": "node scripts/parcours-commande.js"
   },
   "dependencies": {
     "axios": "^1.16.1",

@@ -95,6 +95,30 @@ function pingToDriver(driverId, order) {
   }));
 }
 
+// Restaurant : livreur trouve, plat recupere, commande livree
+function toRestaurant(order, kind) {
+  const who = order.driver?.name || 'Le livreur';
+  const msg = {
+    driver_assigned: ['Livreur trouvé', `${who} vient chercher la commande ${order.id}. Prépare-la.`],
+    picked_up: ['Commande récupérée', `${who} a récupéré la commande ${order.id} et part chez le client.`],
+    delivered: ['Commande livrée', `La commande ${order.id} a bien été livrée au client.`],
+  }[kind];
+  if (!msg) return;
+  merchants.filter(m => m.restaurantId === order.restaurantId).forEach(m => fire(pushTo(m, {
+    title: msg[0], body: msg[1], data: { type: `restaurant_${kind}`, orderId: order.id },
+  })));
+}
+
+// Client : un livreur a accepte sa commande
+function driverAssignedToClient(order) {
+  const user = users.find(u => u.id === order.userId);
+  fire(pushTo(user, {
+    title: 'Livreur trouvé',
+    body: `${order.driver?.name || 'Un livreur'} va récupérer ta commande chez ${order.restaurantName}.`,
+    data: { type: 'order_status', orderId: order.id, status: 'driver_assigned' },
+  }));
+}
+
 const CLIENT_MESSAGES = {
   preparing: (o) => [`${o.restaurantName} prépare ta commande`, 'Ta commande a été acceptée, elle est en préparation.'],
   on_the_way: (o) => ['Ton livreur est en route', `${o.driver?.name || 'Ton livreur'} arrive avec ta commande.`],
@@ -112,4 +136,4 @@ function orderStatusToClient(orderId, status) {
   fire(pushTo(user, { title, body, data: { type: 'order_status', orderId, status } }));
 }
 
-module.exports = { addToInbox, inboxSince, accountFor, registerToken, removeToken, pushTo, newOrderToRestaurant, pingToDriver, orderStatusToClient };
+module.exports = { addToInbox, inboxSince, accountFor, registerToken, removeToken, pushTo, newOrderToRestaurant, pingToDriver, orderStatusToClient, toRestaurant, driverAssignedToClient };
