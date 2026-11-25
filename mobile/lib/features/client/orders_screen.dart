@@ -118,7 +118,6 @@ class _OrderCard extends StatelessWidget {
                 const Spacer(),
                 Text(fcfa(asNum(order['total'])), style: font(size: 14.5, weight: FontWeight.w800)),
                 const SizedBox(width: 6),
-                const Icon(Ic.chevron, size: 18, color: C.muted),
               ]),
             ]),
           ),

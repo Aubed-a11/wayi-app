@@ -19,9 +19,7 @@ class Ic {
   static const IconData bike = LucideIcons.bike;
   static const IconData utensils = LucideIcons.utensilsCrossed;
   static const IconData shield = LucideIcons.shieldCheck;
-  static const IconData back = LucideIcons.arrowLeft;
-  static const IconData next = LucideIcons.arrowRight;
-  static const IconData chevron = LucideIcons.chevronRight;
+  static const IconData more = LucideIcons.ellipsisVertical;
   static const IconData chevronDown = LucideIcons.chevronDown;
   static const IconData bell = LucideIcons.bell;
   static const IconData ticket = LucideIcons.ticket;

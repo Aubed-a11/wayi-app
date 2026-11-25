@@ -348,3 +348,26 @@ class RestoLine extends StatelessWidget {
         ),
       ]);
 }
+
+/// Bouton de retour en texte (aucune fleche dans l'appli).
+class RetourBtn extends StatelessWidget {
+  final VoidCallback? onTap;
+  const RetourBtn({super.key, this.onTap});
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Material(
+          color: Colors.white,
+          elevation: 1.5,
+          shadowColor: Colors.black26,
+          shape: const StadiumBorder(side: BorderSide(color: Color(0xFFEEF0F3))),
+          child: InkWell(
+            customBorder: const StadiumBorder(),
+            onTap: onTap ?? () => Navigator.of(context).maybePop(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              child: Text('Retour', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: C.ink)),
+            ),
+          ),
+        ),
+      );
+}

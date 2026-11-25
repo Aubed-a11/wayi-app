@@ -122,7 +122,7 @@ class _AccountTabState extends State<AccountTab> {
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Ic.lock, color: C.ink2),
           title: Text('Changer mon mot de passe', style: font(size: 15, weight: FontWeight.w600)),
-          trailing: const Icon(Ic.chevron, color: C.muted),
+          
           onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ChangePasswordScreen(path: '/merchants/me/password'))),
         ),
         ListTile(

@@ -103,7 +103,7 @@ class ProfileScreen extends StatelessWidget {
                   Text(asStr(a['address']), style: small(), maxLines: 2, overflow: TextOverflow.ellipsis),
                 ])),
                 PopupMenuButton<String>(
-                  icon: const Icon(Ic.chevron, size: 18, color: C.muted),
+                  icon: const Icon(Ic.more, size: 18, color: C.muted),
                   onSelected: (v) async {
                     try {
                       if (v == 'default') await Api.instance.put('/auth/addresses/${a['id']}/default');
@@ -212,7 +212,7 @@ class _Tile extends StatelessWidget {
         leading: Container(width: 40, height: 40, decoration: BoxDecoration(color: danger ? const Color(0xFFFDECEC) : C.brandSoft, borderRadius: BorderRadius.circular(12)), child: Icon(icon, size: 19, color: danger ? C.danger : C.brand)),
         title: Text(title, style: font(size: 15, weight: FontWeight.w600, color: danger ? C.danger : C.ink)),
         subtitle: subtitle == null ? null : Text(subtitle!, style: small()),
-        trailing: danger ? null : const Icon(Ic.chevron, size: 18, color: C.muted),
+        
       ),
       );
 }
@@ -255,7 +255,7 @@ class _YiviPrefsState extends State<_YiviPrefs> {
     List<String> l(String k) => ((p?[k] as List?) ?? []).map((e) => e.toString()).toList();
     final budget = asNum(p?['budgetMax']);
     return Scaffold(
-      appBar: AppBar(leading: IconButton(icon: const Icon(Ic.back), onPressed: () => Navigator.pop(context)), title: Text('Mes goûts', style: h3())),
+      appBar: AppBar(leadingWidth: 96, leading: Padding(padding: const EdgeInsets.only(left: 10), child: RetourBtn(onTap: () => Navigator.pop(context))), title: Text('Mes goûts', style: h3())),
       body: p == null
           ? const Center(child: CircularProgressIndicator(color: C.brand))
           : ListView(padding: const EdgeInsets.all(20), children: [

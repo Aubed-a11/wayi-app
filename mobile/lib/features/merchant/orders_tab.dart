@@ -120,7 +120,7 @@ class _OrdersTabState extends State<OrdersTab> with WidgetsBindingObserver {
                 leading: const Icon(Ic.bike, color: C.success),
                 title: Text(asStr(d['name']), style: font(size: 15, weight: FontWeight.w700)),
                 subtitle: Text([if (d['distanceKm'] != null) '${d['distanceKm']} km', if (d['rating'] != null) 'note ${d['rating']}'].join(' · '), style: small()),
-                trailing: const Icon(Ic.chevron, color: C.muted),
+                
                 onTap: () => Navigator.pop(c, d),
               ),
           ]),

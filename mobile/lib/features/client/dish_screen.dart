@@ -34,7 +34,7 @@ class _DishScreenState extends State<DishScreen> {
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
           automaticallyImplyLeading: false,
-          leading: Padding(padding: const EdgeInsets.all(6), child: RoundIcon(Ic.back, onTap: () => Navigator.of(context).pop())),
+          leadingWidth: 96, leading: Padding(padding: const EdgeInsets.only(left: 10), child: RetourBtn(onTap: () => Navigator.of(context).pop())),
           flexibleSpace: FlexibleSpaceBar(background: Photo(d.image, radius: 0)),
         ),
         SliverToBoxAdapter(

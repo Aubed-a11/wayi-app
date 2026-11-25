@@ -86,7 +86,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(leading: IconButton(icon: const Icon(Ic.back), onPressed: () => Navigator.pop(context)), title: Text('Mot de passe', style: h3())),
+        appBar: AppBar(leadingWidth: 96, leading: Padding(padding: const EdgeInsets.only(left: 10), child: RetourBtn(onTap: () => Navigator.pop(context))), title: Text('Mot de passe', style: h3())),
         body: ListView(padding: const EdgeInsets.all(20), children: [
           Field(label: 'Mot de passe actuel', icon: Ic.lock, controller: _current, password: true),
           const SizedBox(height: 16),

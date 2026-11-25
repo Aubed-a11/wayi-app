@@ -192,7 +192,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final outOfZone = _quote?['outOfZone'] == true || (_quote != null && asNum(_quote!['deliveryFee']) > 3500 * nResto);
     final total = _quote != null && !outOfZone ? asNum(_quote!['total']) : cart.subtotal;
     return Scaffold(
-      appBar: AppBar(leading: IconButton(icon: const Icon(Ic.back), onPressed: () => Navigator.of(context).pop()), title: Text('Livraison et paiement', style: h3())),
+      appBar: AppBar(leadingWidth: 96, leading: Padding(padding: const EdgeInsets.only(left: 10), child: RetourBtn(onTap: () => Navigator.of(context).pop())), title: Text('Livraison et paiement', style: h3())),
       body: ListView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 170), children: [
         Text('Où te livrer ?', style: h2()),
         const SizedBox(height: 6),

@@ -101,7 +101,7 @@ class _PickLocationScreenState extends State<PickLocationScreen> {
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Row(children: [
-                RoundIcon(Ic.back, onTap: () => Navigator.of(context).pop()),
+                RetourBtn(onTap: () => Navigator.of(context).pop()),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Container(

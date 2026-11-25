@@ -99,7 +99,7 @@ class _DishFormScreenState extends State<DishFormScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(leading: IconButton(icon: const Icon(Ic.back), onPressed: () => Navigator.pop(context)), title: Text(_editing ? 'Modifier le plat' : 'Nouveau plat', style: h3())),
+        appBar: AppBar(leadingWidth: 96, leading: Padding(padding: const EdgeInsets.only(left: 10), child: RetourBtn(onTap: () => Navigator.pop(context))), title: Text(_editing ? 'Modifier le plat' : 'Nouveau plat', style: h3())),
         body: ListView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 120), children: [
           GestureDetector(
             onTap: _uploading ? null : _photoMenu,

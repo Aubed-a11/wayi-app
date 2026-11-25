@@ -187,7 +187,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     final o = _o;
     if (o == null) {
       return Scaffold(
-        appBar: AppBar(leading: IconButton(icon: const Icon(Ic.back), onPressed: () => Navigator.pop(context))),
+        appBar: AppBar(leadingWidth: 96, leading: Padding(padding: const EdgeInsets.only(left: 10), child: RetourBtn(onTap: () => Navigator.pop(context)))),
         body: Center(child: _error != null ? Padding(padding: const EdgeInsets.all(24), child: Notice(_error!)) : const CircularProgressIndicator(color: C.brand)),
       );
     }
@@ -209,7 +209,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          leading: Padding(padding: const EdgeInsets.all(6), child: RoundIcon(Ic.back, onTap: () => Navigator.pop(context))),
+          leadingWidth: 96, leading: Padding(padding: const EdgeInsets.only(left: 10), child: RetourBtn(onTap: () => Navigator.pop(context))),
           flexibleSpace: FlexibleSpaceBar(
             background: _points.isEmpty
                 ? Container(color: C.surface, alignment: Alignment.center, child: Text('Carte indisponible', style: small()))
