@@ -259,7 +259,7 @@ router.post('/drivers', auth, adminAuth, async (req, res) => {
     driver: safeDriver,
     message: 'Livreur créé',
     emailSimulated: !!emailResult?.simulated || emailFailed,
-    devPassword: emailFailed ? tempPassword : undefined,
+    devPassword: (emailFailed || (emailResult?.simulated && process.env.NODE_ENV !== 'production')) ? tempPassword : undefined,
   });
 });
 
@@ -337,7 +337,7 @@ router.post('/merchants', auth, adminAuth, async (req, res) => {
     restaurant, merchant: safeMerchant,
     message: 'Restaurant et compte créés',
     emailSimulated: !!emailResult?.simulated || emailFailed,
-    devPassword: emailFailed ? tempPassword : undefined,
+    devPassword: (emailFailed || (emailResult?.simulated && process.env.NODE_ENV !== 'production')) ? tempPassword : undefined,
   });
 });
 

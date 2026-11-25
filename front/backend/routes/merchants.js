@@ -66,7 +66,7 @@ router.post('/register/start', async (req, res) => {
       message: `Code envoyé à ${email}`,
       email,
       emailSimulated: !!emailResult?.simulated || emailFailed,
-      devCode: emailFailed ? code : undefined,
+      devCode: (emailFailed || (emailResult?.simulated && process.env.NODE_ENV !== 'production')) ? code : undefined,
     });
   } catch (err) {
     res.status(500).json({ error: 'Erreur serveur' });
@@ -90,7 +90,7 @@ router.post('/register/resend', async (req, res) => {
     res.json({
       message: `Code renvoyé à ${email}`,
       emailSimulated: !!emailResult?.simulated || emailFailed,
-      devCode: emailFailed ? code : undefined,
+      devCode: (emailFailed || (emailResult?.simulated && process.env.NODE_ENV !== 'production')) ? code : undefined,
     });
   } catch {
     res.status(500).json({ error: 'Erreur serveur' });

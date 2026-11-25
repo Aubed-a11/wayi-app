@@ -64,7 +64,7 @@ router.post('/register/start', async (req, res) => {
       html: `<p>Bonjour ${data.name},</p><p>Voici ton code pour créer ton compte livreur WAYI :</p><h2>${code}</h2><p>Ce code expire dans 10 minutes.</p>`,
     });
     const emailFailed = !emailResult?.success;
-    res.json({ message: `Code envoyé à ${data.email}`, email: data.email, emailSimulated: !!emailResult?.simulated || emailFailed, devCode: emailFailed ? code : undefined });
+    res.json({ message: `Code envoyé à ${data.email}`, email: data.email, emailSimulated: !!emailResult?.simulated || emailFailed, devCode: (emailFailed || (emailResult?.simulated && process.env.NODE_ENV !== 'production')) ? code : undefined });
   } catch {
     res.status(500).json({ error: 'Erreur serveur' });
   }
@@ -77,7 +77,7 @@ router.post('/register/resend', async (req, res) => {
     const code = createPendingRegistration(pendingKey(req.body.email), pending.data);
     const emailResult = await sendEmail({ to: pending.data.email, subject: 'Ton nouveau code WAYI Livreur', html: `<p>Voici ton nouveau code : <h2>${code}</h2></p>` });
     const emailFailed = !emailResult?.success;
-    res.json({ message: 'Code renvoyé', emailSimulated: !!emailResult?.simulated || emailFailed, devCode: emailFailed ? code : undefined });
+    res.json({ message: 'Code renvoyé', emailSimulated: !!emailResult?.simulated || emailFailed, devCode: (emailFailed || (emailResult?.simulated && process.env.NODE_ENV !== 'production')) ? code : undefined });
   } catch {
     res.status(500).json({ error: 'Erreur serveur' });
   }

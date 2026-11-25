@@ -47,10 +47,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ]),
                 const SizedBox(height: 22),
                 Expanded(
-                  child: Row(children: [
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                     Expanded(flex: 3, child: framed(0, 22)),
                     const SizedBox(width: 12),
-                    Expanded(flex: 2, child: Column(children: [Expanded(child: framed(1, 20)), const SizedBox(height: 12), Expanded(child: framed(2, 20))])),
+                    Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: framed(1, 20)), const SizedBox(height: 12), Expanded(child: framed(2, 20))])),
                   ]),
                 ),
               ]),
