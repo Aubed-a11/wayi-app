@@ -256,6 +256,26 @@ class _DriverHomeState extends State<DriverHome> with WidgetsBindingObserver {
         const SizedBox(height: 14),
         _Line(icon: Ic.store, text: asStr(p['restaurantName']), light: true),
         _Line(icon: Ic.pin, text: [asStr(p['address']), asStr(p['landmark'])].where((x) => x.isNotEmpty).join(' · '), light: true),
+        if (asStr(p['readyAtLabel']).isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(R.md)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Plat prêt vers ${asStr(p['readyAtLabel'])}', style: font(size: 14, weight: FontWeight.w800, color: Colors.white)),
+              const SizedBox(height: 2),
+              Text("Trajet jusqu'au restaurant : environ ${asNum(p['travelMinutes']).toInt()} min", style: font(size: 13, color: Colors.white70)),
+              const SizedBox(height: 2),
+              Text(
+                asNum(p['departInMinutes']) > 0
+                    ? 'Pars vers ${asStr(p['departAtLabel'])} (dans ${asNum(p['departInMinutes']).toInt()} min) pour arriver pile à l\'heure'
+                    : 'Pars tout de suite pour arriver à temps',
+                style: font(size: 13, weight: FontWeight.w700, color: C.brand),
+              ),
+            ]),
+          ),
+        ],
         const SizedBox(height: 10),
         Text('Tu gagnes ${fcfa(asNum(p['estimatedEarnings']))}', style: h2(Colors.white)),
         const SizedBox(height: 16),

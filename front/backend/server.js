@@ -148,6 +148,8 @@ async function start() {
   const seeded = seedDemoMenuIfEmpty();
   if (seeded) console.log(`  Menu de démonstration : ${seeded} plats ajoutés`);
   seedPartners();
+  // Commandes acceptees sans livreur (ex. apres un redemarrage) : la recherche reprend
+  try { const n = require('./services/dispatch').resumeDispatches(require('./data/store').orders); if (n) console.log(`  Recherche de livreur relancee pour ${n} commande(s)`); } catch (e) { console.error('[Dispatch]', e.message); }
   // Mots de passe administrateur/démo définis dans le .env : appliqués après la restauration de l'état.
   applySecurityOverrides();
 

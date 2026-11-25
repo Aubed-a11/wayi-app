@@ -362,6 +362,13 @@ export default function DriverScreen() {
                 <div style={{ fontSize: 10, color: 'var(--gray)' }}>tes gains</div>
               </div>
             </div>
+            {incomingPing.readyAtLabel && (
+              <div style={{ background: '#FFF4EB', border: '1px solid #F7D9C2', borderRadius: 'var(--r-md)', padding: '10px 12px', marginBottom: 10, fontSize: 13, color: '#7A2A18', lineHeight: 1.5 }}>
+                <div style={{ fontWeight: 800 }}>Plat prêt vers {incomingPing.readyAtLabel}</div>
+                <div>Trajet jusqu'au restaurant : environ {incomingPing.travelMinutes} min</div>
+                <div style={{ fontWeight: 700 }}>{incomingPing.departInMinutes > 0 ? `Pars vers ${incomingPing.departAtLabel} (dans ${incomingPing.departInMinutes} min) pour arriver pile à l'heure` : 'Pars tout de suite pour arriver à temps'}</div>
+              </div>
+            )}
             <div style={{ background: 'var(--cream)', borderRadius: 'var(--r-md)', padding: '10px 12px', marginBottom: 16, fontSize: 12, color: 'var(--gray)' }}>
               {(incomingPing.items || []).map((it, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><DynamicIcon name={it.icon} size={13} /> {it.name} x{it.qty}</div>

@@ -20,6 +20,11 @@ const PLATFORM_CONFIG = {
   // Au-dela, l'adresse est hors zone : on refuse au lieu de facturer des frais absurdes
   maxDeliveryKm: 20,
   driverShare: 0.80,
+  // Recherche de livreur : uniquement ceux a moins de X minutes du restaurant,
+  // en visant une arrivee au moment ou le plat est pret.
+  driverMaxMinutes: Number(process.env.DRIVER_MAX_MINUTES) || 25,
+  driverSpeedKmh: 22,      // vitesse moyenne d'une moto en ville
+  roadFactor: 1.35,        // la route est plus longue que la ligne droite
   subscriptionPlans: {
     basic:    { price: 15000,  label: 'Basic',    maxDishes: 20,  priority: 1, badge: null },
     standard: { price: 35000,  label: 'Standard', maxDishes: 60,  priority: 2, badge: 'star' },
@@ -324,6 +329,17 @@ function findNearestDriver(lat, lng) {
     const dist = calcDistance(lat, lng, d.location.lat, d.location.lng);
     return !closest || dist < closest.dist ? { d, dist } : closest;
   }, null)?.d || available[0];
+}
+// Temps de trajet estime (minutes) pour une distance a vol d'oiseau en km
+function travelMinutes(km) {
+  return Math.max(1, Math.ceil((km * PLATFORM_CONFIG.roadFactor) / PLATFORM_CONFIG.driverSpeedKmh * 60));
+}
+// Livreurs disponibles a moins de maxMinutes du point, avec leur temps de trajet
+function driversWithin(lat, lng, maxMinutes = PLATFORM_CONFIG.driverMaxMinutes) {
+  return drivers
+    .filter(d => d.status === 'available' && !d.suspended && !d.pendingApproval && d.location && d.location.lat != null)
+    .map(d => { const km = calcDistance(lat, lng, d.location.lat, d.location.lng); return { driver: d, km, minutes: travelMinutes(km) }; })
+    .filter(x => x.minutes <= maxMinutes);
 }
 function findNearbyDrivers(lat, lng, { limit = 5, maxKm = 8 } = {}) {
   return drivers
@@ -657,7 +673,7 @@ function seedDemoMenuIfEmpty() {
 }
 
 module.exports = { snapshotState, restoreState, outOfZone, outOfZoneMessage,
-  PLATFORM_CONFIG, PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, beninHour, seedDemoMenuIfEmpty, seedPartners,
+  PLATFORM_CONFIG, PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, beninHour, seedDemoMenuIfEmpty, seedPartners, travelMinutes, driversWithin,
   restaurants, dishes, users, drivers, merchants, admins, reviews, orders, receipts, callLogs,
   enrichDish, getMenu, getDishById, getRestaurantById, getDishesByRestaurant,
   getUserById, getOrdersByUser, addOrder, updateOrder,

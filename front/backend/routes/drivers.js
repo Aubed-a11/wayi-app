@@ -167,6 +167,7 @@ router.get('/dashboard', auth, driverAuth, (req, res) => {
       address: incomingPing.address, landmark: incomingPing.landmark || '', mapsLink: incomingPing.mapsLink || null, deliveryFee: incomingPing.deliveryFee,
       estimatedEarnings: Math.round((incomingPing.deliveryFee || 0) * 0.80),
       expiresAt: incomingPing.pingExpiresAt,
+      ...require('../services/dispatch').timingFor(incomingPing, incomingPing.pingedTravelMinutes || 0),
     } : null,
     // Course en cours : carte (restaurant, client, trajet) et contact du client pour l'appli livreur
     activeDelivery: activeDelivery ? (() => {
