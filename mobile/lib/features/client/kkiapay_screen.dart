@@ -37,7 +37,7 @@ class _KkiapayScreenState extends State<KkiapayScreen> {
       'partnerId': widget.orderId,
       'paymentmethod': widget.method == 'card' ? 'card' : 'momo',
       'countries': ['BJ'],
-      'theme': '#D9824E',
+      'theme': '#F2690D',
       'position': 'center',
     });
     final html = '''<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">

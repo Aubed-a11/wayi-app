@@ -6,6 +6,9 @@
 #   VPS_PASSWORD        mot de passe root du VPS
 #   VPS_HOST            facultatif (par defaut 76.13.37.17)
 #   ANTHROPIC_API_KEY   facultatif : si present, remplace la cle de Yivi dans le .env du serveur
+#   Paiement Kkiapay (MTN MoMo, Moov Money, carte), facultatifs, copies dans le .env du serveur :
+#   KKIAPAY_PUBLIC_KEY, KKIAPAY_PRIVATE_KEY, KKIAPAY_SECRET, KKIAPAY_WEBHOOK_SECRET
+#   KKIAPAY_SANDBOX  true pour les tests (aucun vrai prelevement), false pour l'argent reel
 name: Deployer le serveur WAYI
 
 on:
@@ -25,6 +28,11 @@ jobs:
       HOST: ${{ secrets.VPS_HOST || '76.13.37.17' }}
       SSHPASS: ${{ secrets.VPS_PASSWORD }}
       CLAUDE_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      KKIAPAY_PUBLIC_KEY: ${{ secrets.KKIAPAY_PUBLIC_KEY }}
+      KKIAPAY_PRIVATE_KEY: ${{ secrets.KKIAPAY_PRIVATE_KEY }}
+      KKIAPAY_SECRET: ${{ secrets.KKIAPAY_SECRET }}
+      KKIAPAY_WEBHOOK_SECRET: ${{ secrets.KKIAPAY_WEBHOOK_SECRET }}
+      KKIAPAY_SANDBOX: ${{ secrets.KKIAPAY_SANDBOX }}
     steps:
       - uses: actions/checkout@v4
       - name: Secret VPS_PASSWORD present ?
@@ -46,7 +54,14 @@ jobs:
           sshpass -e ssh -o StrictHostKeyChecking=accept-new root@$HOST "sed -i 's/\r$//' /root/sauvegarde-avant-maj.sh && bash /root/sauvegarde-avant-maj.sh"
       - name: 2. Installer et redemarrer
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=accept-new root@$HOST bash -s -- "$CLAUDE_KEY" <<'SCRIPT'
+          # Reglages a ecrire dans le .env du serveur (seulement ceux fournis en secret)
+          : > reglages.env
+          for k in KKIAPAY_PUBLIC_KEY KKIAPAY_PRIVATE_KEY KKIAPAY_SECRET KKIAPAY_WEBHOOK_SECRET KKIAPAY_SANDBOX; do
+            v="${!k}"; if [ -n "$v" ]; then printf '%s=%s\n' "$k" "$v" >> reglages.env; fi
+          done
+          if [ -s reglages.env ]; then echo "Reglages Kkiapay fournis : $(cut -d= -f1 reglages.env | tr '\n' ' ')"; fi
+          REGLAGES=$(base64 -w0 reglages.env)
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new root@$HOST bash -s -- "$CLAUDE_KEY" "$REGLAGES" <<'SCRIPT'
           set -e
           B=/home/wayi/wayi-backend
           cp -r "$B" "$B.sauvegarde-$(date +%Y%m%d-%H%M)"
@@ -56,6 +71,15 @@ jobs:
           if [ -n "$1" ]; then
             sed -i '/^ANTHROPIC_API_KEY=/d;/^ANTHROPIC_MODEL=/d;/^CLAUDE_MODEL=/d' .env
             printf '\nANTHROPIC_API_KEY=%s\nANTHROPIC_MODEL=claude-sonnet-5-5\n' "$1" >> .env
+          fi
+          if [ -n "$2" ]; then
+            echo "$2" | base64 -d > /tmp/reglages.env
+            while IFS='=' read -r key val; do
+              [ -z "$key" ] && continue
+              sed -i "/^${key}=/d" .env
+              printf '%s=%s\n' "$key" "$val" >> .env
+            done < /tmp/reglages.env
+            rm -f /tmp/reglages.env
           fi
           grep -q '^PUBLIC_API_URL=' .env || printf '\nPUBLIC_API_URL=https://api.wayibenin.com\n' >> .env
           chmod 600 .env
@@ -73,4 +97,6 @@ jobs:
           curl -sf https://api.wayibenin.com/health | head -c 400; echo
           code=$(curl -s -o /dev/null -w '%{http_code}' https://api.wayibenin.com/api/notifications)
           echo "Route des notifications (doit repondre 401, signe que la nouvelle version tourne) : $code"
+          echo "Paiement en ligne :"
+          curl -s https://api.wayibenin.com/api/payments/methods | head -c 300; echo
           test "$code" = "401"
