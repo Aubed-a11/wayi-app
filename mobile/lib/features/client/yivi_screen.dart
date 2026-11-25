@@ -113,7 +113,6 @@ class _YiviScreenState extends State<YiviScreen> {
                       ActionChip(
                         label: Text(s, style: font(size: 13.5, weight: FontWeight.w600)),
                         backgroundColor: C.card, side: const BorderSide(color: C.line),
-                        side: BorderSide.none,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                         onPressed: () => _send(s),
                       ),
