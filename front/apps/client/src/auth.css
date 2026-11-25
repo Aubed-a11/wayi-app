@@ -51,7 +51,7 @@
 .a7-label { font-size: 12.5px; font-weight: 600; color: #5E544E; padding-left: 4px; }
 .a7-box { display: flex; align-items: center; gap: 10px; height: 54px; padding: 0 14px; background: #FBF7F3; border: 1.5px solid #EFE5DC; border-radius: 16px; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
 .a7-box svg { color: #B4A79D; flex-shrink: 0; transition: color .2s ease; }
-.a7-box:focus-within { border-color: var(--brand-mid); background: #fff; box-shadow: 0 0 0 4px rgba(217, 130, 78, 0.10); }
+.a7-box:focus-within { border-color: var(--brand-mid); background: #fff; box-shadow: 0 0 0 4px rgba(245, 138, 61, 0.10); }
 .a7-box:focus-within > svg { color: var(--brand); }
 .a7-box input { flex: 1; min-width: 0; height: 100%; border: none !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; font-family: var(--font-body); font-size: 15px; color: var(--ink); outline: none; }
 .a7-box input::placeholder { color: #B9AEA6; }
@@ -74,7 +74,7 @@
 .a7-cta {
   margin-top: 4px; height: 56px; border: none; border-radius: 999px; background: var(--grad-brand); color: #fff;
   font-family: var(--font-body); font-size: 15.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;
-  cursor: pointer; box-shadow: 0 10px 22px rgba(217, 130, 78, 0.28); transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+  cursor: pointer; box-shadow: 0 10px 22px rgba(245, 138, 61, 0.28); transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
 }
 .a7-cta:active { transform: scale(.98); }
 .a7-cta:disabled { opacity: .6; }
@@ -145,7 +145,7 @@
 }
 .a7-title h1 { font-size: 27px; line-height: 1.2; letter-spacing: -.4px; }
 .a7-title h1 span { color: var(--brand-dark); position: relative; white-space: nowrap; }
-.a7-title h1 span::after { content: ''; position: absolute; left: 0; right: 0; bottom: 1px; height: 7px; border-radius: 4px; background: rgba(217, 130, 78, 0.18); z-index: -1; }
+.a7-title h1 span::after { content: ''; position: absolute; left: 0; right: 0; bottom: 1px; height: 7px; border-radius: 4px; background: rgba(245, 138, 61, 0.18); z-index: -1; }
 .a7-title { position: relative; z-index: 0; animation: a7In .6s cubic-bezier(.2, .8, .2, 1) .08s both; }
 
 .a7-card {
@@ -163,11 +163,11 @@
 
 .a7-box { background: #fff; border-color: #EEE3DA; box-shadow: 0 1px 2px rgba(120, 70, 35, 0.04); }
 .a7-box:hover { border-color: #E6D6C8; }
-.a7-box:focus-within { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(217, 130, 78, 0.12); }
+.a7-box:focus-within { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(245, 138, 61, 0.12); }
 .a7-label { font-size: 12.5px; letter-spacing: .1px; }
 
 .a7-cta {
-  background: linear-gradient(135deg, #E39A68 0%, #D9824E 45%, #C46C38 100%);
+  background: linear-gradient(135deg, #E39A68 0%, #F58A3D 45%, #C46C38 100%);
   box-shadow: 0 12px 24px rgba(201, 110, 58, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   letter-spacing: .2px;
 }
@@ -200,7 +200,7 @@
 .a7-role strong { font-size: 13px; font-weight: 600; }
 .a7-role small { font-size: 10.5px; line-height: 1.3; color: var(--gray); }
 .a7-role-ico { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: #fff; color: #A8998E; flex-shrink: 0; transition: background .2s ease, color .2s ease; }
-.a7-role.on { border-color: var(--brand-mid); background: #fff; box-shadow: 0 0 0 4px rgba(217, 130, 78, 0.10); }
+.a7-role.on { border-color: var(--brand-mid); background: #fff; box-shadow: 0 0 0 4px rgba(245, 138, 61, 0.10); }
 .a7-role.on .a7-role-ico { background: var(--brand-light); color: var(--brand-dark); }
 .a7-role.on strong { color: var(--brand-dark); }
 
@@ -229,3 +229,31 @@
 
 /* Plus de bande aux couleurs du drapeau */
 .a7-card-stripe, .a7-brand small::after { display: none !important; }
+
+/* ============================================================
+   v8 : en-tete vivant (degrade orange -> rouge sombre, plats qui defilent)
+   ============================================================ */
+.a7 { background: #F5F6F8; }
+.a7 .a7-hero { background: linear-gradient(165deg, #F9A15A 0%, #F58A3D 40%, #C2462B 82%, #8E2318 100%); color: #fff;
+  padding-bottom: 70px; border-radius: 0 0 32px 32px; }
+.a7 .a7-hero .a7-title h1, .a7 .a7-hero .a7-title h1 span { color: #fff; }
+.a7 .a7-hero .a7-title p { color: rgba(255, 255, 255, 0.88); }
+.a7 .a7-hero .a7-brand { color: #fff; }
+.a7 .a7-hero .a7-brand small { color: rgba(255, 255, 255, 0.8); }
+.a7 .a7-hero .a7-logo { box-shadow: 0 8px 20px rgba(80, 20, 10, 0.3); }
+.a7 .a7-hero .a7-step-ico { background: rgba(255, 255, 255, 0.18); color: #fff; }
+.a7 .a7-hero .a7-back { background: rgba(255, 255, 255, 0.95); }
+.a7 .a7-plates { display: none; }
+.a7-marquee { margin: 20px -24px 4px; display: flex; flex-direction: column; gap: 10px; transform: rotate(-4deg); }
+.a7-mq-row { overflow: hidden; }
+.a7-mq-track { display: flex; gap: 10px; width: max-content; animation: a7-mq 40s linear infinite; }
+.a7-mq-row.r1 .a7-mq-track { animation-direction: reverse; animation-duration: 34s; }
+.a7-mq-photo { width: 104px; height: 78px; border-radius: 16px; overflow: hidden; flex: none;
+  border: 2.5px solid rgba(255, 255, 255, 0.9); box-shadow: 0 8px 18px rgba(80, 20, 10, 0.28); background: rgba(255, 255, 255, 0.2); }
+.a7-mq-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes a7-mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .a7-mq-track { animation: none; } }
+.a7 .a7-card { box-shadow: 0 18px 40px rgba(120, 40, 20, 0.14); }
+.a7 .a7-blob { display: none; }
+.a7 .a7-tabs-pill { background: linear-gradient(90deg, #F58A3D, #C2462B) !important; }
+.a7 .a7-cta { background: linear-gradient(90deg, #F58A3D 0%, #D85A2E 60%, #A8321F 100%) !important; border: 0 !important; }

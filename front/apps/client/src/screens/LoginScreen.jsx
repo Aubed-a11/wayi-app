@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Mail, Lock, User, Eye, EyeOff, ArrowLeft, ArrowRight, AlertCircle, CheckCircle2, MailCheck, KeyRound, Store, Bike, Phone, MapPin, Hash, ShieldCheck, UtensilsCrossed } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Spinner } from '../components/UI';
-import { authAPI, signupAPI } from '../api';
+import { authAPI, signupAPI, menuAPI } from '../api';
 import { openSpace, rememberClient, ROLE_LABEL } from '../lib/roles';
 import '../auth.css';
 
@@ -32,7 +32,13 @@ const ROLE_ICON = { client: UtensilsCrossed, merchant: Store, driver: Bike, admi
 export default function LoginScreen() {
   const { dispatch, navigate } = useApp();
   // 'login' | 'register' | 'verify' | 'forgot' | 'reset'
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState(() => {
+    try { const m = sessionStorage.getItem('wayi.authMode'); sessionStorage.removeItem('wayi.authMode'); return m === 'register' ? 'register' : 'login'; } catch (_) { return 'login'; }
+  });
+  const [photos, setPhotos] = useState([]);
+  useEffect(() => {
+    menuAPI.get({}).then(r => setPhotos((r.data?.dishes || []).map(d => d.image).filter(Boolean))).catch(() => {});
+  }, []);
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', restaurantName: '', phone: '', zone: '', vehicleType: 'moto', vehiclePlate: '' });
   // Profil choisi a l'inscription : client, restaurant ou livreur
   const [role, setRole] = useState('client');
@@ -279,6 +285,21 @@ export default function LoginScreen() {
             <span className="a7-brand">WAYI<small>Bénin</small></span>
           </div>
 
+          {full && photos.length > 0 && (
+            <div className="a7-marquee" aria-hidden="true">
+              {[0, 1].map(row => {
+                const list = row ? [...photos].reverse() : photos;
+                return (
+                  <div key={row} className={`a7-mq-row r${row}`}>
+                    <div className="a7-mq-track">
+                      {[...list, ...list].map((src, i) => <span key={i} className="a7-mq-photo"><img src={src} alt="" loading="lazy" /></span>)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {!full && <div className="a7-step-ico" aria-hidden="true"><StepIcon size={30} strokeWidth={1.7} /></div>}
 
           <div className="a7-title" key={mode}>
@@ -288,7 +309,6 @@ export default function LoginScreen() {
         </header>
 
         <main className="a7-card">
-          <span className="a7-card-stripe" aria-hidden="true" />
           {full && (
             <div className="a7-tabs" role="tablist">
               <span className={`a7-tabs-pill ${mode}`} aria-hidden="true" />

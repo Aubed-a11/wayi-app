@@ -14,24 +14,33 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = dark ? C.ink : C.brand;
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: FilledButton(
-        onPressed: loading ? null : onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: bg, disabledBackgroundColor: bg.withValues(alpha: 0.45),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(R.md)),
-          textStyle: font(size: 15.5, weight: FontWeight.w700, color: Colors.white),
+    final enabled = onPressed != null && !loading;
+    return Opacity(
+      opacity: enabled || loading ? 1 : 0.5,
+      child: Container(
+        width: double.infinity,
+        height: 54,
+        decoration: BoxDecoration(
+          color: dark ? C.ink : null,
+          gradient: dark ? null : buttonGradient,
+          borderRadius: BorderRadius.circular(R.md),
+          boxShadow: dark ? null : [BoxShadow(color: C.brandDark.withValues(alpha: 0.28), blurRadius: 16, offset: const Offset(0, 6))],
         ),
-        child: loading
-            ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white))
-            : Row(mainAxisSize: MainAxisSize.min, children: [
-                Text(label, style: font(size: 15.5, weight: FontWeight.w700, color: Colors.white)),
-                if (icon != null) ...[const SizedBox(width: 10), Icon(icon, size: 18, color: Colors.white)],
-              ]),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(R.md),
+            onTap: enabled ? onPressed : null,
+            child: Center(
+              child: loading
+                  ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white))
+                  : Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text(label, style: font(size: 15.5, weight: FontWeight.w700, color: Colors.white)),
+                      if (icon != null) ...[const SizedBox(width: 10), Icon(icon, size: 18, color: Colors.white)],
+                    ]),
+            ),
+          ),
+        ),
       ),
     );
   }

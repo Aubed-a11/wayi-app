@@ -1,28 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/cascade.dart';
 import '../../core/icons.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
+import '../../state/menu.dart';
 
-/// En-tete commun des ecrans de connexion
+/// En-tete commun des ecrans de connexion : degrade orange vers rouge sombre,
+/// photos des plats qui defilent, titre en blanc.
 class AuthHeader extends StatelessWidget {
   final String title;
   final String subtitle;
-  const AuthHeader({super.key, required this.title, required this.subtitle});
+  final bool photos;
+  final VoidCallback? onBack;
+  final Widget? trailing;
+  const AuthHeader({super.key, required this.title, required this.subtitle, this.photos = true, this.onBack, this.trailing});
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          RoundIcon(Ic.back, onTap: () => Navigator.of(context).maybePop()),
-          const Spacer(),
-          ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.asset('assets/logo.png', width: 36, height: 36)),
-        ]),
-        const SizedBox(height: 26),
-        Text(title, style: h1()),
-        const SizedBox(height: 10),
-        Text(subtitle, style: body(C.muted)),
-        const SizedBox(height: 28),
-      ]);
+  Widget build(BuildContext context) {
+    final list = context.watch<Menu>().dishes.map((d) => d.image).whereType<String>().where((u) => u.isNotEmpty).toList();
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF9A15A), C.brand, Color(0xFFC2462B), Color(0xFF8E2318)], stops: [0, 0.35, 0.8, 1]),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [BoxShadow(color: C.brandDark.withValues(alpha: 0.25), blurRadius: 22, offset: const Offset(0, 10))],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+          child: Row(children: [
+            RoundIcon(Ic.back, onTap: onBack ?? () => Navigator.of(context).maybePop()),
+            const Spacer(),
+            trailing ?? ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.asset('assets/logo.png', width: 36, height: 36)),
+          ]),
+        ),
+        if (photos && list.isNotEmpty)
+          SizedBox(
+            height: 150,
+            child: Transform.rotate(
+              angle: -0.06,
+              child: Transform.scale(scale: 1.15, child: Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: DishCascade(photos: list, columns: 2, horizontal: true, gap: 10, tileRatio: 0.75))),
+            ),
+          )
+        else
+          const SizedBox(height: 18),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 22),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: h1(Colors.white)),
+            const SizedBox(height: 8),
+            Text(subtitle, style: body(Colors.white.withValues(alpha: 0.9))),
+          ]),
+        ),
+      ]),
+    );
+  }
 }
 
 IconData roleIcon(Role r) => switch (r) {

@@ -2,6 +2,7 @@ import { Toaster } from 'react-hot-toast';
 import { useApp } from './context/AppContext';
 import SplashScreen  from './screens/SplashScreen';
 import LoginScreen   from './screens/LoginScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
 import HomeScreen    from './screens/HomeScreen';
 import { lazy, Suspense, useEffect } from 'react';
 import { setBackHandler } from './lib/native';
@@ -28,7 +29,7 @@ export default function App() {
   // Bouton Retour d'Android : ecran precedent, ou accueil, puis l'appli passe en arriere-plan
   useEffect(() => {
     setBackHandler(() => {
-      if (['home', 'login', 'splash'].includes(state.screen)) return false;
+      if (['home', 'login', 'splash', 'welcome'].includes(state.screen)) return false;
       dispatch({ type: 'GO_BACK' });
       return true;
     });
@@ -39,6 +40,7 @@ export default function App() {
   }, []);
   const screens = {
     splash:  <SplashScreen />,
+    welcome: <WelcomeScreen />,
     login:   <LoginScreen />,
     home:    <HomeScreen />,
     dish:    <DishScreen />,

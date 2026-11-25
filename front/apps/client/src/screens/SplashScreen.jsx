@@ -7,7 +7,7 @@ export default function SplashScreen() {
 
   useEffect(() => {
     if (state.authLoading) return undefined;
-    const timer = setTimeout(() => navigate(state.user ? 'home' : 'login'), 1400);
+    const timer = setTimeout(() => navigate(state.user ? 'home' : 'welcome'), 1400);
     return () => clearTimeout(timer);
   }, [state.user, state.authLoading, navigate]);
 

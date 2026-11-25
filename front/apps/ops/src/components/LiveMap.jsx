@@ -31,7 +31,7 @@ function pinIcon(name, bg, size = 38) {
   });
 }
 const ICONS = {
-  delivery: () => pinIcon('home', '#D9824E'),
+  delivery: () => pinIcon('home', '#F58A3D'),
   restaurant: () => pinIcon('chef', '#8A6A55'),
   driver: () => pinIcon('bike', '#4F8A68', 42),
 };
@@ -155,7 +155,7 @@ export function LiveMap({ restaurant, delivery, driver, pickup, trail = [], heig
         {valid(driver) && <span><i style={{ background: '#4F8A68' }} />Livreur</span>}
         {(trail || []).length > 1 && <span><i style={{ background: '#4F8A68', borderRadius: 2, width: 12, height: 4 }} />Trajet</span>}
         {valid(restaurant) && <span><i style={{ background: '#8A6A55' }} />Restaurant</span>}
-        {valid(delivery) && <span><i style={{ background: '#D9824E' }} />Livraison</span>}
+        {valid(delivery) && <span><i style={{ background: '#F58A3D' }} />Livraison</span>}
       </div>
     </div>
   );

@@ -64,10 +64,30 @@ const scroll = async (page, dy) => { await page.mouse.move(W / 2, H / 2); await 
 const tabX = (i, n) => Math.round((W / n) * (i + 0.5));
 const navY = H - 34;
 
-// Accueil sans compte
+// Accueil sans compte, puis connexion et inscription
 let p = await open(null);
 await shot(p, '01-bienvenue');
+await tap(p, W / 2, 795, 4000); await shot(p, '02-connexion');
 await p.close();
+p = await open(null);
+await tap(p, W / 2, 730, 4000); await shot(p, '03-inscription');
+await p.close();
+
+// Site client (web) : accueil, connexion, inscription
+{
+  const w = await browser.newPage();
+  await w.setViewport({ width: W, height: H, deviceScaleFactor: 2, isMobile: true });
+  w.on('pageerror', (e) => console.log('  erreur site :', String(e).slice(0, 200)));
+  await w.goto('http://localhost:8081', { waitUntil: 'networkidle2' });
+  await sleep(5000);
+  await w.screenshot({ path: `${OUT}/40-site-accueil.png` }); console.log('  capture 40-site-accueil');
+  const clickText = async (txt) => w.evaluate((t) => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.includes(t)); if (b) b.click(); return !!b; }, txt);
+  await clickText("J'ai déjà un compte"); await sleep(3500);
+  await w.screenshot({ path: `${OUT}/41-site-connexion.png` }); console.log('  capture 41-site-connexion');
+  await clickText('Inscription'); await sleep(2500);
+  await w.screenshot({ path: `${OUT}/42-site-inscription.png` }); console.log('  capture 42-site-inscription');
+  await w.close();
+}
 
 if (client) {
   p = await open({ token: client.token, role: 'client', name: client.name });

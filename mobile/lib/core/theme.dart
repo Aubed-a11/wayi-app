@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Palette WAYI, style super-appli : fond gris tres clair, cartes blanches,
-/// orange vif du logo pour les actions.
+/// orange clair pour les actions, avec une touche de rouge sombre.
 class C {
   static const bg = Color(0xFFF5F6F8);
   static const card = Color(0xFFFFFFFF);
@@ -12,9 +12,9 @@ class C {
   static const ink = Color(0xFF15181F);
   static const ink2 = Color(0xFF414754);
   static const muted = Color(0xFF8A909C);
-  static const brand = Color(0xFFF2690D);
-  static const brandDark = Color(0xFFC9520A);
-  static const brandSoft = Color(0xFFFFF0E5);
+  static const brand = Color(0xFFF58A3D);
+  static const brandDark = Color(0xFFA8321F);
+  static const brandSoft = Color(0xFFFFF1E6);
   static const success = Color(0xFF1E9E5A);
   static const successSoft = Color(0xFFE6F6EE);
   static const danger = Color(0xFFD64545);
@@ -36,6 +36,10 @@ const List<BoxShadow> softShadow = [
 ];
 
 /// Decoration d'une carte blanche
+/// Degrade de marque : orange clair vers rouge sombre
+const LinearGradient brandGradient = LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFF9A15A), C.brand, Color(0xFFB8402A)]);
+const LinearGradient buttonGradient = LinearGradient(colors: [C.brand, Color(0xFFD85A2E), C.brandDark]);
+
 BoxDecoration cardBox({double radius = R.lg, Color color = C.card}) =>
     BoxDecoration(color: color, borderRadius: BorderRadius.circular(radius), boxShadow: softShadow);
 

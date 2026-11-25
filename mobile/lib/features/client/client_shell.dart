@@ -97,7 +97,7 @@ class _ClientShellState extends State<ClientShell> {
                             duration: const Duration(milliseconds: 200),
                             width: 48, height: 48,
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: [Color(0xFFF57A1F), C.brandDark]),
+                              gradient: const LinearGradient(colors: [Color(0xFFF9A15A), C.brandDark]),
                               shape: BoxShape.circle,
                               boxShadow: [BoxShadow(color: C.brand.withValues(alpha: _tab == 2 ? 0.45 : 0.25), blurRadius: 12, offset: const Offset(0, 4))],
                             ),

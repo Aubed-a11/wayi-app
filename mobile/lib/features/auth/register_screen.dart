@@ -129,22 +129,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Scaffold(
         body: SafeArea(
           child: ListView(padding: const EdgeInsets.fromLTRB(24, 12, 24, 24), children: [
-            Row(children: [
-              RoundIcon(Ic.back, onTap: _back),
-              const Spacer(),
-              for (var i = 0; i < 3; i++)
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.only(left: 6),
-                  width: i == _step ? 22 : 8, height: 8,
-                  decoration: BoxDecoration(color: i <= _step ? C.ink : C.line, borderRadius: BorderRadius.circular(8)),
-                ),
-            ]),
-            const SizedBox(height: 28),
-            Text(titles[_step].$1, style: h1()),
-            const SizedBox(height: 10),
-            Text(titles[_step].$2, style: body(C.muted)),
-            const SizedBox(height: 26),
+            AuthHeader(
+              title: titles[_step].$1,
+              subtitle: titles[_step].$2,
+              onBack: _back,
+              photos: _step == 0,
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                for (var i = 0; i < 3; i++)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    margin: const EdgeInsets.only(left: 6),
+                    width: i == _step ? 22 : 8, height: 8,
+                    decoration: BoxDecoration(color: i <= _step ? Colors.white : Colors.white.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(8)),
+                  ),
+              ]),
+            ),
             if (_step == 0) ..._roleStep(),
             if (_step == 1) ..._formStep(),
             if (_step == 2) ..._codeStep(),
