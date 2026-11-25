@@ -25,17 +25,15 @@ class CartScreen extends StatelessWidget {
     final top = MediaQuery.of(context).padding.top;
 
     final header = Container(
-      padding: EdgeInsets.fromLTRB(20, top + 12, 16, 52),
+      padding: EdgeInsets.fromLTRB(20, top + 12, 16, 56),
       decoration: const BoxDecoration(gradient: brandGradient, borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _Pill(label: 'Retour', onTap: () => Navigator.of(context).pop()),
-        const Spacer(),
-        if (!cart.isEmpty) _Pill(label: 'Vider', icon: Ic.trash, onTap: () => _confirmClear(context, cart), light: true),
-      ]),
-    );
-    final title = Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          _Pill(label: 'Retour', onTap: () => Navigator.of(context).pop()),
+          const Spacer(),
+          if (!cart.isEmpty) _Pill(label: 'Vider', icon: Ic.trash, onTap: () => _confirmClear(context, cart), light: true),
+        ]),
+        const SizedBox(height: 18),
         Text('Mon panier', style: h1(Colors.white)),
         const SizedBox(height: 4),
         Text(cart.isEmpty ? 'Il est encore vide.' : '$count plat${count > 1 ? 's' : ''} · ${cart.restaurantCount} restaurant${cart.restaurantCount > 1 ? 's' : ''}',
@@ -46,10 +44,7 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(children: [
         ListView(padding: EdgeInsets.zero, children: [
-          Stack(children: [
-            header,
-            Positioned(left: 0, right: 0, top: top + 62, child: title),
-          ]),
+          header,
           Transform.translate(
             offset: const Offset(0, -34),
             child: Padding(

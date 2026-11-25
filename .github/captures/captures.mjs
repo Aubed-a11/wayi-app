@@ -95,7 +95,8 @@ await p.close();
     await w.screenshot({ path: `${OUT}/44-site-restaurants-phares.png` }); console.log('  capture 44-site-restaurants-phares');
     await clickText('Panier'); await sleep(3500);
     await w.screenshot({ path: `${OUT}/45-site-panier-vide.png` }); console.log('  capture 45-site-panier-vide');
-    await clickText('Ajouter'); await sleep(800); await clickText('Ajouter'); await sleep(2500);
+    await clickText('Ajouter'); await sleep(800); await clickText('Ajouter'); await sleep(1200);
+    await clickText('Panier'); await sleep(3000);
     await w.screenshot({ path: `${OUT}/46-site-panier.png` }); console.log('  capture 46-site-panier');
   }
   await w.close();
