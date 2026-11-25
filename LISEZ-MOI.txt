@@ -1,7 +1,10 @@
 WAYI : DEMARRER EN 3 ETAPES
 ===========================
 1. Mettre le serveur en ligne a jour (tes donnees restent en place) :
-   double-clic sur 1-DEPLOYER-SERVEUR.bat (mot de passe du VPS demande 2 fois).
+   double-clic sur 1-DEPLOYER-SERVEUR.bat (mot de passe du VPS demande 4 fois).
+   Avant toute modification, il sauvegarde tes donnees sur le VPS
+   (/home/wayi/sauvegardes) ET sur ce PC (dossier recuperation). Si la sauvegarde
+   echoue, la mise a jour est annulee.
 2. Installer l'appli sur le telephone :
    https://github.com/Aubed-a11/wayi-app/releases/latest  ->  WAYI.apk
    (ou double-clic sur 4-CONSTRUIRE-APPLI-ANDROID.bat si Flutter est installe).
