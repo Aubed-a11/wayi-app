@@ -49,7 +49,7 @@ const FAQ = [
   {
     id: 'frais', sujet: 'Frais de livraison',
     re: /(frais|cout|coute|prix|combien|tarif).{0,25}(livraison|livrer|livreur|deplacement)|(livraison|delivery).{0,15}(gratuite|offerte|payante|combien|cher|prix)/,
-    answer: () => `Les frais dépendent de la distance : ${fmt(cfg.deliveryBasePrice)} de base plus ${fmt(cfg.deliveryPerKm)} par km entre le restaurant et toi. Si ton panier vient de deux restaurants, il y a deux livraisons, donc deux frais. Avec un abonnement WAYI, la livraison est offerte. Le montant exact s'affiche dans ton panier une fois ton point choisi.`,
+    answer: () => `Les frais dépendent de la distance : ${fmt(cfg.deliveryPerKm)} par kilomètre entre le restaurant et toi (par exemple ${fmt(cfg.deliveryPerKm * 4)} pour 4 km). Si ton panier vient de deux restaurants, il y a deux livraisons, donc deux frais. Avec un abonnement WAYI, la livraison est offerte. Le montant exact s'affiche dans ton panier une fois ton point choisi.`,
   },
   {
     id: 'delai', sujet: 'Délai de livraison',

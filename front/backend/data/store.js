@@ -12,8 +12,11 @@ const DEMO_PASSWORD_HASH = bcrypt.hashSync('wayi2026', 10);
 
 const PLATFORM_CONFIG = {
   commissionRate: 0.15,
-  deliveryBasePrice: 500,
-  deliveryPerKm: 150,
+  // Livraison au kilometre : distance restaurant -> client x prix du km.
+  // Moins d'un km compte pour un km. Montant arrondi aux 5 FCFA superieurs.
+  deliveryBasePrice: 0,
+  deliveryPerKm: 75,
+  deliveryMinKm: 1,
   // Au-dela, l'adresse est hors zone : on refuse au lieu de facturer des frais absurdes
   maxDeliveryKm: 20,
   driverShare: 0.80,
@@ -301,7 +304,9 @@ function haversine(lat1, lng1, lat2, lng2) {
 }
 function calcDistance(lat1, lng1, lat2, lng2) { return haversine(lat1, lng1, lat2, lng2); }
 function calcDeliveryFee(distKm) {
-  return Math.round((PLATFORM_CONFIG.deliveryBasePrice + distKm * PLATFORM_CONFIG.deliveryPerKm) / 50) * 50;
+  const km = Math.max(Number(distKm) || 0, PLATFORM_CONFIG.deliveryMinKm || 0);
+  const raw = (PLATFORM_CONFIG.deliveryBasePrice || 0) + km * PLATFORM_CONFIG.deliveryPerKm;
+  return Math.ceil(raw / 5) * 5;
 }
 // Distance la plus grande entre le point de livraison et les restaurants de la commande
 function outOfZone(distKm) { return Number.isFinite(distKm) && distKm > PLATFORM_CONFIG.maxDeliveryKm; }
