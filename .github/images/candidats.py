@@ -8,7 +8,7 @@ def get(url, raw=False):
     with urllib.request.urlopen(req, timeout=30) as r:
         b = r.read()
     return b if raw else json.loads(b)
-def commons(q, n=3):
+def commons(q, n=4):
     u = 'https://commons.wikimedia.org/w/api.php?' + urllib.parse.urlencode({
         'action': 'query', 'generator': 'search', 'gsrsearch': f'filetype:bitmap {q}', 'gsrnamespace': 6,
         'gsrlimit': n, 'prop': 'imageinfo', 'iiprop': 'url|extmetadata', 'iiurlwidth': 900, 'format': 'json'})
@@ -19,7 +19,7 @@ def commons(q, n=3):
         out.append({'src': ii.get('thumburl') or ii.get('url'), 'page': ii.get('descriptionurl'),
                     'licence': (md.get('LicenseShortName') or {}).get('value', ''), 'auteur': (md.get('Artist') or {}).get('value', '')})
     return out
-def openverse(q, n=3):
+def openverse(q, n=5):
     u = 'https://api.openverse.org/v1/images/?' + urllib.parse.urlencode({'q': q, 'page_size': n, 'license_type': 'commercial', 'mature': 'false'})
     return [{'src': r.get('url'), 'page': r.get('foreign_landing_url'), 'licence': f"{r.get('license','')} {r.get('license_version','')}".strip(), 'auteur': r.get('creator') or ''}
             for r in get(u).get('results', [])]
@@ -39,7 +39,7 @@ for slug, queries in plan.items():
             except Exception as e: print('  recherche', slug, q, e)
     seen, k = set(), 0
     for c in found:
-        if not c['src'] or c['src'] in seen or k >= 8: continue
+        if not c['src'] or c['src'] in seen or k >= 14: continue
         seen.add(c['src'])
         try:
             open(f'cand/{slug}/{k}.jpg', 'wb').write(square(get(c['src'], raw=True)))
