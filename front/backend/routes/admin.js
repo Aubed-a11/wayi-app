@@ -91,7 +91,8 @@ router.get('/dashboard', auth, adminAuth, (req, res) => {
       avgDeliveryMinutes: avgDeliveryMinutes !== null ? Math.round(avgDeliveryMinutes) : null,
       underperformingDrivers: driverPerformance.filter(d => d.underperforming).length,
     },
-    recentOrders: [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10),
+    recentOrders: [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10)
+      .map(o => ({ ...o, restaurantLogo: restaurants.find(r => r.id === o.restaurantId)?.logo || null })),
   });
 });
 
@@ -99,7 +100,25 @@ router.get('/dashboard', auth, adminAuth, (req, res) => {
 
 // GET /api/admin/restaurants
 router.get('/restaurants', auth, adminAuth, (req, res) => {
-  res.json({ restaurants, total: restaurants.length });
+  const { rotationFor, PLATFORM_CONFIG: CFG } = require('../data/store');
+  const list = restaurants.map(r => {
+    const mine = dishes.filter(d => d.restaurantId === r.id);
+    const online = rotationFor(r);
+    const m = merchants.find(x => x.restaurantId === r.id);
+    const plan = m?.subscription?.plan && CFG.subscriptionPlans[m.subscription.plan];
+    const week = mine.filter(d => online.has(d.id));
+    return {
+      ...r,
+      dishesCount: mine.length,
+      onlineCount: week.length,
+      cover: (week.find(d => d.image) || mine.find(d => d.image))?.image || null,
+      thisWeek: week.slice(0, 6).map(d => ({ id: d.id, name: d.name, image: d.image || null, price: d.price })),
+      plan: plan ? { id: m.subscription.plan, label: plan.label, price: plan.price, maxDishes: plan.maxDishes } : null,
+      account: m ? { email: m.email, name: m.name } : null,
+      ordersCount: orders.filter(o => o.restaurantId === r.id && o.status !== 'cancelled').length,
+    };
+  });
+  res.json({ restaurants: list, total: list.length });
 });
 
 // POST /api/admin/restaurants — ajouter un restaurant propriétaire de plats
@@ -137,7 +156,8 @@ router.get('/dishes', auth, adminAuth, (req, res) => {
   if (period) result = result.filter(d => d.period === period);
   if (category) result = result.filter(d => d.category === category);
   if (restaurantId) result = result.filter(d => d.restaurantId === restaurantId);
-  res.json({ dishes: result.map(enrichDish), periods: PERIODS, categories: CATEGORIES, tastes: TASTES, total: result.length });
+  const { isDishOnline } = require('../data/store');
+  res.json({ dishes: result.map(d => ({ ...enrichDish(d), onlineThisWeek: isDishOnline(d) })), periods: PERIODS, categories: CATEGORIES, tastes: TASTES, total: result.length });
 });
 
 // POST /api/admin/dishes — ajouter un plat au menu du jour + assigner son restaurant
@@ -175,7 +195,8 @@ router.get('/orders', auth, adminAuth, (req, res) => {
   const { status } = req.query;
   let result = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   if (status) result = result.filter(o => o.status === status);
-  res.json({ orders: result, total: result.length });
+  const logo = (id) => restaurants.find(r => r.id === id)?.logo || null;
+  res.json({ orders: result.map(o => ({ ...o, restaurantLogo: logo(o.restaurantId) })), total: result.length });
 });
 
 // PUT /api/admin/orders/:id/payment — confirmer ou rejeter un paiement Mobile Money manuel
