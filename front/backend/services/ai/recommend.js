@@ -181,7 +181,7 @@ function searchDishes(user, filtres = {}) {
     id: d.id,
     nom: d.name,
     prix: d.price,
-    restaurant: d.restaurant?.name || null,
+    restaurant: null,
     creneau: periodLabel(d.period),
     categorie: d.category,
     gout: d.taste || null,

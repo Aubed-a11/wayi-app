@@ -12,7 +12,8 @@ const { paymentMode } = require('../payment');
 
 const n = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’`]/g, "'");
 const fmt = (x) => `${Number(x || 0).toLocaleString('fr-FR').replace(/ /g, ' ')} FCFA`;
-const chez = (name) => (/^chez /i.test(name || '') ? `chez ${name.slice(5)}` : `chez ${name}`);
+// Le client ne doit jamais connaitre le restaurant : aucune mention de l'enseigne
+const chez = () => '';
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 function support() {
@@ -199,7 +200,7 @@ function dishFacts(dish) {
     id: d.id,
     nom: d.name,
     prix: d.price,
-    restaurant: d.restaurant?.name,
+    restaurant: undefined,
     restaurant_description: d.restaurant?.tagline,
     temps_preparation_min: d.restaurant?.prepTime,
     creneau: PERIODS.find(p => p.id === d.period)?.label,

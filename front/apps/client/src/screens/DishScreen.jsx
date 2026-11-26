@@ -58,7 +58,6 @@ export default function DishScreen() {
         <div className="w-dish-body">
           <div className="w-dish-name">{dish.name}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, color: 'var(--gray)' }}>
-            <button className="rs-link" onClick={() => { dispatch({ type: 'SET_ACTIVE_RESTAURANT', payload: r }); navigate('restaurant'); }}>Voir toute la carte</button>
             {r?.prepTime && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Clock size={13} aria-hidden="true" /> {r.prepTime} min</span>}
           </div>
           <div className="w-tags">

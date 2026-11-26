@@ -46,7 +46,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       if (_period != null && d.period != _period) return false;
       if (_category != null && d.category != _category) return false;
       if (q.isEmpty) return true;
-      return _norm('${d.name} ${d.desc} ${d.restaurantName} ${d.composition.join(' ')}').contains(q);
+      return _norm('${d.name} ${d.desc} ${d.composition.join(' ')}').contains(q);
     }).toList();
   }
 
@@ -70,7 +70,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               },
               style: font(size: 15, weight: FontWeight.w600),
               decoration: InputDecoration(
-                hintText: 'Attiéké, poulet, Chez Maman...',
+                hintText: 'Attiéké, poulet, yassa...',
                 hintStyle: font(size: 14.5, color: C.muted),
                 prefixIcon: const Icon(Ic.search, size: 19, color: C.muted),
                 suffixIcon: _query.isEmpty ? null : IconButton(icon: const Icon(Ic.close, size: 18, color: C.muted), onPressed: () { _q.clear(); setState(() => _query = ''); }),

@@ -36,7 +36,7 @@ class CartScreen extends StatelessWidget {
         const SizedBox(height: 18),
         Text('Mon panier', style: h1(Colors.white)),
         const SizedBox(height: 4),
-        Text(cart.isEmpty ? 'Il est encore vide.' : '$count plat${count > 1 ? 's' : ''} · ${cart.restaurantCount} restaurant${cart.restaurantCount > 1 ? 's' : ''}',
+        Text(cart.isEmpty ? 'Il est encore vide.' : '$count plat${count > 1 ? 's' : ''}${cart.restaurantCount > 1 ? ' · ${cart.restaurantCount} livraisons' : ''}',
             style: font(size: 14, weight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.9))),
       ]),
     );
@@ -127,19 +127,6 @@ class _Filled extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final menu = context.watch<Menu>();
-    String? logoOf(String restaurantId) {
-      for (final d in menu.dishes) {
-        if (d.restaurantId == restaurantId && d.restaurantLogo != null) return d.restaurantLogo;
-      }
-      return null;
-    }
-    String? overlayOf(String restaurantId) {
-      for (final d in menu.dishes) {
-        if (d.restaurantId == restaurantId && d.restaurantLogoOverlay != null) return d.restaurantLogoOverlay;
-      }
-      return null;
-    }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (cart.restaurantCount > 1)
@@ -150,7 +137,7 @@ class _Filled extends StatelessWidget {
           child: Row(children: [
             const Icon(Ic.bike, size: 16, color: C.brandDark),
             const SizedBox(width: 8),
-            Expanded(child: Text('${cart.restaurantCount} restaurants : ${cart.restaurantCount} livraisons séparées, chacune avec son livreur.', style: font(size: 13, weight: FontWeight.w600, color: C.brandDark))),
+            Expanded(child: Text('Ta commande part en ${cart.restaurantCount} livraisons séparées, chacune avec son livreur.', style: font(size: 13, weight: FontWeight.w600, color: C.brandDark))),
           ]),
         ),
       for (final g in groups.entries)
@@ -160,9 +147,14 @@ class _Filled extends StatelessWidget {
           decoration: cardBox(radius: 22),
           child: Column(children: [
             Row(children: [
-              PhotoMark(overlay: overlayOf(g.value.first.restaurantId), logo: logoOf(g.value.first.restaurantId), name: g.key, height: 36),
+              Container(
+                width: 38, height: 38,
+                decoration: BoxDecoration(color: C.brandSoft, borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Ic.bike, size: 18, color: C.brand),
+              ),
               const SizedBox(width: 10),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (groups.length > 1) Text('Livraison ${groups.keys.toList().indexOf(g.key) + 1}', style: font(size: 14.5, weight: FontWeight.w700)),
                 Text('${g.value.fold<int>(0, (n, i) => n + i.qty)} plat(s)', style: small()),
               ])),
             ]),

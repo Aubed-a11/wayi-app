@@ -49,13 +49,13 @@ function ManualPayCard({ order, onClaimed }) {
   if (status === 'claimed') {
     return <div style={box}>
       <div style={{ fontWeight: 800, fontSize: 14, color: '#8a5a00' }}>Vérification du paiement en cours</div>
-      <div style={{ fontSize: 12.5, color: 'var(--gray)', marginTop: 4 }}>{order.paymentPayee === 'restaurant' ? (order.paymentPayeeName || order.restaurantName) : 'WAYI'} contrôle la réception de {Number(order.total).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0')} FCFA. Dès que c'est confirmé, ta commande est préparée.</div>
+      <div style={{ fontSize: 12.5, color: 'var(--gray)', marginTop: 4 }}>WAYI contrôle la réception de {Number(order.total).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0')} FCFA. Dès que c'est confirmé, ta commande est préparée.</div>
     </div>;
   }
   return <div style={box}>
     <div style={{ fontWeight: 800, fontSize: 14, color: '#8a5a00', marginBottom: 8 }}>Dernière étape : envoie ton paiement {net}</div>
     <div style={{ fontSize: 12.5, color: 'var(--ink)', lineHeight: 1.5 }}>
-      Envoie <b>{Number(order.total).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0')} FCFA</b> par {net} au numéro {order.paymentPayee === 'restaurant' ? <>de <b>{order.paymentPayeeName || order.restaurantName}</b></> : 'WAYI'} :
+      Envoie <b>{Number(order.total).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0')} FCFA</b> par {net} au numéro suivant :
     </div>
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '10px 0' }}>
       <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 18, flex: 1 }}>{pretty || order.paymentTo}</div>

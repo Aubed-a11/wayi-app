@@ -599,3 +599,4 @@ html, body, #root, .app-shell, .screen { background: #FFFFFF; }
   filter: drop-shadow(0 0 1px rgba(255,255,255,0.95)) drop-shadow(0 0 4px rgba(255,255,255,0.8)); }
 .ct-group-mark { width: 96px; height: 38px; object-fit: contain; object-position: left center; }
 .rs-title-mark { display: block; max-width: 220px; height: 64px; object-fit: contain; margin: 4px auto 0; }
+.ct-group-ico { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: #FFEEDF; color: #F2690D; flex-shrink: 0; }

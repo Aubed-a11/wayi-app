@@ -58,6 +58,7 @@ LE PARCOURS DE COMMANDE
 - Un plat marque exemple_non_commandable ne peut pas encore etre commande.
 
 REGLES STRICTES
+- Ne cite JAMAIS le nom d'un restaurant, d'une enseigne ou d'un partenaire, meme si on te le demande : WAYI prepare et livre, le client choisit un plat, pas un restaurant. Si on te demande d'ou vient un plat, reponds qu'il est prepare par une cuisine partenaire verifiee par WAYI.
 - Ne cite JAMAIS un plat, un prix, des frais ou une info de service qui ne vient pas d'un outil appele dans cette conversation.
 - Ne repropose pas un plat deja propose ou refuse, sauf si le client le redemande.
 - Gout durable exprime (n'aime pas, adore, allergie, budget habituel) : enregistrer_preference.
@@ -93,7 +94,7 @@ function buildContext(user, cart) {
     summary.vide
       ? 'Panier : vide.'
       : `Panier actuel : ${summary.restaurants.flatMap(r => r.plats.map(p => `${p.quantite} x ${p.nom}`)).join(', ')} (total ${summary.total} FCFA livraison comprise).`,
-    active.length ? `Commandes en cours : ${active.map(o => `${o.id} chez ${o.restaurantName} (${STATUS_FR[o.status] || o.status})`).join(' ; ')}. Detail avec suivre_commandes.` : 'Aucune commande en cours.',
+    active.length ? `Commandes en cours : ${active.map(o => `${o.id} (${STATUS_FR[o.status] || o.status})`).join(' ; ')}. Detail avec suivre_commandes.` : 'Aucune commande en cours.',
     `Paiement sur la plateforme : mode ${paymentMode()}.`,
   ];
   return lines.join('\n');

@@ -7,7 +7,6 @@ import '../../core/ui.dart';
 import '../../models/models.dart';
 import '../../state/menu.dart';
 import 'client_shell.dart';
-import 'top_restaurants.dart';
 import 'widgets.dart';
 
 /// Couleurs des tuiles de service (icone, fond)
@@ -89,7 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 0), child: _YiviBanner(onTap: () => ClientShell.goTab(context, 2)))),
-        const SliverToBoxAdapter(child: TopRestaurants()),
         if (menu.loading && menu.dishes.isEmpty)
           const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.all(48), child: Center(child: CircularProgressIndicator(color: C.brand))))
         else if (menu.error != null && menu.dishes.isEmpty)
@@ -212,7 +210,7 @@ class _Header extends StatelessWidget {
             child: Row(children: [
               const Icon(Ic.search, size: 19, color: C.brand),
               const SizedBox(width: 12),
-              Text('Un plat, un restaurant...', style: font(size: 14.5, color: C.muted)),
+              Text('Rechercher un plat...', style: font(size: 14.5, color: C.muted)),
             ]),
           ),
         ),

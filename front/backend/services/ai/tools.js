@@ -197,7 +197,7 @@ function cartSummary(user, cart, pos = null) {
     const deliveryFee = freeDelivery ? 0 : calcDeliveryFee(distKm);
     return {
       _km: distKm,
-      restaurant: r?.name || 'Restaurant', sous_total: subtotal, frais_livraison: deliveryFee,
+      livraison_id: rid, sous_total: subtotal, frais_livraison: deliveryFee,
       plats: items.map(i => ({
         id: i.d.id, nom: i.d.name, prix: i.d.price, quantite: i.qty, creneau: periodLabel(i.d.period),
         servi_maintenant: i.d.period === serviceState().period,
@@ -328,7 +328,7 @@ function runTool(name, input = {}, session) {
       if (active.length) session.ui.tracking = active.map(o => o.id);
       return {
         en_cours: active.map(o => ({
-          id: o.id, restaurant: o.restaurantName, statut: STATUS_FR[o.status] || o.status,
+          id: o.id, statut: STATUS_FR[o.status] || o.status,
           paiement: o.paymentMethod === 'cash' ? 'especes a la livraison' : (o.paymentStatus === 'paid' ? 'paye' : (o.paymentStatus || 'en attente')),
           livreur: o.driver?.name || null,
           heure_estimee: o.estimatedDelivery ? new Date(o.estimatedDelivery).toLocaleTimeString('fr-FR', { timeZone: 'Africa/Porto-Novo', hour: '2-digit', minute: '2-digit' }) : null,
@@ -337,7 +337,7 @@ function runTool(name, input = {}, session) {
         })),
         a_faire: active.filter(o => o.paymentMethod !== 'cash' && o.paymentStatus === 'awaiting_payment').length
           ? 'Un paiement est en attente : rappelle au client de le finaliser depuis l\'ecran de suivi.' : undefined,
-        derniere_livree: lastDelivered ? { id: lastDelivered.id, restaurant: lastDelivered.restaurantName, plats: (lastDelivered.items || []).map(i => i.name).join(', '), note_donnee: !!(lastDelivered.dishRating || lastDelivered.serviceRating) } : null,
+        derniere_livree: lastDelivered ? { id: lastDelivered.id, plats: (lastDelivered.items || []).map(i => i.name).join(', '), note_donnee: !!(lastDelivered.dishRating || lastDelivered.serviceRating) } : null,
         mode_paiement_plateforme: paymentMode(),
       };
     }

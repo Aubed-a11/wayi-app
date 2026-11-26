@@ -5,7 +5,6 @@ import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav } from '../components/UI';
 import { PERIODS, MenuCard, toCartItem, Empty } from '../components/Wayi';
 import AddressSheet from '../components/AddressSheet';
-import TopRestaurants from '../components/TopRestaurants';
 import { menuAPI, ordersAPI } from '../api';
 
 function currentPeriodId() {
@@ -88,7 +87,7 @@ export default function HomeScreen() {
 
           <button className="w-search" onClick={() => navigate('explore')} style={{ width: '100%', border: 'none', marginTop: 16, cursor: 'text', fontFamily: 'var(--font-body)' }}>
             <Search size={20} aria-hidden="true" />
-            <span style={{ color: '#A69C95', fontSize: 14 }}>Rechercher un plat ou un restaurant...</span>
+            <span style={{ color: '#A69C95', fontSize: 14 }}>Rechercher un plat...</span>
           </button>
 
           {/* Banniere menu du jour */}
@@ -114,7 +113,6 @@ export default function HomeScreen() {
           </button>
 
           {/* Restaurants favoris de la semaine */}
-          <TopRestaurants dishes={dishes} onOpenDish={openDish} onAdd={addToCart} />
 
           {/* Creneaux */}
           <div className="w-periods" style={{ marginTop: 18 }}>

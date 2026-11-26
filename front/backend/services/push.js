@@ -114,16 +114,16 @@ function driverAssignedToClient(order) {
   const user = users.find(u => u.id === order.userId);
   fire(pushTo(user, {
     title: 'Livreur trouvé',
-    body: `${order.driver?.name || 'Un livreur'} va récupérer ta commande chez ${order.restaurantName}.`,
+    body: `${order.driver?.name || 'Un livreur'} va récupérer ta commande.`,
     data: { type: 'order_status', orderId: order.id, status: 'driver_assigned' },
   }));
 }
 
 const CLIENT_MESSAGES = {
-  preparing: (o) => [`${o.restaurantName} prépare ta commande`, 'Ta commande a été acceptée, elle est en préparation.'],
+  preparing: (o) => ['Ta commande est en préparation', 'Ta commande a été acceptée, elle est en préparation.'],
   on_the_way: (o) => ['Ton livreur est en route', `${o.driver?.name || 'Ton livreur'} arrive avec ta commande.`],
   delivered: () => ['Commande livrée', 'Bon appétit ! Pense à noter ta commande.'],
-  cancelled: (o) => ['Commande annulée', `${o.restaurantName} ne peut pas honorer ta commande pour le moment.`],
+  cancelled: (o) => ['Commande annulée', 'Ta commande ne peut pas être honorée pour le moment.'],
 };
 
 function orderStatusToClient(orderId, status) {

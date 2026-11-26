@@ -17,7 +17,8 @@ const n = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]
 const fmt = (x) => `${Number(x || 0).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0')}\u00a0FCFA`;
 const has = (q, re) => re.test(q);
 // "chez Chez Maman Piment" -> "chez Maman Piment"
-const chez = (name) => (/^chez /i.test(name || '') ? `chez ${name.slice(5)}` : `chez ${name}`);
+// Le client ne doit jamais connaitre le restaurant : aucune mention de l'enseigne
+const chez = () => '';
 
 // Choisit une formulation differente de la derniere reponse envoyee
 function pick(options, avoid = '') {
@@ -259,7 +260,7 @@ function addFlow(session, q, ctx, { thenOrder = false } = {}) {
   if (thenOrder) return orderFlow(session, q, ctx);
   const nb = out.restaurants.length;
   return {
-    reply: `${pick([`C'est ajouté : ${qty} x ${dish.name}.`, `${qty > 1 ? `${qty} x ` : ''}${dish.name} est dans ton panier.`, `Je t'ai mis ${qty > 1 ? `${qty} x ` : ''}${dish.name}.`], ctx.lastReply)} Total ${fmt(out.total)} livraison comprise${nb > 1 ? ` (${nb} restaurants, donc ${nb} livraisons)` : ''}. ${pick(['On commande, ou tu veux ajouter une boisson ?', 'Je prépare la commande ?', 'Autre chose, ou on valide ?'], ctx.lastReply)}`,
+    reply: `${pick([`C'est ajouté : ${qty} x ${dish.name}.`, `${qty > 1 ? `${qty} x ` : ''}${dish.name} est dans ton panier.`, `Je t'ai mis ${qty > 1 ? `${qty} x ` : ''}${dish.name}.`], ctx.lastReply)} Total ${fmt(out.total)} livraison comprise${nb > 1 ? ` (${nb} livraisons)` : ''}. ${pick(['On commande, ou tu veux ajouter une boisson ?', 'Je prépare la commande ?', 'Autre chose, ou on valide ?'], ctx.lastReply)}`,
     awaiting: 'confirm_order',
   };
 }

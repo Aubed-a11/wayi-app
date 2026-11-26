@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { MapPin, LocateFixed, Trash2, Plus, Check, Smartphone, CreditCard, Banknote, ShoppingCart, Bike, BadgePercent, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav, Spinner, launchConfetti } from '../components/UI';
-import { DishImg, Qty, fcfa, RestoLogo, MenuCard, toCartItem } from '../components/Wayi';
+import { DishImg, Qty, fcfa, MenuCard, toCartItem } from '../components/Wayi';
 import AddressSheet from '../components/AddressSheet';
 import { ordersAPI, paymentsAPI, authAPI, menuAPI } from '../api';
 
@@ -269,7 +269,7 @@ export default function CartScreen() {
     <div style={{ marginTop: 8 }}>
       <div className="w-sum-row"><span>Sous-total</span><span>{fcfa(cartTotal)}</span></div>
       <div className="w-sum-row">
-        <span>Livraison{restaurantCount > 1 ? ` (${restaurantCount} restaurants)` : ''}</span>
+        <span>Livraison{restaurantCount > 1 ? ` (${restaurantCount} livraisons)` : ''}</span>
         <span>{outOfZone ? 'Hors zone' : exact ? (estimatedDeliveryFee ? fcfa(estimatedDeliveryFee) : 'Offerte') : `env. ${fcfa(estimatedDeliveryFee)}`}</span>
       </div>
       {discount > 0 && (
@@ -293,7 +293,7 @@ export default function CartScreen() {
             <div className="ct-hero-row">
               <div>
                 <h1>Mon panier</h1>
-                <p>{count} plat{count > 1 ? 's' : ''} · {restaurantCount} restaurant{restaurantCount > 1 ? 's' : ''}</p>
+                <p>{count} plat{count > 1 ? 's' : ''}{restaurantCount > 1 ? ` · ${restaurantCount} livraisons` : ''}</p>
               </div>
               <button className="ct-clear" onClick={() => { if (window.confirm('Vider le panier ?')) dispatch({ type: 'CART_CLEAR' }); }} aria-label="Vider le panier">
                 <Trash2 size={18} aria-hidden="true" /> Vider
@@ -303,16 +303,15 @@ export default function CartScreen() {
 
           <div className="w-pad ct-body">
             {restaurantCount > 1 && (
-              <div className="ct-note"><Bike size={16} aria-hidden="true" /> {restaurantCount} restaurants : {restaurantCount} livraisons séparées, chacune avec son livreur.</div>
+              <div className="ct-note"><Bike size={16} aria-hidden="true" /> Ta commande part en {restaurantCount} livraisons séparées, chacune avec son livreur.</div>
             )}
 
-            {cartByRestaurant.map(group => (
+            {cartByRestaurant.map((group, gi) => (
               <div key={group.restaurantId} className="ct-group">
                 <div className="ct-group-head">
-                  {group.items.find(i => i.restaurantLogoOverlay)
-                    ? <img className="ct-group-mark" src={group.items.find(i => i.restaurantLogoOverlay).restaurantLogoOverlay} alt="" />
-                    : <RestoLogo restaurant={{ name: group.restaurantName, logo: group.items.find(i => i.restaurantLogo)?.restaurantLogo }} size={38} />}
+                  <span className="ct-group-ico"><Bike size={18} aria-hidden="true" /></span>
                   <div>
+                    {restaurantCount > 1 && <strong>Livraison {gi + 1}</strong>}
                     <small>{group.items.reduce((n, i) => n + i.qty, 0)} plat{group.items.reduce((n, i) => n + i.qty, 0) > 1 ? 's' : ''}</small>
                   </div>
                 </div>
@@ -435,7 +434,7 @@ export default function CartScreen() {
               {viaKkiapay && <div style={{ fontSize: 12, color: 'var(--gray)', marginTop: 8, lineHeight: 1.45 }}>Après la confirmation, une fenêtre de paiement sécurisée s'ouvre pour valider sur ton téléphone.</div>}
               {manual && payNumbers[payMethod] && (
                 <div style={{ fontSize: 12, color: 'var(--gray)', marginTop: 8, lineHeight: 1.45 }}>
-                  Tu enverras ensuite le montant par {payMethod === 'mtn_momo' ? 'MTN MoMo' : 'Moov Money'} au numéro affiché{restaurantCount > 1 ? ', un paiement par restaurant' : ''}. La commande est préparée dès que la réception est confirmée.
+                  Tu enverras ensuite le montant par {payMethod === 'mtn_momo' ? 'MTN MoMo' : 'Moov Money'} au numéro affiché{restaurantCount > 1 ? ', un paiement par livraison' : ''}. La commande est préparée dès que la réception est confirmée.
                 </div>
               )}
             </div>

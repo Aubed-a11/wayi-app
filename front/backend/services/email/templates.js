@@ -88,9 +88,9 @@ const welcomeAccount = ({ name, role, email, password, url, extra }) => layout({
 });
 
 const orderConfirmed = (d) => layout({
-  preheader: `Commande ${d.orderId} confirmée chez ${d.shopName}`,
+  preheader: `Commande ${d.orderId} confirmée`,
   body: title('Commande confirmée') + hello(d.userName)
-    + p(`Ta commande chez <b>${esc(d.shopName)}</b> a bien été reçue. Le restaurant la prépare.`)
+    + p('Ta commande a bien été reçue. Elle est en préparation.')
     + (d.itemsHtml || '')
     + infoBox([['Commande', esc(d.orderId)], ['Livraison estimée', esc(d.estimatedTime || '30-45 min')], ['Total', `<span style="color:${BRAND};">${esc(d.total)} FCFA</span>`]])
     + button('Suivre ma commande', SITE)
@@ -100,7 +100,7 @@ const orderConfirmed = (d) => layout({
 const orderDelivered = (d) => layout({
   preheader: 'Ta commande est arrivée, bon appétit !',
   body: title('Livré, bon appétit !') + hello(d.userName)
-    + p(`Ta commande chez <b>${esc(d.shopName)}</b> est arrivée. On espère que tu vas te régaler.`)
+    + p('Ta commande est arrivée. On espère que tu vas te régaler.')
     + p("Ton avis aide les autres clients : prends quelques secondes pour noter ton plat dans l'application.")
     + button('Noter ma commande', SITE),
 });
@@ -108,7 +108,7 @@ const orderDelivered = (d) => layout({
 const orderCancelled = (d) => layout({
   preheader: `Commande ${d.orderId} annulée`,
   body: title('Commande annulée') + hello(d.userName)
-    + p(`Ta commande <b>${esc(d.orderId)}</b>${d.shopName ? ` chez <b>${esc(d.shopName)}</b>` : ''} a été annulée.`)
+    + p(`Ta commande <b>${esc(d.orderId)}</b> a été annulée.`)
     + p("Si tu avais déjà payé, le remboursement est fait automatiquement sur ton moyen de paiement.")
     + button('Commander à nouveau', SITE),
 });

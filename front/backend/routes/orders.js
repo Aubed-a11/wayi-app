@@ -164,9 +164,9 @@ router.get('/:id', auth, (req, res) => {
   if (!order) return res.status(404).json({ error: 'Commande introuvable' });
 
   const steps = [
-    { key: 'pending',    label: 'Commande envoyée',    sub: `En attente de confirmation de ${order.restaurantName}`, done: true },
-    { key: 'confirmed',  label: 'Commande confirmée',  sub: `${order.restaurantName} a accepté ta commande`, done: ['preparing', 'ready', 'on_the_way', 'delivered'].includes(order.status) },
-    { key: 'preparing',  label: 'En préparation',      sub: `${order.restaurantName} prépare ton plat`, done: ['preparing', 'ready', 'on_the_way', 'delivered'].includes(order.status) },
+    { key: 'pending',    label: 'Commande envoyée',    sub: 'En attente de confirmation', done: true },
+    { key: 'confirmed',  label: 'Commande confirmée',  sub: 'Ta commande a été acceptée', done: ['preparing', 'ready', 'on_the_way', 'delivered'].includes(order.status) },
+    { key: 'preparing',  label: 'En préparation',      sub: 'Ton plat est en préparation', done: ['preparing', 'ready', 'on_the_way', 'delivered'].includes(order.status) },
     { key: 'ready',      label: 'Plat prêt',           sub: order.driver ? `${order.driver.name} va venir le récupérer` : 'En attente du livreur', done: ['ready', 'on_the_way', 'delivered'].includes(order.status) },
     { key: 'on_the_way', label: 'Livreur en route',    sub: `${order.driver?.name || 'Ton livreur'} arrive bientôt`, done: ['on_the_way', 'delivered'].includes(order.status) },
     { key: 'delivered',  label: 'Livré !',             sub: 'Bon appétit !', done: order.status === 'delivered' },

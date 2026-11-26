@@ -58,16 +58,16 @@ const WA_TEMPLATES = {
 // ── MESSAGE TEXTS (SMS + WhatsApp texte simple) ───────────────
 const MESSAGES = {
   order_confirmed: (d) =>
-    `Wayi : Commande confirmée.\n\nBonjour ${d.userName}, ta commande #${d.orderId} chez *${d.shopName}* est en cours de préparation.\n\nTotal : ${d.total} FCFA\nLivraison estimée : ${d.estimatedTime}\n\nSuis ta commande sur Wayi.`,
+    `Wayi : Commande confirmée.\n\nBonjour ${d.userName}, ta commande #${d.orderId} est en cours de préparation.\n\nTotal : ${d.total} FCFA\nLivraison estimée : ${d.estimatedTime}\n\nSuis ta commande sur Wayi.`,
 
   order_preparing: (d) =>
-    `Wayi : ${d.shopName} prépare ta commande #${d.orderId}. Un livreur sera assigné sous peu.`,
+    `Wayi : ta commande #${d.orderId} est en préparation. Un livreur sera assigné sous peu.`,
 
   order_on_the_way: (d) =>
     `Wayi : Ton livreur est en route.\n\n*${d.driverName}* (${d.vehiclePlate}) arrive dans environ ${d.eta} min.\nAppelle-le : ${d.driverPhone}\n\nCommande : #${d.orderId}`,
 
   order_delivered: (d) =>
-    `Wayi : Livré.\n\nBonjour ${d.userName}, ta commande chez *${d.shopName}* est arrivée. Bon appétit.\n\nNote ta commande : ${d.ratingUrl || 'wayi.app'}\n\nMerci de faire confiance à Wayi.`,
+    `Wayi : Livré.\n\nBonjour ${d.userName}, ta commande est arrivée. Bon appétit.\n\nNote ta commande : ${d.ratingUrl || 'wayi.app'}\n\nMerci de faire confiance à Wayi.`,
 
   order_cancelled: (d) =>
     `Wayi : Commande #${d.orderId} annulée.\n\nRaison : ${d.reason || 'Annulation demandée'}. Si tu as payé en ligne, le remboursement sera effectué sous 24 à 48h.\n\nBesoin d'aide ? Réponds à ce message.`,

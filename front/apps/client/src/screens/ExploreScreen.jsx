@@ -30,7 +30,7 @@ export default function ExploreScreen() {
   const q = norm(query.trim());
   const shown = dishes.filter(d =>
     (period === 'all' || d.period === period) &&
-    (!q || norm(d.name).includes(q) || norm(d.restaurant?.name).includes(q) || norm(d.desc).includes(q))
+    (!q || norm(d.name).includes(q) || norm(d.desc).includes(q))
   );
 
   const openDish = (dish) => { dispatch({ type: 'SET_ACTIVE_DISH', payload: dish }); navigate('dish'); };
@@ -52,7 +52,7 @@ export default function ExploreScreen() {
         <div className="w-pad">
           <label className="w-search">
             <Search size={20} aria-hidden="true" />
-            <input ref={inputRef} type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher un plat ou un restaurant..." aria-label="Rechercher" />
+            <input ref={inputRef} type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Rechercher un plat..." aria-label="Rechercher" />
             {query && <button onClick={() => setQuery('')} className="w-icon-btn" style={{ width: 30, height: 30 }} aria-label="Effacer"><X size={16} aria-hidden="true" /></button>}
           </label>
 

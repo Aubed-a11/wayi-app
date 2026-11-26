@@ -7,7 +7,6 @@ import '../../core/ui.dart';
 import '../../models/models.dart';
 import '../../state/cart.dart';
 import '../../state/menu.dart';
-import 'restaurant_screen.dart';
 import 'widgets.dart';
 
 /// Fiche d'un plat : grande photo, composition, ajout au panier
@@ -70,28 +69,9 @@ class _DishScreenState extends State<DishScreen> {
                 const SizedBox(height: 10),
                 for (final c in d.advantages) _Line(c),
               ],
-              if (d.restaurantTagline != null && d.restaurantTagline!.isNotEmpty) ...[
-                const SizedBox(height: 22),
-                GestureDetector(
-                  onTap: () => openRestaurant(context, id: d.restaurantId, name: d.restaurantName, logo: d.restaurantLogo, tagline: d.restaurantTagline),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: cardBox(radius: R.md),
-                    child: Row(children: [
-                      PhotoMark(overlay: d.restaurantLogoOverlay, logo: d.restaurantLogo, name: d.restaurantName, height: 44),
-                      const SizedBox(width: 14),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(d.restaurantTagline!, style: small()),
-                        const SizedBox(height: 4),
-                        Text('Voir toute la carte', style: font(size: 13, weight: FontWeight.w700, color: C.brand)),
-                      ])),
-                    ]),
-                  ),
-                ),
-              ],
               if (sameResto.isNotEmpty) ...[
                 const SizedBox(height: 26),
-                Text('Du même restaurant', style: h3()),
+                Text('Tu aimeras aussi', style: h3()),
                 const SizedBox(height: 12),
                 SizedBox(
                   height: 270,
