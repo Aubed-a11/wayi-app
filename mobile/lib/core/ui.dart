@@ -392,6 +392,10 @@ class PhotoMark extends StatelessWidget {
             imageFilter: ImageFilter.blur(sigmaX: 2.2, sigmaY: 2.2),
             child: ColorFiltered(colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn), child: img),
           ),
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
+            child: ColorFiltered(colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn), child: img),
+          ),
           img,
         ]),
       );

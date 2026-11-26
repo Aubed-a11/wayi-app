@@ -145,7 +145,7 @@ router.get('/top-restaurants', (req, res) => {
       const bestId = Object.entries(s.byDish).sort((a, b) => b[1] - a[1])[0]?.[0];
       const best = menu.find(d => d.id === bestId) || menu.find(d => d.image) || menu[0];
       return {
-        restaurant: { id: r.id, name: r.name, logo: r.logo || null, tagline: r.tagline || '', rating: r.rating || null, verified: !!r.verified, zone: r.zone || '' },
+        restaurant: { id: r.id, name: r.name, logo: r.logo || null, logoOverlay: r.logoOverlay || null, tagline: r.tagline || '', rating: r.rating || null, verified: !!r.verified, zone: r.zone || '' },
         dishesSold: s.dishes,
         ordersCount: s.orders,
         favorites: favs[r.id] || 0,

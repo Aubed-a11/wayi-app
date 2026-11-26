@@ -115,7 +115,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Expanded(child: Stack(children: [
                           Positioned.fill(child: Photo(d.image, radius: R.md)),
-                          Positioned(left: 8, top: 8, child: PhotoMark(overlay: d.restaurantLogoOverlay, logo: d.restaurantLogo, name: d.restaurantName, height: 26)),
+                          Positioned(left: 8, top: 8, child: PhotoMark(overlay: d.restaurantLogoOverlay, logo: d.restaurantLogo, name: d.restaurantName, height: 40)),
                           Positioned(right: 8, bottom: 8, child: AddButton(dish: d)),
                         ])),
                         const SizedBox(height: 10),

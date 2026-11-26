@@ -39,7 +39,7 @@ class FeatureCard extends StatelessWidget {
                 child: Text(tag, style: font(size: 12, weight: FontWeight.w700)),
               ),
             ),
-            Positioned(right: 14, top: 12, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 40)),
+            Positioned(right: 14, top: 12, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 50)),
             Positioned(
               left: 18, right: 18, bottom: 18,
               child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -82,7 +82,7 @@ class TallCard extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Stack(children: [
               AspectRatio(aspectRatio: 1.1, child: Photo(dish.image, radius: 0)),
-              Positioned(right: 8, bottom: 8, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 28)),
+              Positioned(right: 8, bottom: 8, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 38)),
               Positioned(
                 left: 8, top: 8,
                 child: Container(
@@ -127,7 +127,7 @@ class DishRow extends StatelessWidget {
               width: 84, height: 84,
               child: Stack(children: [
                 Positioned.fill(child: Photo(dish.image, radius: 14)),
-                Positioned(left: 4, top: 4, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 20)),
+                Positioned(left: 4, top: 4, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 24)),
               ]),
             ),
             const SizedBox(width: 14),
