@@ -1,0 +1,26 @@
+name: Lire le compte admin (chiffre)
+on:
+  workflow_dispatch:
+    inputs:
+      cle_publique:
+        description: 'Cle publique (base64) pour chiffrer la reponse'
+        required: true
+permissions:
+  contents: read
+jobs:
+  lire:
+    runs-on: ubuntu-latest
+    env:
+      HOST: ${{ secrets.VPS_HOST || '76.13.37.17' }}
+      SSHPASS: ${{ secrets.VPS_PASSWORD }}
+    steps:
+      - name: Lire ADMIN_EMAIL et ADMIN_PASSWORD sur le serveur, reponse chiffree
+        env:
+          PUB: ${{ inputs.cle_publique }}
+        run: |
+          sudo apt-get install -y -qq sshpass > /dev/null
+          echo "$PUB" | base64 -d > pub.pem
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new root@$HOST "cd /home/wayi/wayi-backend && grep -E '^(ADMIN_EMAIL|ADMIN_PASSWORD)=' .env || echo 'AUCUN_REGLAGE_ADMIN'" > admin.txt
+          openssl pkeyutl -encrypt -pubin -inkey pub.pem -in admin.txt | base64 -w0 > chiffre.txt
+          echo "REPONSE_CHIFFREE:$(cat chiffre.txt)"
+          rm -f admin.txt
