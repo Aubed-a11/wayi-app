@@ -75,7 +75,6 @@ export function MenuCard({ dish, onOpen, onAdd }) {
     <div className="w-mcard" onClick={() => onOpen(dish)}>
       <DishImg src={dish.image} />
       <span className="w-mcard-tag">{dish.isPopular ? 'Populaire' : 'Plat du jour'}</span>
-      <PhotoMark restaurant={dish.restaurant} className="w-mcard-mark" />
       <div className="w-mcard-body">
         <div className="w-mcard-name">{dish.name}</div>
         {dish.desc && <div className="w-mcard-desc">{dish.desc}</div>}
@@ -97,7 +96,7 @@ export function MenuCard({ dish, onOpen, onAdd }) {
 export function ListCard({ dish, onOpen, onAdd, cta = 'Commander' }) {
   return (
     <div className="w-lcard" onClick={() => onOpen(dish)}>
-      <div className="w-ecard-photo w-lcard-photo"><DishImg src={dish.image} iconSize={22} /><PhotoMark restaurant={dish.restaurant} size="sm" className="w-ecard-mark" /></div>
+      <div className="w-ecard-photo w-lcard-photo"><DishImg src={dish.image} iconSize={22} /></div>
       <div className="w-lcard-body">
         <div className="w-lcard-name">{dish.name}</div>
         {dish.desc && <div className="w-lcard-desc">{dish.desc}</div>}
@@ -118,7 +117,6 @@ export function ExploreCard({ dish, onOpen, onAdd }) {
     <div className="w-ecard" onClick={() => onOpen(dish)}>
       <div className="w-ecard-photo">
         <DishImg src={dish.image} />
-        <PhotoMark restaurant={dish.restaurant} size="sm" className="w-ecard-mark" />
       </div>
       <button className="w-ecard-add" onClick={e => { e.stopPropagation(); onAdd(dish); }} aria-label={`Ajouter ${dish.name}`}>
         <Plus size={17} strokeWidth={2.6} aria-hidden="true" />
