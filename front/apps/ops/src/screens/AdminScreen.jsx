@@ -355,6 +355,7 @@ export default function AdminScreen() {
           <div className="bo-top-mobile">
             <img src="/logo.png" alt="WAYI" />
             <b>Back office WAYI</b>
+            <button className="bo-icon-btn light" onClick={refresh} aria-label="Actualiser"><RefreshCw size={17} className={refreshing ? 'spin' : ''} /></button>
             <button className="bo-icon-btn light" onClick={logout} aria-label="Déconnexion"><LogOut size={17} /></button>
           </div>
           <div className="bo-top-row">
@@ -383,7 +384,7 @@ export default function AdminScreen() {
               <section className="bo-hero">
                 <div className="bo-hero-text">
                   <small>{today}</small>
-                  <h2>Bonjour {(admin.name || '').split(' ').slice(-1)[0] || ''}, voici WAYI aujourd'hui</h2>
+                  <h2>Bonjour, voici WAYI aujourd'hui</h2>
                   <p>{active} commande{active > 1 ? 's' : ''} en cours{unassigned > 0 ? `, dont ${unassigned} sans livreur` : ''}. {st.driversOnline || 0} livreur{(st.driversOnline || 0) > 1 ? 's' : ''} en ligne.</p>
                   <div className="bo-hero-actions">
                     <button className="bo-btn white" onClick={() => setTab('orders')}><Receipt size={15} /> Voir les commandes</button>

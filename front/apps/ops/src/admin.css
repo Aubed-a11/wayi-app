@@ -339,3 +339,12 @@
   .bo-table-wrap { display: none; }
   .bo-orders { display: grid; }
 }
+@media (max-width: 900px) {
+  .bo-top-actions { display: none; }
+  .bo-top-row { padding: 14px 16px 0; }
+  .bo-top p { font-size: 12.5px; }
+  .bo-toolbar-actions { width: 100%; }
+  .bo-toolbar-actions .bo-btn { flex: 1; padding: 10px 8px; font-size: 12.5px; }
+  .bo-toolbar > .bo-btn:last-child { width: 100%; }
+  .bo-hero-text h2 { font-size: 19px; }
+}
