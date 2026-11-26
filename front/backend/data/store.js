@@ -632,14 +632,36 @@ function seedPartners() {
     if (known && (RESTAURANT.oldPositions || []).some(([a, b]) => known.lat === a && known.lng === b)) {
       known.lat = RESTAURANT.lat; known.lng = RESTAURANT.lng; known.zone = RESTAURANT.zone;
     }
+    // Plats ajoutes apres coup (nouvelle version de la carte) : inseres une seule fois
+    for (let v = 2; v <= (RESTAURANT.menuVersion || 1); v++) {
+      const key = `${RESTAURANT.id}:plats-v${v}`;
+      if (!known || partnersSeeded.includes(key)) continue;
+      for (const d of DISHES.filter(x => x.since === v)) {
+        if (!dishes.find(x => x.id === d.id)) { dishes.push({ icon: 'utensils', characteristics: '', advantages: '', benefits: '', ...d, since: undefined }); added++; }
+      }
+      partnersSeeded.push(key);
+      console.log(`[Store] ${RESTAURANT.name} : plats de la version ${v} ajoutes`);
+    }
+    // Formule du contrat appliquee une seule fois au compte du restaurant
+    const planKey = `${RESTAURANT.id}:formule-${RESTAURANT.plan}`;
+    const plan = RESTAURANT.plan && PLATFORM_CONFIG.subscriptionPlans[RESTAURANT.plan];
+    if (plan && !partnersSeeded.includes(planKey)) {
+      const m = merchants.find(x => x.restaurantId === RESTAURANT.id);
+      if (m) {
+        m.subscription = { plan: RESTAURANT.plan, monthlyFee: plan.price, active: true, since: new Date().toISOString() };
+        if (known) known.priorityScore = 50 + plan.priority * 10;
+        partnersSeeded.push(planKey);
+        console.log(`[Store] ${RESTAURANT.name} : formule ${plan.label} appliquee`);
+      }
+    }
     if (partnersSeeded.includes(RESTAURANT.id)) continue;
     if (!restaurants.find(r => r.id === RESTAURANT.id)) {
       restaurants.push({ icon: 'utensils', rating: null, verified: true, priorityScore: 60, momoMtn: null, momoMoov: null,
-        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined, oldPositions: undefined });
+        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined, oldPositions: undefined, plan: undefined, menuVersion: undefined });
     }
     for (const d of DISHES) {
       if (dishes.find(x => x.id === d.id)) continue;
-      dishes.push({ icon: 'utensils', characteristics: '', advantages: '', benefits: '', ...d });
+      dishes.push({ icon: 'utensils', characteristics: '', advantages: '', benefits: '', ...d, since: undefined });
       added++;
     }
     partnersSeeded.push(RESTAURANT.id);

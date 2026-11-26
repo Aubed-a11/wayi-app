@@ -184,5 +184,35 @@
   "page": "https://commons.wikimedia.org/wiki/File:Lemonade_with_straws.jpg",
   "licence": "CC BY 2.0",
   "auteur": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/34344874@N00\">newleaf01</a>"
+ },
+ "sauce-legumes": {
+  "src": "https://upload.wikimedia.org/wikipedia/commons/2/22/A_serving_of_Mealie_meal_with_spinach_and_chicken_stew_at_home.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:A_serving_of_Mealie_meal_with_spinach_and_chicken_stew_at_home.jpg",
+  "licence": "CC BY-SA 4.0",
+  "auteur": "<a href=\"//commons.wikimedia.org/wiki/User:Olgatladi2020\" title=\"User:Olgatladi2020\">Olgatladi2020</a>"
+ },
+ "monyo": {
+  "src": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Ga_Kenkey_and_black_and_red_pepper_sauce_with_protein.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:Ga_Kenkey_and_black_and_red_pepper_sauce_with_protein.jpg",
+  "licence": "CC0",
+  "auteur": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Umuhiera&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Umuhiera (page does not exist)\">Umuhiera</a>"
+ },
+ "bomiwo-poulet": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Amiw%C3%B4_accompagn%C3%A9_de_la_viande_de_poulet.jpg/960px-Amiw%C3%B4_accompagn%C3%A9_de_la_viande_de_poulet.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Amiw%C3%B4_accompagn%C3%A9_de_la_viande_de_poulet.jpg",
+  "licence": "CC BY-SA 4.0",
+  "auteur": "<a href=\"//commons.wikimedia.org/wiki/User:Aimeabibis\" title=\"User:Aimeabibis\">Aimeabibis</a>"
+ },
+ "choukouya-poulet": {
+  "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/DFC_0330_Grilled_meat_skewers_topped_with_sliced_red_onion_chopped_herbs_and_a_sprinkle_of_seasoning_served_alongside_fresh_lettuce.jpg/960px-DFC_0330_Grilled_meat_skewers_topped_with_sliced_red_onion_chopped_herbs_and_a_sprinkle_of_seasoning_served_alongside_fresh_lettuce.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:DFC_0330_Grilled_meat_skewers_topped_with_sliced_red_onion_chopped_herbs_and_a_sprinkle_of_seasoning_served_alongside_fresh_lettuce.jpg",
+  "licence": "CC BY-SA 4.0",
+  "auteur": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/PattayaPatrol/\">PattayaPatrol</a>"
+ },
+ "lapin-grille": {
+  "src": "https://upload.wikimedia.org/wikipedia/commons/4/48/Rabbit_Grilled_from_Algeria.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:Rabbit_Grilled_from_Algeria.JPG",
+  "licence": "CC BY-SA 4.0",
+  "auteur": "<a href=\"//commons.wikimedia.org/w/index.php?title=User:Nasimanilsen25&amp;action=edit&amp;redlink=1\" class=\"new\" title=\"User:Nasimanilsen25 (page does not exist)\">Nasimanilsen25</a>"
  }
 }

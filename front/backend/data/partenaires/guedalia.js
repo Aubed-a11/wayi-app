@@ -20,6 +20,9 @@ const RESTAURANT = {
   // Ancienne position par defaut, remplacee au demarrage si elle n'a pas ete modifiee depuis
   oldPositions: [[6.3654, 2.4183]],
   prepTime: '25-35',
+  // Formule du contrat de partenariat (article 4)
+  plan: 'ahossi',
+  menuVersion: 2,
 };
 
 // Compte de connexion de l'espace restaurant (mot de passe transmis au proprietaire,
@@ -43,12 +46,18 @@ const PLATS = [
   ['sauce-arachide', 'dejeuner', 'plats_locaux', "Sauce d'arachide", 3500, 'sale', 'terroir', `Sauce onctueuse à la pâte d'arachide. ${ACC}`],
   ['sauce-gombo', 'dejeuner', 'plats_locaux', 'Sauce gombo, crincrin royal', 3500, 'sale', 'terroir', `Sauce gombo et crincrin, version royale. ${ACC}`],
   ['couscous-royal', 'diner', 'plats_locaux', 'Couscous royal', 4000, 'sale', 'terroir', 'Couscous au mouton et aux légumes.'],
+  // Ajoutes le 26/11/2026 pour la formule Ahossi (15 plats)
+  ['sauce-legumes', 'dejeuner', 'plats_locaux', 'Sauce légumes', 3500, 'sale', 'terroir', `Gboman, tchiayo et amanvivê, la sauce feuille de chez nous. ${ACC}`, 2],
+  ['monyo', 'dejeuner', 'plats_locaux', 'Monyo', 3500, 'epice', 'terroir', `Sauce crue tomate, oignon et piment, servie avec son poisson ou sa viande. ${ACC}`, 2],
+  ['bomiwo-poulet', 'dejeuner', 'plats_locaux', 'Bomiwô au poulet entier', 4000, 'sale', 'terroir', 'Pâte rouge de maïs à la tomate, servie avec un poulet entier.', 2],
+  ['choukouya-poulet', 'diner', 'grillades', 'Choukouya poulet', 4500, 'epice', 'braise', `Poulet grillé à la béninoise, oignon et piment. ${ACC}`, 2],
+  ['lapin-grille', 'diner', 'grillades', 'Lapin grillé sauce BBQ', 4000, 'sale', 'braise', `Lapin grillé, nappé de sauce barbecue. ${ACC}`, 2],
   ['degue-raisin', 'gouter', 'plats_locaux', 'Dêguê au raisin', 1000, 'sucre', 'fraicheur', 'Dêguê frais au yaourt et aux raisins secs.'],
   ['jus-gingembre', 'gouter', 'boissons', 'Jus de gingembre', 1000, 'epice', 'fraicheur', 'Jus de gingembre naturel, bien relevé.'],
 ];
 
-const DISHES = PLATS.map(([slug, period, category, name, price, taste, label, desc]) => ({
-  id: `guedalia-${slug}`, restaurantId: RESTAURANT.id, period, category, name, price, taste, label, desc, image: IMG(slug),
+const DISHES = PLATS.map(([slug, period, category, name, price, taste, label, desc, since = 1]) => ({
+  since, id: `guedalia-${slug}`, restaurantId: RESTAURANT.id, period, category, name, price, taste, label, desc, image: IMG(slug),
 }));
 
 module.exports = { RESTAURANT, DISHES, ACCOUNT };
