@@ -11,59 +11,127 @@ import 'dish_screen.dart';
 void openDish(BuildContext context, Dish d) =>
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => DishScreen(dish: d)));
 
-/// Grande carte photo (mise en avant)
+/// Degrade sombre pose sur les photos pour lire le texte
+BoxDecoration _shade(double r) => BoxDecoration(
+      borderRadius: BorderRadius.circular(r),
+      gradient: LinearGradient(
+        begin: Alignment.topCenter, end: Alignment.bottomCenter,
+        colors: [Colors.black.withValues(alpha: 0), const Color(0xFF140802).withValues(alpha: 0.55), const Color(0xFF140802).withValues(alpha: 0.9)],
+        stops: const [0.3, 0.62, 1],
+      ),
+    );
+
+Widget _chip(String t, {bool small = false}) => Container(
+      padding: EdgeInsets.symmetric(horizontal: small ? 9 : 12, vertical: small ? 4 : 6),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.94), borderRadius: BorderRadius.circular(999)),
+      child: Text(t, style: font(size: small ? 10.5 : 12, weight: FontWeight.w700)),
+    );
+
+Widget _price(Dish d, {bool small = false}) => Container(
+      padding: EdgeInsets.symmetric(horizontal: small ? 10 : 14, vertical: small ? 5 : 8),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
+      child: Text(fcfa(d.price), style: font(size: small ? 12.5 : 15, weight: FontWeight.w800, color: C.brandDark)),
+    );
+
+List<BoxShadow> get _lift => [BoxShadow(color: const Color(0xFF3C1905).withValues(alpha: 0.18), blurRadius: 30, offset: const Offset(0, 14))];
+
+/// Grande carte photo (plat vedette de la carte de la semaine)
 class FeatureCard extends StatelessWidget {
   final Dish dish;
   final String tag;
-  const FeatureCard({super.key, required this.dish, this.tag = 'Plat du moment'});
+  const FeatureCard({super.key, required this.dish, this.tag = 'Le plat du moment'});
   @override
   Widget build(BuildContext context) => GestureDetector(
         onTap: () => openDish(context, dish),
-        child: AspectRatio(
-          aspectRatio: 4 / 3.4,
+        child: Container(
+          height: 310,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(26), boxShadow: _lift),
           child: Stack(children: [
-            Positioned.fill(child: Photo(dish.image, radius: R.lg)),
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(R.lg),
-                  gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withValues(alpha: 0), Colors.black.withValues(alpha: 0.72)], stops: const [0.4, 1]),
-                ),
-              ),
-            ),
+            Positioned.fill(child: Photo(dish.image, radius: 26)),
+            Positioned.fill(child: DecoratedBox(decoration: _shade(26))),
+            Positioned(left: 14, top: 14, child: _chip(tag)),
             Positioned(
-              left: 16, top: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
-                child: Text(tag, style: font(size: 12, weight: FontWeight.w700)),
-              ),
-            ),
-            Positioned(
-              left: 18, right: 18, bottom: 18,
-              child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(dish.name, style: h2(Colors.white), maxLines: 2, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 6),
-                    Row(children: [
-                      Icon(Ic.clock, size: 14, color: Colors.white.withValues(alpha: 0.9)),
-                      const SizedBox(width: 5),
-                      Text('${dish.prepTime} min', style: font(size: 12.5, weight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.9))),
-                    ]),
-                  ]),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
-                  child: Text(fcfa(dish.price), style: font(size: 13.5, weight: FontWeight.w800)),
-                ),
+              left: 18, right: 18, bottom: 16,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(dish.name, style: font(size: 24, weight: FontWeight.w800, color: Colors.white, height: 1.12, spacing: -0.3), maxLines: 2, overflow: TextOverflow.ellipsis),
+                if (dish.desc.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(dish.desc, style: font(size: 13, weight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.86), height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                ],
+                const SizedBox(height: 12),
+                Row(children: [
+                  _price(dish),
+                  const SizedBox(width: 12),
+                  Icon(Ic.clock, size: 14, color: Colors.white.withValues(alpha: 0.9)),
+                  const SizedBox(width: 5),
+                  Text('${dish.prepTime} min', style: font(size: 12.5, weight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.9))),
+                  const Spacer(),
+                  AddButton(dish: dish, size: 50),
+                ]),
               ]),
             ),
           ]),
         ),
       );
+}
+
+/// Plat en photo pleine carte (nom et prix poses sur la photo)
+class PhotoTile extends StatelessWidget {
+  final Dish dish;
+  final String? tag;
+  final double height;
+  final bool wide;
+  const PhotoTile({super.key, required this.dish, this.tag, this.height = 220, this.wide = false});
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: () => openDish(context, dish),
+        child: Container(
+          height: height,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), boxShadow: _lift),
+          child: Stack(children: [
+            Positioned.fill(child: Photo(dish.image, radius: 22)),
+            Positioned.fill(child: DecoratedBox(decoration: _shade(22))),
+            if (tag != null && tag!.isNotEmpty) Positioned(left: 10, top: 10, child: _chip(tag!, small: true)),
+            Positioned(right: 10, top: 10, child: AddButton(dish: dish, size: 38)),
+            Positioned(
+              left: 12, right: 12, bottom: 12,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(dish.name, style: font(size: wide ? 19 : 15.5, weight: FontWeight.w700, color: Colors.white, height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 8),
+                _price(dish, small: true),
+              ]),
+            ),
+          ]),
+        ),
+      );
+}
+
+/// Carte de la semaine : plat vedette puis les autres en photos, deux par ligne
+class WeekMenu extends StatelessWidget {
+  final List<Dish> dishes;
+  final String heroTag;
+  final String Function(String? period) tagOf;
+  const WeekMenu({super.key, required this.dishes, required this.heroTag, required this.tagOf});
+  @override
+  Widget build(BuildContext context) {
+    if (dishes.isEmpty) return const SizedBox.shrink();
+    final rest = dishes.skip(1).toList();
+    final rows = <Widget>[];
+    for (var i = 0; i < rest.length; i += 2) {
+      final last = i + 1 >= rest.length;
+      rows.add(Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: last
+            ? PhotoTile(dish: rest[i], tag: tagOf(rest[i].period), height: 190, wide: true)
+            : Row(children: [
+                Expanded(child: PhotoTile(dish: rest[i], tag: tagOf(rest[i].period))),
+                const SizedBox(width: 12),
+                Expanded(child: PhotoTile(dish: rest[i + 1], tag: tagOf(rest[i + 1].period))),
+              ]),
+      ));
+    }
+    return Column(children: [FeatureCard(dish: dishes.first, tag: heroTag), ...rows]);
+  }
 }
 
 /// Carte verticale (carrousel) : carte blanche, photo en haut

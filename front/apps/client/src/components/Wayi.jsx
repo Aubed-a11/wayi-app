@@ -92,6 +92,53 @@ export function MenuCard({ dish, onOpen, onAdd }) {
   );
 }
 
+const PERIOD_LABEL = { petit_dejeuner: 'Petit-déj', dejeuner: 'Déjeuner', gouter: 'Goûter', diner: 'Dîner' };
+const prepLabel = (dish) => dish.restaurant?.prepTime ? `${dish.restaurant.prepTime} min` : "Aujourd'hui";
+
+// Carte de la semaine : un plat vedette en grand, puis les autres en photos pleine carte
+export function WeekMenu({ dishes, onOpen, onAdd, heroLabel = 'Le plat du moment' }) {
+  if (!dishes.length) return null;
+  const [hero, ...rest] = dishes;
+  return (
+    <div className="wm">
+      <div className="wm-hero" onClick={() => onOpen(hero)}>
+        <DishImg src={hero.image} className="wm-photo" />
+        <div className="wm-shade" />
+        <span className="wm-chip">{heroLabel}</span>
+        <div className="wm-hero-txt">
+          <h3>{hero.name}</h3>
+          {hero.desc && <p>{hero.desc}</p>}
+          <div className="wm-hero-foot">
+            <span className="wm-price">{fcfa(hero.price)}</span>
+            <span className="wm-time"><Clock size={13} aria-hidden="true" /> {prepLabel(hero)}</span>
+            <button className="wm-add lg" onClick={e => { e.stopPropagation(); onAdd(hero); }} aria-label={`Ajouter ${hero.name}`}>
+              <Plus size={22} strokeWidth={2.6} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </div>
+      {rest.length > 0 && (
+        <div className="wm-tiles">
+          {rest.map((d, i) => (
+            <div key={d.id} className={`wm-tile${rest.length % 2 === 1 && i === rest.length - 1 ? ' wide' : ''}`} onClick={() => onOpen(d)}>
+              <DishImg src={d.image} className="wm-photo" />
+              <div className="wm-shade" />
+              {PERIOD_LABEL[d.period] && <span className="wm-chip sm">{PERIOD_LABEL[d.period]}</span>}
+              <button className="wm-add" onClick={e => { e.stopPropagation(); onAdd(d); }} aria-label={`Ajouter ${d.name}`}>
+                <Plus size={18} strokeWidth={2.6} aria-hidden="true" />
+              </button>
+              <div className="wm-tile-txt">
+                <b>{d.name}</b>
+                <span className="wm-price sm">{fcfa(d.price)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Carte en liste : logo | photo | infos
 export function ListCard({ dish, onOpen, onAdd, cta = 'Commander' }) {
   return (

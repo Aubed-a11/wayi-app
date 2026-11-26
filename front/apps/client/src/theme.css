@@ -600,3 +600,33 @@ html, body, #root, .app-shell, .screen { background: #FFFFFF; }
 .ct-group-mark { width: 96px; height: 38px; object-fit: contain; object-position: left center; }
 .rs-title-mark { display: block; max-width: 220px; height: 64px; object-fit: contain; margin: 4px auto 0; }
 .ct-group-ico { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: #FFEEDF; color: #F2690D; flex-shrink: 0; }
+
+/* Carte de la semaine (accueil) */
+.wm-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 26px 0 14px; }
+.wm-head h2 { font-family: var(--font-display); font-size: 21px; font-weight: 800; letter-spacing: -0.3px; margin: 0; color: var(--ink); }
+.wm-head p { font-size: 12.5px; color: var(--gray); margin: 3px 0 0; }
+.wm { display: flex; flex-direction: column; gap: 12px; }
+.wm-hero, .wm-tile { position: relative; overflow: hidden; cursor: pointer; isolation: isolate; box-shadow: 0 14px 30px rgba(60, 25, 5, 0.18); }
+.wm-hero { height: 300px; border-radius: 26px; }
+.wm-photo { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; transition: transform .5s ease; }
+.wm-hero:hover .wm-photo, .wm-tile:hover .wm-photo { transform: scale(1.04); }
+.wm-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(20,8,2,.55) 62%, rgba(20,8,2,.88) 100%); }
+.wm-chip { position: absolute; top: 14px; left: 14px; z-index: 2; background: rgba(255,255,255,.94); color: var(--ink); font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; }
+.wm-chip.sm { top: 10px; left: 10px; font-size: 10.5px; padding: 4px 9px; }
+.wm-hero-txt { position: absolute; left: 18px; right: 18px; bottom: 16px; z-index: 2; color: #fff; }
+.wm-hero-txt h3 { font-family: var(--font-display); font-size: 24px; line-height: 1.12; font-weight: 800; margin: 0; color: #fff; letter-spacing: -0.3px; }
+.wm-hero-txt p { font-size: 13px; line-height: 1.4; margin: 6px 0 0; color: rgba(255,255,255,.86); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 85%; }
+.wm-hero-foot { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.wm-price { background: #fff; color: var(--brand-dark); font-weight: 800; font-size: 15px; padding: 8px 14px; border-radius: 999px; white-space: nowrap; }
+.wm-price.sm { font-size: 12.5px; padding: 5px 10px; align-self: flex-start; }
+.wm-time { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.9); }
+.wm-add { border: none; background: var(--brand); color: #fff; border-radius: 50%; width: 38px; height: 38px; display: grid; place-items: center; cursor: pointer; box-shadow: 0 8px 18px rgba(242,105,13,.45); transition: transform .15s ease; }
+.wm-add:active { transform: scale(.9); }
+.wm-add.lg { width: 50px; height: 50px; margin-left: auto; }
+.wm-tile .wm-add { position: absolute; top: 10px; right: 10px; z-index: 3; }
+.wm-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wm-tile { height: 220px; border-radius: 22px; }
+.wm-tile.wide { grid-column: 1 / -1; height: 190px; }
+.wm-tile-txt { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; display: flex; flex-direction: column; gap: 8px; }
+.wm-tile-txt b { color: #fff; font-family: var(--font-display); font-size: 15.5px; line-height: 1.2; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.wm-tile.wide .wm-tile-txt b { font-size: 19px; }

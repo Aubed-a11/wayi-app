@@ -42,14 +42,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final session = context.watch<Session>();
     final period = _period ?? menu.currentPeriod;
     final list = menu.forPeriod(period);
-    final featured = list.isNotEmpty ? list.first : (menu.dishes.isNotEmpty ? menu.dishes.first : null);
     final addresses = (session.user?['addresses'] as List?) ?? const [];
     Map? def;
     for (final a in addresses) {
       if (a is Map && a['isDefault'] == true) def = a;
     }
     def ??= addresses.isNotEmpty && addresses.first is Map ? addresses.first as Map : null;
-    final others = _others(menu, period);
+    // Les plats du creneau choisi d'abord, puis le reste de la carte
+    final ordered = [...list, ...menu.dishes.where((d) => d.period != period)];
 
     return RefreshIndicator(
       color: C.brand,
@@ -95,57 +95,40 @@ class _HomeScreenState extends State<HomeScreen> {
             child: EmptyState(icon: Ic.alert, title: 'Menu indisponible', text: menu.error!, action: GhostButton(label: 'Réessayer', icon: Ic.refresh, onPressed: () => menu.load(force: true))),
           )
         else ...[
-          if (featured != null) ...[
-            SectionTitle(period == menu.currentPeriod ? 'Servi maintenant' : (menu.periodLabel(period).isEmpty ? 'À la une' : 'Au ${menu.periodLabel(period).toLowerCase()}')).sliver,
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: FeatureCard(dish: featured, tag: menu.periodLabel(period).isEmpty ? 'À la une' : menu.periodLabel(period)),
-              ),
-            ),
-          ],
-          if (list.length > 1) ...[
-            SectionTitle('Aussi au menu', action: 'Tout voir', onAction: () => ClientShell.goTab(context, 1)).sliver,
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 262,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  clipBehavior: Clip.none,
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  itemCount: list.length - 1,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (_, i) => TallCard(dish: list[i + 1]),
-                ),
-              ),
-            ),
-          ],
-          if (list.isEmpty)
-            const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.fromLTRB(16, 16, 16, 0), child: Notice('Pas de plat sur ce créneau pour le moment.', error: false))),
-          if (others.isNotEmpty) ...[
-            const SectionTitle('Toute la journée').sliver,
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: CardBox(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                  child: Column(children: [
-                    for (var i = 0; i < others.length; i++) ...[
-                      if (i > 0) const Divider(),
-                      DishRow(dish: others[i]),
-                    ],
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 26, 10, 14),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('La carte de la semaine', style: font(size: 21, weight: FontWeight.w800, spacing: -0.3)),
+                    const SizedBox(height: 3),
+                    Text('${menu.dishes.length} plats choisis par WAYI. Nouvelle carte chaque lundi.', style: small()),
                   ]),
                 ),
+                TextButton(onPressed: () => ClientShell.goTab(context, 1), child: Text('Tout voir', style: font(size: 13.5, weight: FontWeight.w700, color: C.brandDark))),
+              ]),
+            ),
+          ),
+          if (menu.dishes.isEmpty)
+            const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.fromLTRB(16, 0, 16, 0), child: Notice('La carte de la semaine arrive bientôt.', error: false)))
+          else
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: WeekMenu(
+                  dishes: ordered,
+                  heroTag: list.isNotEmpty ? (period == menu.currentPeriod ? 'Servi maintenant' : menu.periodLabel(period)) : 'Le plat du moment',
+                  tagOf: (p) => _short(menu.periodLabel(p)),
+                ),
               ),
             ),
-          ],
           const SliverToBoxAdapter(child: SizedBox(height: 110)),
         ],
       ]),
     );
   }
 
-  List<Dish> _others(Menu m, String? period) => m.dishes.where((d) => d.period != period).toList();
 }
 
 /// Bandeau orange en haut : adresse, salutation, recherche

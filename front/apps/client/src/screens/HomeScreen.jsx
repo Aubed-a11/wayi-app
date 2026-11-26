@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { Search, MapPin, ChevronDown, Bell, CalendarDays, Check, RefreshCw, UtensilsCrossed, ChefHat } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav } from '../components/UI';
-import { PERIODS, MenuCard, toCartItem, Empty } from '../components/Wayi';
+import { PERIODS, WeekMenu, toCartItem, Empty } from '../components/Wayi';
 import AddressSheet from '../components/AddressSheet';
 import { menuAPI, ordersAPI } from '../api';
 
@@ -125,23 +125,30 @@ export default function HomeScreen() {
           </div>
 
           {/* Menus du jour */}
-          <div className="w-section-head" ref={gridRef} style={{ scrollMarginTop: 12 }}>
-            <span className="w-section-title">Menus du jour</span>
+          <div className="wm-head" ref={gridRef} style={{ scrollMarginTop: 12 }}>
+            <div>
+              <h2>La carte de la semaine</h2>
+              <p>{dishes.length ? `${dishes.length} plats choisis par WAYI. ` : ''}Nouvelle carte chaque lundi.</p>
+            </div>
             <button className="w-link" onClick={() => navigate('explore')}>Voir tout</button>
           </div>
 
           {loading ? (
-            <div className="w-grid">
-              {[0, 1, 2, 3].map(i => <div key={i} className="w-skel" style={{ height: 240, borderRadius: 18 }} />)}
+            <div className="wm">
+              <div className="w-skel" style={{ height: 300, borderRadius: 26 }} />
+              <div className="wm-tiles">{[0, 1].map(i => <div key={i} className="w-skel" style={{ height: 210, borderRadius: 22 }} />)}</div>
             </div>
           ) : loadError ? (
             <Empty Icon={RefreshCw} title="Menu indisponible" text="Impossible de charger le menu. Vérifie ta connexion." action={loadMenu} actionLabel="Réessayer" />
           ) : shown.length === 0 ? (
             <Empty Icon={UtensilsCrossed} title="Rien pour ce créneau" text="Aucun plat n'est proposé pour ce moment de la journée." action={() => setPeriod('all')} actionLabel="Voir tous les plats" />
           ) : (
-            <div className="w-grid">
-              {shown.map(d => <MenuCard key={d.id} dish={d} onOpen={openDish} onAdd={addToCart} />)}
-            </div>
+            <WeekMenu
+              dishes={shown}
+              onOpen={openDish}
+              onAdd={addToCart}
+              heroLabel={period === 'all' ? (shown[0]?.period === now ? 'Servi maintenant' : 'Le plat du moment') : (PERIODS.find(p => p.id === period)?.label || 'Le plat du moment')}
+            />
           )}
         </div>
       </div>
