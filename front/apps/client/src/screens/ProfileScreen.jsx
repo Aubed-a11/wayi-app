@@ -158,8 +158,7 @@ export default function ProfileScreen() {
                 }}>
                   <span style={{ width: 44, height: 44, borderRadius: 14, background: 'var(--brand-light)', color: 'var(--brand)', display: 'grid', placeItems: 'center', flexShrink: 0 }}><Bike size={20} aria-hidden="true" /></span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>{order.restaurantName}</div>
-                    <div style={{ fontSize: 12, color: 'var(--gray)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(order.items || []).map(i => `${i.qty} x ${i.name}`).join(', ')}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(order.items || []).map(i => `${i.qty} x ${i.name}`).join(', ')}</div>
                     <div style={{ fontSize: 11.5, color: 'var(--gray)' }}>{new Date(order.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}</div>
                     {order.dishRating && <div style={{ display: 'flex', gap: 1, marginTop: 2, color: 'var(--brand)' }}>{Array.from({ length: 5 }).map((_, i) => <Star key={i} size={12} strokeWidth={1.8} fill={i < order.dishRating ? 'currentColor' : 'none'} aria-hidden="true" />)}</div>}
                   </div>
@@ -233,7 +232,6 @@ export default function ProfileScreen() {
                 <DishImg src={d.image} iconSize={20} />
                 <div className="w-cart-info">
                   <div className="w-cart-name">{d.name}</div>
-                  <div className="w-cart-resto">{d.restaurant?.name}</div>
                   <div className="w-price">{fcfa(d.price)}</div>
                 </div>
                 <button className="w-add" onClick={e => { e.stopPropagation(); dispatch({ type: 'CART_ADD', payload: { item: toCartItem(d) } }); }}>Ajouter</button>

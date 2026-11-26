@@ -77,7 +77,7 @@ export default function RestaurantScreen() {
 
         <div className="rs-head">
           <RestoLogo restaurant={info} size={78} className="rs-logo" />
-          <h1>{info.name}</h1>
+          {info.logoOverlay ? <img className="rs-title-mark" src={info.logoOverlay} alt={info.name} /> : <h1>{info.name}</h1>}
           {info.tagline && <p>{info.tagline}</p>}
           <div className="rs-meta">
             <span><Clock size={15} /> {info.prepTime || '25-35'} min</span>

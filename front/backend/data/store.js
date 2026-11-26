@@ -110,7 +110,7 @@ function enrichDish(dish) {
   const r = restaurants.find(x => x.id === dish.restaurantId);
   return {
     ...dish,
-    restaurant: r ? { id: r.id, name: r.name, icon: r.icon, logo: r.logo, tagline: r.tagline, rating: r.rating, verified: r.verified, demo: !!r.demo, prepTime: r.prepTime } : null,
+    restaurant: r ? { id: r.id, name: r.name, icon: r.icon, logo: r.logo, logoOverlay: r.logoOverlay || null, tagline: r.tagline, rating: r.rating, verified: r.verified, demo: !!r.demo, prepTime: r.prepTime } : null,
   };
 }
 
@@ -663,6 +663,7 @@ function seedPartners() {
     }
     if (known && (RESTAURANT.oldTaglines || []).includes(known.tagline)) known.tagline = RESTAURANT.tagline;
     if (known && RESTAURANT.weeklyDishes && known.weeklyDishes === undefined) known.weeklyDishes = RESTAURANT.weeklyDishes;
+    if (known && RESTAURANT.logoOverlay && !known.logoOverlay) known.logoOverlay = RESTAURANT.logoOverlay;
     if (known && RESTAURANT.rotationOrder && known.rotationOrder === undefined) known.rotationOrder = RESTAURANT.rotationOrder;
     if (known && (RESTAURANT.oldPositions || []).some(([a, b]) => known.lat === a && known.lng === b)) {
       known.lat = RESTAURANT.lat; known.lng = RESTAURANT.lng; known.zone = RESTAURANT.zone;

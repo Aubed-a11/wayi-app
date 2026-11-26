@@ -232,7 +232,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(22, 20, 22, 40),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(asStr(o['restaurantName']), style: small()),
+              Text('Ta commande', style: small()),
               const SizedBox(height: 4),
               Text(orderStatusLabels[status] ?? status, style: h1()),
               if (activeStatuses.contains(status) && o['estimatedDelivery'] != null) ...[

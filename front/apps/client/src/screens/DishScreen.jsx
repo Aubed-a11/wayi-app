@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Heart, Share2, ShoppingCart, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
-import { DishImg, RestoLogo, Qty, toCartItem, fcfa } from '../components/Wayi';
+import { DishImg, PhotoMark, Qty, toCartItem, fcfa } from '../components/Wayi';
 import { TASTE_META } from '../components/DynamicIcon';
 
 const PERIOD_LABEL = { petit_dejeuner: 'Petit-déjeuner', dejeuner: 'Déjeuner', gouter: 'Goûter', diner: 'Dîner' };
@@ -53,15 +53,15 @@ export default function DishScreen() {
               <button className="w-icon-btn on-img" onClick={share} aria-label="Partager"><Share2 size={19} aria-hidden="true" /></button>
             </div>
           </div>
-          <button className="w-dish-logo-btn" onClick={() => { dispatch({ type: 'SET_ACTIVE_RESTAURANT', payload: r }); navigate('restaurant'); }} aria-label={`Voir la carte de ${r?.name || 'ce restaurant'}`}>
-            <RestoLogo restaurant={r} size={92} className="w-dish-logo" />
+          <button className="w-dish-mark-btn" onClick={() => { dispatch({ type: 'SET_ACTIVE_RESTAURANT', payload: r }); navigate('restaurant'); }} aria-label="Voir la carte du restaurant">
+            <PhotoMark restaurant={r} size="lg" />
           </button>
         </div>
 
         <div className="w-dish-body">
           <div className="w-dish-name">{dish.name}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, color: 'var(--gray)' }}>
-            <button className="rs-link" onClick={() => { dispatch({ type: 'SET_ACTIVE_RESTAURANT', payload: r }); navigate('restaurant'); }}>{r?.name} · voir la carte</button>
+            <button className="rs-link" onClick={() => { dispatch({ type: 'SET_ACTIVE_RESTAURANT', payload: r }); navigate('restaurant'); }}>Voir toute la carte</button>
             {r?.prepTime && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Clock size={13} aria-hidden="true" /> {r.prepTime} min</span>}
           </div>
           <div className="w-tags">

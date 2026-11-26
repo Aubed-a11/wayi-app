@@ -1,3 +1,4 @@
+import 'dart:ui' show ImageFilter;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'icons.dart';
@@ -370,4 +371,34 @@ class RetourBtn extends StatelessWidget {
           ),
         ),
       );
+}
+
+
+/// Logo du restaurant pose sur la photo du plat (aucun nom ecrit) :
+/// version sans fond si elle existe, avec un leger halo blanc pour rester lisible.
+class PhotoMark extends StatelessWidget {
+  final String? overlay;
+  final String? logo;
+  final String name;
+  final double height;
+  const PhotoMark({super.key, this.overlay, this.logo, required this.name, this.height = 34});
+  @override
+  Widget build(BuildContext context) {
+    if (overlay != null) {
+      final img = Image.network(overlay!, height: height, fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox());
+      return IgnorePointer(
+        child: Stack(alignment: Alignment.centerLeft, children: [
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 2.2, sigmaY: 2.2),
+            child: ColorFiltered(colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn), child: img),
+          ),
+          img,
+        ]),
+      );
+    }
+    return Container(
+      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
+      child: RestoLogo(url: logo, name: name, size: height),
+    );
+  }
 }

@@ -134,6 +134,12 @@ class _Filled extends StatelessWidget {
       }
       return null;
     }
+    String? overlayOf(String restaurantId) {
+      for (final d in menu.dishes) {
+        if (d.restaurantId == restaurantId && d.restaurantLogoOverlay != null) return d.restaurantLogoOverlay;
+      }
+      return null;
+    }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (cart.restaurantCount > 1)
@@ -154,10 +160,9 @@ class _Filled extends StatelessWidget {
           decoration: cardBox(radius: 22),
           child: Column(children: [
             Row(children: [
-              RestoLogo(url: logoOf(g.value.first.restaurantId), name: g.key, size: 38),
+              PhotoMark(overlay: overlayOf(g.value.first.restaurantId), logo: logoOf(g.value.first.restaurantId), name: g.key, height: 36),
               const SizedBox(width: 10),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(g.key, style: font(size: 15, weight: FontWeight.w700)),
                 Text('${g.value.fold<int>(0, (n, i) => n + i.qty)} plat(s)', style: small()),
               ])),
             ]),

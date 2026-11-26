@@ -19,7 +19,7 @@ export const fcfa = (n) => `${fmtNum(n)}\u00a0FCFA`;
 // Element de panier a partir d'un plat (avec sa photo pour l'ecran Panier)
 export const toCartItem = (dish) => ({
   id: dish.id, name: dish.name, icon: dish.icon, image: dish.image || null, price: dish.price,
-  restaurantId: dish.restaurantId, restaurantName: dish.restaurant?.name, restaurantIcon: dish.restaurant?.icon,
+  restaurantId: dish.restaurantId, restaurantName: dish.restaurant?.name, restaurantIcon: dish.restaurant?.icon, restaurantLogoOverlay: dish.restaurant?.logoOverlay || null,
   restaurantLogo: dish.restaurant?.logo || null,
 });
 
@@ -58,13 +58,24 @@ export function RestoLogo({ restaurant, size = 56, className = '', style }) {
   );
 }
 
+// Logo du restaurant pose sur la photo du plat : version sans fond si le
+// restaurant en a une, sinon son logo rond. Aucun nom ecrit.
+export function PhotoMark({ restaurant, className = '', size = 'md' }) {
+  const [broken, setBroken] = useState(false);
+  if (!restaurant) return null;
+  if (restaurant.logoOverlay && !broken) {
+    return <img className={`w-mark ${size} ${className}`} src={restaurant.logoOverlay} alt="" onError={() => setBroken(true)} />;
+  }
+  return <RestoLogo restaurant={restaurant} size={size === 'lg' ? 64 : size === 'sm' ? 30 : 40} className={`w-mark-round ${className}`} />;
+}
+
 // Carte de la grille "Menus du jour"
 export function MenuCard({ dish, onOpen, onAdd }) {
   return (
     <div className="w-mcard" onClick={() => onOpen(dish)}>
       <DishImg src={dish.image} />
       <span className="w-mcard-tag">{dish.isPopular ? 'Populaire' : 'Plat du jour'}</span>
-      <RestoLogo restaurant={dish.restaurant} size={46} className="w-mcard-logo" />
+      <PhotoMark restaurant={dish.restaurant} className="w-mcard-mark" />
       <div className="w-mcard-body">
         <div className="w-mcard-name">{dish.name}</div>
         {dish.desc && <div className="w-mcard-desc">{dish.desc}</div>}
@@ -86,8 +97,7 @@ export function MenuCard({ dish, onOpen, onAdd }) {
 export function ListCard({ dish, onOpen, onAdd, cta = 'Commander' }) {
   return (
     <div className="w-lcard" onClick={() => onOpen(dish)}>
-      <div className="w-lcard-logo"><RestoLogo restaurant={dish.restaurant} size={62} /></div>
-      <DishImg src={dish.image} iconSize={22} />
+      <div className="w-ecard-photo w-lcard-photo"><DishImg src={dish.image} iconSize={22} /><PhotoMark restaurant={dish.restaurant} size="sm" className="w-ecard-mark" /></div>
       <div className="w-lcard-body">
         <div className="w-lcard-name">{dish.name}</div>
         {dish.desc && <div className="w-lcard-desc">{dish.desc}</div>}
@@ -106,13 +116,14 @@ export function ListCard({ dish, onOpen, onAdd, cta = 'Commander' }) {
 export function ExploreCard({ dish, onOpen, onAdd }) {
   return (
     <div className="w-ecard" onClick={() => onOpen(dish)}>
-      <RestoLogo restaurant={dish.restaurant} size={58} />
-      <DishImg src={dish.image} />
+      <div className="w-ecard-photo">
+        <DishImg src={dish.image} />
+        <PhotoMark restaurant={dish.restaurant} size="sm" className="w-ecard-mark" />
+      </div>
       <button className="w-ecard-add" onClick={e => { e.stopPropagation(); onAdd(dish); }} aria-label={`Ajouter ${dish.name}`}>
         <Plus size={17} strokeWidth={2.6} aria-hidden="true" />
       </button>
       <div className="w-ecard-name">{dish.name}</div>
-      {dish.restaurant?.name && <div style={{ fontSize: 11.5, color: 'var(--gray)', marginTop: 2 }}>{dish.restaurant.name}</div>}
       <div className="w-ecard-price">{fcfa(dish.price)}</div>
     </div>
   );

@@ -78,6 +78,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     final shownStars = stars.take(3).toList();
     final cover = shownStars.isNotEmpty ? shownStars.first.image : null;
     final prep = dishes.isNotEmpty ? dishes.first.prepTime : '25-35';
+    final overlay = dishes.isNotEmpty ? dishes.first.restaurantLogoOverlay : null;
     final tagline = widget.tagline ?? (dishes.isNotEmpty ? dishes.first.restaurantTagline : null);
     final mine = cart.items.where((i) => i.restaurantId == widget.id);
     final count = mine.fold<int>(0, (s, i) => s + i.qty);
@@ -120,7 +121,10 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                       boxShadow: softShadow,
                     ),
                     child: Column(children: [
-                      Text(widget.name, textAlign: TextAlign.center, style: h2()),
+                      if (overlay != null)
+                        PhotoMark(overlay: overlay, name: widget.name, height: 56)
+                      else
+                        Text(widget.name, textAlign: TextAlign.center, style: h2()),
                       if (tagline != null && tagline.isNotEmpty) ...[
                         const SizedBox(height: 6),
                         Text(tagline, textAlign: TextAlign.center, style: small(C.ink2)),

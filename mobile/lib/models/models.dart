@@ -13,6 +13,8 @@ class Dish {
   final String restaurantId;
   final String restaurantName;
   final String? restaurantLogo;
+  /// Logo sans fond, pose sur les photos des plats
+  final String? restaurantLogoOverlay;
   final String? restaurantTagline;
   final String prepTime;
   final List<String> composition;
@@ -23,7 +25,7 @@ class Dish {
   Dish({
     required this.id, required this.name, required this.desc, required this.price, this.image,
     required this.period, required this.category, required this.taste,
-    required this.restaurantId, required this.restaurantName, this.restaurantLogo, this.restaurantTagline,
+    required this.restaurantId, required this.restaurantName, this.restaurantLogo, this.restaurantLogoOverlay, this.restaurantTagline,
     required this.prepTime, this.composition = const [], this.advantages = const [],
     this.demo = false, this.popular = false,
   });
@@ -44,6 +46,7 @@ class Dish {
       restaurantId: asStr(j['restaurantId']),
       restaurantName: asStr(r['name'] ?? j['restaurantName'], 'Restaurant'),
       restaurantLogo: (r['logo'] is String && (r['logo'] as String).isNotEmpty) ? r['logo'] as String : null,
+      restaurantLogoOverlay: (r['logoOverlay'] is String && (r['logoOverlay'] as String).isNotEmpty) ? r['logoOverlay'] as String : null,
       restaurantTagline: r['tagline'] as String?,
       prepTime: asStr(r['prepTime'], '20-30'),
       composition: _lines(j['characteristics']),

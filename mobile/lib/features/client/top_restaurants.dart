@@ -136,12 +136,10 @@ class _Card extends StatelessWidget {
           Positioned(
             left: 14, right: 14, bottom: 14,
             child: Row(children: [
-              RestoLogo(url: r['logo'] as String?, name: name, size: 46),
+              PhotoMark(overlay: r['logoOverlay'] as String?, logo: r['logo'] as String?, name: name, height: 44),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                  Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: h3(Colors.white)),
-                  const SizedBox(height: 2),
                   Text(
                     top['name'] != null ? '${sold > 0 ? 'Le plus commandé' : 'Spécialité'} : ${top['name']}' : asStr(r['tagline']),
                     maxLines: 1, overflow: TextOverflow.ellipsis,

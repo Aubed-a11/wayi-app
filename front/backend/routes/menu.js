@@ -83,7 +83,7 @@ router.get('/restaurant-of-week', (req, res) => {
   const r = restaurants.find(x => x.id === best[0]);
   if (!r) return res.json({ restaurant: null });
   res.json({
-    restaurant: { id: r.id, name: r.name, logo: r.logo || null, icon: r.icon, tagline: r.tagline || '', rating: r.rating, verified: !!r.verified, prepTime: r.prepTime },
+    restaurant: { id: r.id, name: r.name, logo: r.logo || null, logoOverlay: r.logoOverlay || null, icon: r.icon, tagline: r.tagline || '', rating: r.rating, verified: !!r.verified, prepTime: r.prepTime },
     dishesServed: best[1].dishes,
     ordersCount: best[1].orders,
     periodDays: 7,

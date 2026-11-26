@@ -98,7 +98,7 @@ function CheckoutCard({ checkout, onValidate }) {
       <div className="yivi-card-title"><ShoppingBag size={16} aria-hidden="true" /> Récapitulatif de ta commande</div>
       {checkout.restaurants.map(r => (
         <div key={r.name} style={{ marginBottom: 8 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gray)', marginBottom: 2 }}>{r.name}</div>
+          {checkout.restaurants.length > 1 && <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gray)', marginBottom: 2 }}>Livraison {checkout.restaurants.indexOf(r) + 1}</div>}
           {r.items.map(it => (
             <div key={it.name} className="yivi-line"><span>{it.qty} x {it.name}</span><span>{fmt(it.price * it.qty)}</span></div>
           ))}

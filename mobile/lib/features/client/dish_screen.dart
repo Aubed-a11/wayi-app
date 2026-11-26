@@ -45,10 +45,6 @@ class _DishScreenState extends State<DishScreen> {
               Text(d.name, style: h1()),
               const SizedBox(height: 10),
               Row(children: [
-                RestoLogo(url: d.restaurantLogo, name: d.restaurantName, size: 24),
-                const SizedBox(width: 8),
-                Flexible(child: Text(d.restaurantName, style: font(size: 14, weight: FontWeight.w600, color: C.ink2), overflow: TextOverflow.ellipsis)),
-                const SizedBox(width: 14),
                 const Icon(Ic.clock, size: 15, color: C.muted),
                 const SizedBox(width: 6),
                 Text('${d.prepTime} min', style: font(size: 14, weight: FontWeight.w600, color: C.ink2)),
@@ -82,10 +78,9 @@ class _DishScreenState extends State<DishScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: cardBox(radius: R.md),
                     child: Row(children: [
-                      RestoLogo(url: d.restaurantLogo, name: d.restaurantName, size: 48),
+                      PhotoMark(overlay: d.restaurantLogoOverlay, logo: d.restaurantLogo, name: d.restaurantName, height: 44),
                       const SizedBox(width: 14),
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(d.restaurantName, style: h3()),
                         Text(d.restaurantTagline!, style: small()),
                         const SizedBox(height: 4),
                         Text('Voir toute la carte', style: font(size: 13, weight: FontWeight.w700, color: C.brand)),

@@ -39,6 +39,7 @@ class FeatureCard extends StatelessWidget {
                 child: Text(tag, style: font(size: 12, weight: FontWeight.w700)),
               ),
             ),
+            Positioned(right: 14, top: 12, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 40)),
             Positioned(
               left: 18, right: 18, bottom: 18,
               child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -46,7 +47,11 @@ class FeatureCard extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(dish.name, style: h2(Colors.white), maxLines: 2, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 6),
-                    RestoLine(logo: dish.restaurantLogo, name: dish.restaurantName, suffix: '${dish.prepTime} min', color: Colors.white.withValues(alpha: 0.9), size: 22),
+                    Row(children: [
+                      Icon(Ic.clock, size: 14, color: Colors.white.withValues(alpha: 0.9)),
+                      const SizedBox(width: 5),
+                      Text('${dish.prepTime} min', style: font(size: 12.5, weight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.9))),
+                    ]),
                   ]),
                 ),
                 const SizedBox(width: 12),
@@ -77,6 +82,7 @@ class TallCard extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Stack(children: [
               AspectRatio(aspectRatio: 1.1, child: Photo(dish.image, radius: 0)),
+              Positioned(right: 8, bottom: 8, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 28)),
               Positioned(
                 left: 8, top: 8,
                 child: Container(
@@ -94,8 +100,6 @@ class TallCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 10, 10, 12),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(dish.name, style: font(size: 14.5, weight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 2),
-                RestoLine(logo: dish.restaurantLogo, name: dish.restaurantName),
                 const SizedBox(height: 8),
                 Row(children: [
                   Expanded(child: Text(fcfa(dish.price), style: font(size: 14, weight: FontWeight.w800, color: C.brandDark))),
@@ -119,13 +123,17 @@ class DishRow extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(children: [
-            Photo(dish.image, width: 84, height: 84, radius: 14),
+            SizedBox(
+              width: 84, height: 84,
+              child: Stack(children: [
+                Positioned.fill(child: Photo(dish.image, radius: 14)),
+                Positioned(left: 4, top: 4, child: PhotoMark(overlay: dish.restaurantLogoOverlay, logo: dish.restaurantLogo, name: dish.restaurantName, height: 20)),
+              ]),
+            ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(dish.name, style: h3(), maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 5),
-                RestoLine(logo: dish.restaurantLogo, name: dish.restaurantName),
                 const SizedBox(height: 8),
                 Row(children: [
                   Text(fcfa(dish.price), style: font(size: 14, weight: FontWeight.w800, color: C.brandDark)),

@@ -14,6 +14,8 @@ const RESTAURANT = {
   // Ancienne phrase remplacee au demarrage si elle n'a pas ete modifiee depuis
   oldTaglines: ['Salades, chawarmas, grillades, pizzas et spécialités africaines'],
   logo: `${SITE}/restaurants/guedalia.jpg`,
+  // Logo sans fond, pose sur les photos des plats
+  logoOverlay: `${SITE}/restaurants/guedalia-transparent.png`,
   zone: 'Abomey-Calavi, face Université Le Faucon',
   // Position approchee (secteur du campus d'Abomey-Calavi), a affiner avec le point GPS exact
   lat: 6.441, lng: 2.352,

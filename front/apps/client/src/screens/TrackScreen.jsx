@@ -287,7 +287,7 @@ export default function TrackScreen() {
     ? [{ key: 'cancelled', label: 'Commande annulée', sub: "Cette commande n'a pas été préparée.", done: true }]
     : [
       { key: 'pending', label: reached('confirmed') ? 'Commande confirmée' : 'Commande envoyée', sub: reached('confirmed') ? (timeOf('confirmed') || `${order.restaurantName} a accepté`) : `En attente de ${order.restaurantName}`, done: true },
-      { key: 'preparing', label: 'Préparation en cours', sub: `Restaurant : ${order.restaurantName}${timeOf('preparing') ? `\n${timeOf('preparing')}` : ''}`, done: reached('preparing') },
+      { key: 'preparing', label: 'Préparation en cours', sub: `Le restaurant prépare ta commande${timeOf('preparing') ? `\n${timeOf('preparing')}` : ''}`, done: reached('preparing') },
       { key: 'on_the_way', label: 'En cours de livraison', sub: order.driver ? `${order.driver.name}${order.driver.vehicle?.plate ? ` · ${order.driver.vehicle.plate}` : ''}` : (reached('ready') ? 'En attente du livreur' : (eta !== null ? `Estimation : ${eta} min` : '')), done: reached('on_the_way'), icon: Bike },
       { key: 'delivered', label: 'Livraison terminée', sub: timeOf('delivered') || '', done: isDelivered },
     ];
@@ -307,7 +307,7 @@ export default function TrackScreen() {
           {orders.length > 1 && (
             <div className="w-chips" style={{ marginBottom: 14 }}>
               {orders.map((o, i) => (
-                <button key={o.id} className={`w-chip${i === activeIdx ? ' on' : ''}`} onClick={() => setActiveIdx(i)}>{o.restaurantName}</button>
+                <button key={o.id} className={`w-chip${i === activeIdx ? ' on' : ''}`} onClick={() => setActiveIdx(i)}>Livraison {i + 1}</button>
               ))}
             </div>
           )}
@@ -367,7 +367,7 @@ export default function TrackScreen() {
                 {onTheWay && (
                   <div className="w-card" style={{ padding: '12px 14px', marginTop: 10 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: 'var(--gray)', marginBottom: 8 }}>
-                      <span>Départ : {t?.restaurant?.name || order.restaurantName}{t?.pickup?.at ? ` à ${new Date(t.pickup.at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : ''}</span>
+                      <span>Départ : le restaurant{t?.pickup?.at ? ` à ${new Date(t.pickup.at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : ''}</span>
                       <span>Chez toi</span>
                     </div>
                     <div style={{ height: 8, borderRadius: 8, background: '#EFE7E0', overflow: 'hidden' }}>
@@ -398,7 +398,7 @@ export default function TrackScreen() {
 
           {/* Recapitulatif */}
           <div className="w-card" style={{ padding: '14px 16px', marginBottom: 16 }}>
-            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>{order.restaurantName}</div>
+            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>Ta commande</div>
             {(order.items || []).map((item, i) => (
               <div key={i} className="w-sum-row" style={{ padding: '3px 0', fontSize: 13 }}><span>{item.qty} x {item.name}</span><span>{fcfa(item.price * item.qty)}</span></div>
             ))}

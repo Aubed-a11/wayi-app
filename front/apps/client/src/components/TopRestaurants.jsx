@@ -70,9 +70,8 @@ export default function TopRestaurants({ dishes = [], onOpenDish, onAdd }) {
               <span className="tr-badge"><Flame size={13} strokeWidth={2.4} aria-hidden="true" /> #{i + 1} · {badge}</span>
               {r.rating ? <span className="tr-rating"><Star size={12} strokeWidth={2.4} aria-hidden="true" /> {Number(r.rating).toFixed(1)}</span> : null}
               <span className="tr-info">
-                <Logo url={r.logo} name={r.name} size={46} />
+                {r.logoOverlay ? <img className="tr-mark" src={r.logoOverlay} alt="" /> : <Logo url={r.logo} name={r.name} size={46} />}
                 <span className="tr-text">
-                  <strong>{r.name}</strong>
                   <small>{item.topDish?.name ? `${sold > 0 ? 'Le plus commandé' : 'Spécialité'} : ${item.topDish.name}` : r.tagline}</small>
                 </span>
               </span>

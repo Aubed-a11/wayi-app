@@ -309,9 +309,10 @@ export default function CartScreen() {
             {cartByRestaurant.map(group => (
               <div key={group.restaurantId} className="ct-group">
                 <div className="ct-group-head">
-                  <RestoLogo restaurant={{ name: group.restaurantName, logo: group.items.find(i => i.restaurantLogo)?.restaurantLogo }} size={38} />
+                  {group.items.find(i => i.restaurantLogoOverlay)
+                    ? <img className="ct-group-mark" src={group.items.find(i => i.restaurantLogoOverlay).restaurantLogoOverlay} alt="" />
+                    : <RestoLogo restaurant={{ name: group.restaurantName, logo: group.items.find(i => i.restaurantLogo)?.restaurantLogo }} size={38} />}
                   <div>
-                    <strong>{group.restaurantName}</strong>
                     <small>{group.items.reduce((n, i) => n + i.qty, 0)} plat{group.items.reduce((n, i) => n + i.qty, 0) > 1 ? 's' : ''}</small>
                   </div>
                 </div>

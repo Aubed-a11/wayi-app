@@ -103,7 +103,7 @@ class _OrderCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Expanded(child: Text(asStr(order['restaurantName'], 'Restaurant'), style: h3())),
+                Expanded(child: Text(items.map((i) => '${i['qty']} × ${i['name']}').join(', '), style: h3(), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
@@ -111,7 +111,6 @@ class _OrderCard extends StatelessWidget {
                 ),
               ]),
               const SizedBox(height: 6),
-              Text(items.map((i) => '${i['qty']} × ${i['name']}').join(', '), style: small(), maxLines: 2, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 10),
               Row(children: [
                 Text(dateOf(order['createdAt']?.toString()), style: small()),
