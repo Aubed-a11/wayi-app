@@ -5,7 +5,7 @@ name: Captures d'ecran et test du parcours WAYI
 on:
   workflow_dispatch:
   push:
-    paths: ['mobile/lib/**', 'front/apps/client/src/**', 'front/backend/**', '.github/captures/**', '.github/workflows/captures.yml']
+    paths: ['mobile/lib/**', 'front/apps/client/src/**', 'front/apps/ops/src/**', 'front/backend/**', '.github/captures/**', '.github/workflows/captures.yml']
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
         working-directory: front/backend
         run: |
           npm ci --omit=dev --no-audit --no-fund
-          NODE_ENV=development PORT=3001 FRONTEND_URLS=http://localhost:8080,http://localhost:8081 nohup node server.js > /tmp/serveur.log 2>&1 &
+          NODE_ENV=development PORT=3001 FRONTEND_URLS=http://localhost:8080,http://localhost:8081,http://localhost:8082 nohup node server.js > /tmp/serveur.log 2>&1 &
           sleep 6 && curl -s localhost:3001/health | head -c 200
       - uses: subosito/flutter-action@v2
         with:
@@ -41,6 +41,13 @@ jobs:
           npm install --no-audit --no-fund --silent
           VITE_API_URL=http://localhost:3001 npx vite build
           nohup npx vite preview --port 8081 --strictPort > /tmp/site.log 2>&1 &
+          sleep 3
+      - name: Back office (web)
+        working-directory: front/apps/ops
+        run: |
+          npm install --no-audit --no-fund --silent
+          VITE_API_URL=http://localhost:3001 npx vite build
+          nohup npx vite preview --port 8082 --strictPort > /tmp/ops.log 2>&1 &
           sleep 3
       - name: Captures
         working-directory: .github/captures

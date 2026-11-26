@@ -161,4 +161,38 @@ if (driver) {
   await scroll(p, 700); await shot(p, '31-livreur-suite');
   await p.close();
 }
+// ── Back office (admin.wayibenin.com en local) ──
+if (admin) {
+  // une commande de demonstration pour remplir les listes
+  try {
+    const menu = await (await fetch(API + '/menu')).json();
+    const d = (menu.dishes || []).find(x => x.restaurantId === 'resto-guedalia') || (menu.dishes || [])[0];
+    if (d && client) await post('/orders', { items: [{ dishId: d.id, qty: 2 }], address: 'Campus UAC, Abomey-Calavi', lat: 6.4415, lng: 2.3505, paymentMethod: 'cash' }, client.token);
+  } catch (e) { console.log('  commande demo :', e.message); }
+  const OPS = 'http://localhost:8082/';
+  for (const [w, h, tag] of [[1440, 900, 'bureau'], [390, 844, 'mobile']]) {
+    const bo = await browser.newPage();
+    await bo.setViewport({ width: w, height: h, deviceScaleFactor: tag === 'mobile' ? 2 : 1 });
+    await bo.goto(OPS, { waitUntil: 'domcontentloaded' });
+    await bo.evaluate(t => localStorage.setItem('wayi_admin_token', t), admin.token);
+    await bo.goto(OPS, { waitUntil: 'networkidle2' });
+    await new Promise(r => setTimeout(r, 4000));
+    const tabs = ["Vue d'ensemble", 'Restaurants', 'Plats', 'Commandes', 'Livreurs'];
+    for (const [i, t] of tabs.entries()) {
+      await bo.evaluate(t => {
+        const sel = window.innerWidth > 900 ? '.bo-side nav button' : '.bo-mtabs button';
+        const el = [...document.querySelectorAll(sel)].find(b => b.textContent.includes(t)); if (el) el.click();
+      }, t);
+      await new Promise(r => setTimeout(r, 3500));
+      await bo.screenshot({ path: `${OUT}/6${i}-backoffice-${tag}-${i}.png` }); console.log(`  capture 6${i}-backoffice-${tag}`);
+      if (tag === 'bureau' && i < 3) {
+        await bo.evaluate(() => document.querySelector('.bo-content')?.scrollBy(0, 760)); await new Promise(r => setTimeout(r, 1500));
+        await bo.screenshot({ path: `${OUT}/6${i}-backoffice-${tag}-${i}b.png` });
+        await bo.evaluate(() => document.querySelector('.bo-content')?.scrollTo(0, 0));
+      }
+      if (tag === 'mobile' && i >= 2) break;
+    }
+    await bo.close();
+  }
+}
 await browser.close();
