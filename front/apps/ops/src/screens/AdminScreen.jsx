@@ -305,6 +305,16 @@ export default function AdminScreen() {
     return orders.filter(o => o.status === orderFilter);
   }, [orders, orderFilter]);
   const unassigned = orders.filter(o => !o.driver && !['delivered', 'cancelled', 'pending'].includes(o.status)).length;
+  const active = orders.filter(o => !['delivered', 'cancelled'].includes(o.status)).length;
+  const dayKey = (d) => new Date(d).toLocaleDateString('fr-CA', { timeZone: 'Africa/Porto-Novo' });
+  const todayKey = dayKey(Date.now());
+  const todayRevenue = orders.filter(o => o.status !== 'cancelled' && dayKey(o.createdAt) === todayKey).reduce((a, o) => a + (o.total || 0), 0);
+  const week = Array.from({ length: 7 }, (_, k) => {
+    const t = Date.now() - (6 - k) * 86400000; const key = dayKey(t);
+    return { key, today: key === todayKey, n: orders.filter(o => o.status !== 'cancelled' && dayKey(o.createdAt) === key).length,
+      label: new Date(t).toLocaleDateString('fr-FR', { weekday: 'short', timeZone: 'Africa/Porto-Novo' }).replace('.', '') };
+  });
+  const weekMax = Math.max(1, ...week.map(d => d.n));
 
   if (!admin || loading) {
     return <div className="screen" style={{ alignItems: 'center', justifyContent: 'center' }}><Spinner size={32} /></div>;
@@ -370,76 +380,105 @@ export default function AdminScreen() {
           {/* ══════════ VUE D'ENSEMBLE ══════════ */}
           {tab === 'dashboard' && dashboard && (
             <>
+              <section className="bo-hero">
+                <div className="bo-hero-text">
+                  <small>{today}</small>
+                  <h2>Bonjour {(admin.name || '').split(' ').slice(-1)[0] || ''}, voici WAYI aujourd'hui</h2>
+                  <p>{active} commande{active > 1 ? 's' : ''} en cours{unassigned > 0 ? `, dont ${unassigned} sans livreur` : ''}. {st.driversOnline || 0} livreur{(st.driversOnline || 0) > 1 ? 's' : ''} en ligne.</p>
+                  <div className="bo-hero-actions">
+                    <button className="bo-btn white" onClick={() => setTab('orders')}><Receipt size={15} /> Voir les commandes</button>
+                    <button className="bo-btn glass" onClick={() => setTab('menu')}><UtensilsCrossed size={15} /> Plats de la semaine</button>
+                  </div>
+                </div>
+                <div className="bo-hero-stats">
+                  <div><b>{st.todayOrders || 0}</b><small>Commandes du jour</small></div>
+                  <div><b>{money(todayRevenue)}</b><small>Ventes du jour</small></div>
+                  <div><b>{money(st.platformRevenue)}</b><small>Commission WAYI</small></div>
+                </div>
+              </section>
+
               <div className="bo-kpis">
                 {[
-                  { icon: Receipt, val: st.todayOrders, label: "Commandes aujourd'hui", tone: 'orange' },
                   { icon: TrendingUp, val: money(st.totalRevenue), label: "Chiffre d'affaires livré", tone: 'dark' },
-                  { icon: Wallet, val: money(st.platformRevenue), label: 'Commission WAYI', tone: 'green' },
                   { icon: Bike, val: `${st.driversOnline}/${st.driversTotal}`, label: 'Livreurs en ligne', tone: 'blue' },
                   { icon: Store, val: st.restaurantsCount, label: 'Restaurants partenaires', tone: 'orange' },
                   { icon: UtensilsCrossed, val: st.dishesCount, label: 'Plats enregistrés', tone: 'violet' },
-                  { icon: Clock, val: st.avgDeliveryMinutes != null ? `${st.avgDeliveryMinutes} min` : '-', label: 'Temps moyen de livraison', tone: 'blue' },
-                  { icon: CircleAlert, val: st.unassignedOrders, label: 'Sans livreur assigné', tone: st.unassignedOrders > 0 ? 'red' : 'green' },
+                  { icon: Clock, val: st.avgDeliveryMinutes != null ? `${st.avgDeliveryMinutes} min` : '-', label: 'Livraison moyenne', tone: 'green' },
+                  { icon: CircleAlert, val: st.unassignedOrders, label: 'Sans livreur', tone: st.unassignedOrders > 0 ? 'red' : 'green' },
                 ].map(k => (
                   <div key={k.label} className="bo-kpi">
-                    <span className={`bo-kpi-ico ${k.tone}`}><k.icon size={19} /></span>
-                    <b>{k.val}</b>
-                    <small>{k.label}</small>
+                    <span className={`bo-kpi-ico ${k.tone}`}><k.icon size={18} /></span>
+                    <div><b>{k.val}</b><small>{k.label}</small></div>
                   </div>
                 ))}
               </div>
 
-              {aiStatus && (
-                <div className={`bo-ai ${aiStatus.configured ? 'ok' : 'off'}`}>
-                  <span className="bo-ai-ico"><ChefHat size={20} /></span>
-                  <div>
-                    <b>Yivi, l'assistante WAYI</b>
-                    <small>{aiStatus.configured ? `Active avec Claude (${aiStatus.model})` : 'Mode simulation : clé ANTHROPIC_API_KEY absente du serveur'}</small>
-                  </div>
-                  <span className="bo-dot" />
-                </div>
-              )}
-
               <div className="bo-grid2">
-                <section className="bo-card">
-                  <div className="bo-card-head"><h2>Commandes récentes</h2><button className="bo-link" onClick={() => setTab('orders')}>Tout voir</button></div>
-                  {dashboard.recentOrders.length === 0 && <p className="bo-empty">Aucune commande pour le moment.</p>}
-                  {dashboard.recentOrders.slice(0, 6).map(o => (
-                    <div key={o.id} className="bo-row">
-                      <Logo src={o.restaurantLogo} name={o.restaurantName} icon={o.restaurantIcon} size={40} />
-                      <div className="bo-row-main">
-                        <b>{o.restaurantName}</b>
-                        <small>{o.id} · {timeAgo(o.createdAt)}</small>
-                      </div>
-                      <div className="bo-row-end">
-                        <b>{money(o.total)}</b>
-                        <Status s={o.status} />
-                      </div>
+                <div className="bo-col">
+                  <section className="bo-card">
+                    <div className="bo-card-head"><h2>Commandes des 7 derniers jours</h2><span className="bo-muted">{week.reduce((a, d) => a + d.n, 0)} au total</span></div>
+                    <div className="bo-chart">
+                      {week.map(d => (
+                        <div key={d.key} className={`bo-bar${d.today ? ' today' : ''}`}>
+                          <em>{d.n || ''}</em>
+                          <span style={{ height: `${Math.max(6, (d.n / weekMax) * 100)}%` }} />
+                          <small>{d.label}</small>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </section>
+                  </section>
+                  <section className="bo-card">
+                    <div className="bo-card-head"><h2>Commandes récentes</h2><button className="bo-link" onClick={() => setTab('orders')}>Tout voir</button></div>
+                    {dashboard.recentOrders.length === 0 && <p className="bo-empty">Aucune commande pour le moment.</p>}
+                    {dashboard.recentOrders.slice(0, 6).map(o => (
+                      <div key={o.id} className="bo-row">
+                        <Logo src={o.restaurantLogo} name={o.restaurantName} icon={o.restaurantIcon} size={44} />
+                        <div className="bo-row-main">
+                          <b>{o.restaurantName}</b>
+                          <small>{(o.items || []).map(it => `${it.qty || 1} x ${it.name}`).join(', ') || o.id}</small>
+                        </div>
+                        <div className="bo-row-end">
+                          <b>{money(o.total)}</b>
+                          <Status s={o.status} />
+                        </div>
+                      </div>
+                    ))}
+                  </section>
+                </div>
 
-                <section className="bo-card">
-                  <div className="bo-card-head"><h2>À la carte cette semaine</h2><button className="bo-link" onClick={() => setTab('restaurants')}>Restaurants</button></div>
-                  {restaurants.length === 0 && <p className="bo-empty">Aucun restaurant pour le moment.</p>}
-                  {restaurants.map(r => (
-                    <div key={r.id} className="bo-spot">
-                      <div className="bo-spot-head">
-                        <Logo src={r.logo} name={r.name} icon={r.icon} size={42} />
-                        <div className="bo-row-main"><b>{r.name}</b><small>{r.onlineCount} plat{r.onlineCount > 1 ? 's' : ''} en ligne sur {r.dishesCount}{r.plan ? ` · formule ${r.plan.label}` : ''}</small></div>
+                <div className="bo-col">
+                  {aiStatus && (
+                    <div className={`bo-ai ${aiStatus.configured ? 'ok' : 'off'}`}>
+                      <span className="bo-ai-ico"><ChefHat size={20} /></span>
+                      <div>
+                        <b>Yivi, l'assistante WAYI</b>
+                        <small>{aiStatus.configured ? `Active avec Claude (${aiStatus.model})` : 'Mode simulation : clé Claude absente du serveur'}</small>
                       </div>
-                      <div className="bo-thumbs">
-                        {(r.thisWeek || []).map(d => (
-                          <div key={d.id} className="bo-thumb">
-                            <span style={d.image ? { backgroundImage: `url("${d.image}")` } : undefined} />
-                            <small>{d.name}</small>
-                            <b>{money(d.price)}</b>
-                          </div>
-                        ))}
-                      </div>
+                      <span className="bo-dot" />
                     </div>
-                  ))}
-                </section>
+                  )}
+                  <section className="bo-card">
+                    <div className="bo-card-head"><h2>À la carte cette semaine</h2><button className="bo-link" onClick={() => setTab('restaurants')}>Restaurants</button></div>
+                    {restaurants.filter(r => r.dishesCount > 0).length === 0 && <p className="bo-empty">Aucun plat en ligne pour le moment.</p>}
+                    {restaurants.filter(r => r.dishesCount > 0).map(r => (
+                      <div key={r.id} className="bo-spot">
+                        <div className="bo-spot-head">
+                          <Logo src={r.logo} name={r.name} icon={r.icon} size={48} />
+                          <div className="bo-row-main"><b>{r.name}</b><small>{r.onlineCount} plat{r.onlineCount > 1 ? 's' : ''} en ligne sur {r.dishesCount}{r.plan ? ` · formule ${r.plan.label}` : ''}</small></div>
+                        </div>
+                        <div className="bo-thumbs">
+                          {(r.thisWeek || []).slice(0, 4).map(d => (
+                            <div key={d.id} className="bo-thumb">
+                              <span style={d.image ? { backgroundImage: `url("${d.image}")` } : undefined} />
+                              <small>{d.name}</small>
+                              <b>{money(d.price)}</b>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </section>
+                </div>
               </div>
             </>
           )}
@@ -566,6 +605,48 @@ export default function AdminScreen() {
               </div>
               {assignError && <div className="bo-notice ko">{assignError}</div>}
               {shownOrders.length === 0 && <p className="bo-empty">Aucune commande.</p>}
+              {shownOrders.length > 0 && (
+                <div className="bo-table-wrap">
+                  <table className="bo-table">
+                    <thead><tr><th>Commande</th><th>Plats</th><th>Livraison</th><th>Livreur</th><th>Total</th><th>Statut</th></tr></thead>
+                    <tbody>
+                      {shownOrders.map(o => {
+                        const canAssign = !o.driver && !['delivered', 'cancelled'].includes(o.status);
+                        const busyDriverIds = orders.filter(x => x.driver && !['delivered', 'cancelled'].includes(x.status)).map(x => x.driver.id);
+                        const freeDrivers = availableDrivers.filter(d => !busyDriverIds.includes(d.id) && !d.suspended);
+                        const pay = o.paymentProvider === 'manual' && ['awaiting_payment', 'claimed'].includes(o.paymentStatus);
+                        return (
+                          <tr key={o.id}>
+                            <td><div className="bo-cell-resto"><Logo src={o.restaurantLogo} name={o.restaurantName} icon={o.restaurantIcon} size={40} /><div><b>{o.restaurantName}</b><small>{o.id} · {timeAgo(o.createdAt)}</small></div></div></td>
+                            <td className="bo-cell-items">{(o.items || []).map((it, k) => <span key={k}>{it.qty || 1} x {it.name}</span>)}</td>
+                            <td className="bo-cell-addr">{o.address || '-'}</td>
+                            <td>
+                              {o.driver ? <span className="bo-cell-driver"><Bike size={14} /> {o.driver.name}</span> : canAssign ? (
+                                <select className="bo-mini-select" onChange={e => assignDriver(o.id, e.target.value)} disabled={assigningOrderId === o.id} defaultValue="">
+                                  <option value="" disabled>Assigner...</option>
+                                  {freeDrivers.length === 0 && <option value="" disabled>Aucun livreur libre</option>}
+                                  {freeDrivers.map(d => <option key={d.id} value={d.id}>{d.name} {d.status === 'available' ? '(en ligne)' : '(hors ligne)'}</option>)}
+                                </select>
+                              ) : <span className="bo-muted">-</span>}
+                            </td>
+                            <td>
+                              <b className="bo-cell-total">{money(o.total)}</b>
+                              {o.paymentProvider === 'kkiapay' && <small className={`bo-cell-pay ${o.paymentStatus === 'paid' ? 'ok' : ''}`}>{o.paymentStatus === 'paid' ? 'Payée Kkiapay' : 'Paiement en attente'}</small>}
+                              {pay && (
+                                <div className="bo-cell-paybtns">
+                                  <button className="bo-btn small" disabled={payBusyId === o.id} onClick={() => decidePayment(o.id, 'confirm')}>Argent reçu</button>
+                                  <button className="bo-btn ghost small" disabled={payBusyId === o.id} onClick={() => decidePayment(o.id, 'reject')}>Rejeter</button>
+                                </div>
+                              )}
+                            </td>
+                            <td><Status s={o.status} /></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
               <div className="bo-orders">
                 {shownOrders.map(o => {
                   const canAssign = !o.driver && !['delivered', 'cancelled'].includes(o.status);
