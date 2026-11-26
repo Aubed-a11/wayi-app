@@ -25,10 +25,11 @@ const PLATFORM_CONFIG = {
   driverMaxMinutes: Number(process.env.DRIVER_MAX_MINUTES) || 25,
   driverSpeedKmh: 22,      // vitesse moyenne d'une moto en ville
   roadFactor: 1.35,        // la route est plus longue que la ligne droite
+  // Formules du contrat de partenariat restaurant (article 4)
   subscriptionPlans: {
-    basic:    { price: 15000,  label: 'Basic',    maxDishes: 20,  priority: 1, badge: null },
-    standard: { price: 35000,  label: 'Standard', maxDishes: 60,  priority: 2, badge: 'star' },
-    premium:  { price: 75000,  label: 'Premium',  maxDishes: 200, priority: 3, badge: 'flame' },
+    ahovi:  { price: 5000,  label: 'Ahovi',  maxDishes: 5,  priority: 1, priorityLabel: 'standard',      durationMonths: 6, badge: null },
+    ahossi: { price: 10750, label: 'Ahossi', maxDishes: 15, priority: 2, priorityLabel: 'intermédiaire', durationMonths: 3, badge: 'star' },
+    aholou: { price: 20000, label: 'Aholou', maxDishes: 20, priority: 3, priorityLabel: 'maximale',      durationMonths: 3, badge: 'flame' },
   },
   // Abonnements clients : livraison gratuite pendant la durée de l'abonnement.
   clientSubscriptionPlans: {

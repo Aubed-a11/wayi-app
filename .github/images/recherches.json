@@ -1,7 +1,22 @@
 {
- "jus-citron": [
-  "citronnade",
-  "lemonade",
-  "fresh lemonade glass"
+ "sauce-legumes": [
+  "sauce légumes gboman",
+  "african spinach stew"
+ ],
+ "monyo": [
+  "monyo sauce tomate oignon",
+  "fried fish tomato onion sauce"
+ ],
+ "bomiwo-poulet": [
+  "amiwo poulet",
+  "bomiwo"
+ ],
+ "choukouya-poulet": [
+  "grilled chicken pieces onion",
+  "suya chicken"
+ ],
+ "lapin-grille": [
+  "grilled rabbit",
+  "lapin grillé"
  ]
 }
