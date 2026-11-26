@@ -32,6 +32,7 @@ export default function MerchantScreen() {
   const [plans, setPlans] = useState({});
   const [myDishes, setMyDishes] = useState([]);
   const [maxDishes, setMaxDishes] = useState(null);
+  const [weeklyDishes, setWeeklyDishes] = useState(null);
 
   useEffect(() => {
     if (!state.merchantToken) navigate('merchant_login');
@@ -55,6 +56,7 @@ export default function MerchantScreen() {
       setPlans(p.data.plans || {});
       setMyDishes(dishRes.data.dishes);
       setMaxDishes(dishRes.data.maxDishes);
+      setWeeklyDishes(dishRes.data.weeklyDishes || null);
     } catch {
       // token invalide → intercepteur gère la déconnexion
     } finally {
@@ -207,6 +209,7 @@ export default function MerchantScreen() {
       const { data } = await merchantAPI.dishes();
       setMyDishes(data.dishes);
       setMaxDishes(data.maxDishes);
+      setWeeklyDishes(data.weeklyDishes || null);
       cancelEditDish();
     } catch (err) {
       setDishFormError(err.response?.data?.error || "Impossible d'enregistrer ce plat.");
@@ -221,6 +224,7 @@ export default function MerchantScreen() {
       const { data } = await merchantAPI.dishes();
       setMyDishes(data.dishes);
       setMaxDishes(data.maxDishes);
+      setWeeklyDishes(data.weeklyDishes || null);
     } catch (err) {
       setDishFormError(err.response?.data?.error || 'Impossible de retirer ce plat.');
     }
@@ -488,12 +492,22 @@ export default function MerchantScreen() {
             </div>
 
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 15, marginBottom: 10 }}>Mon menu ({myDishes.length})</div>
+            {weeklyDishes && (
+              <div style={{ background: '#FFF4EB', border: '1px solid #F7D9C2', borderRadius: 'var(--r-md)', padding: '10px 12px', marginBottom: 12, fontSize: 13, color: '#7A2A18', lineHeight: 1.5 }}>
+                Tes clients voient <b>{weeklyDishes} plats par semaine</b>. Chaque lundi à minuit, ils passent automatiquement aux {weeklyDishes} plats suivants de ta carte.
+              </div>
+            )}
             {myDishes.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--gray)', fontSize: 13 }}>Aucun plat pour le moment - ajoute ton premier plat ci-dessus.</div>
             ) : (
               <div className="cards-grid">
                 {myDishes.map(dish => (
                   <div key={dish.id} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 12 }}>
+                    {weeklyDishes && (
+                      <div style={{ fontSize: 11.5, fontWeight: 700, marginBottom: 6, color: dish.onlineThisWeek ? '#1E7D4B' : dish.onlineNextWeek ? '#A8321F' : 'var(--gray)' }}>
+                        {dish.onlineThisWeek ? 'En ligne cette semaine' : dish.onlineNextWeek ? 'En ligne la semaine prochaine' : 'Plus tard dans la rotation'}
+                      </div>
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                       <span style={{ fontWeight: 700, fontSize: 13 }}>{dish.name}</span>
                       <span style={{ fontWeight: 800, color: 'var(--emerald)', fontSize: 13 }}>{dish.price?.toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0')} F</span>

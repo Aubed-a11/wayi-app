@@ -20,6 +20,7 @@ class MenuTab extends StatefulWidget {
 class _MenuTabState extends State<MenuTab> {
   List<Map<String, dynamic>> _dishes = [];
   int? _max;
+  int? _weekly;
   bool _loading = true;
   String? _error;
 
@@ -34,6 +35,7 @@ class _MenuTabState extends State<MenuTab> {
       final d = await Api.instance.get('/merchants/dishes');
       _dishes = (d['dishes'] as List? ?? []).map((e) => (e as Map).cast<String, dynamic>()).toList();
       _max = d['maxDishes'] is num ? (d['maxDishes'] as num).toInt() : null;
+      _weekly = d['weeklyDishes'] is num ? (d['weeklyDishes'] as num).toInt() : null;
       _error = null;
     } on ApiException catch (e) {
       _error = e.message;
@@ -88,6 +90,10 @@ class _MenuTabState extends State<MenuTab> {
             Text('Mon menu', style: h1()),
             const SizedBox(height: 4),
             Text('${_dishes.length} plat${_dishes.length > 1 ? 's' : ''}${_max != null ? ' sur $_max possibles avec ton abonnement' : ''}', style: small()),
+            if (_weekly != null) ...[
+              const SizedBox(height: 12),
+              Notice('Tes clients voient $_weekly plats par semaine. Chaque lundi à minuit, ils passent automatiquement aux $_weekly plats suivants de ta carte.', error: false),
+            ],
             const SizedBox(height: 16),
             if (full) ...[const Notice("Tu as atteint la limite de plats de ton abonnement.", error: false), const SizedBox(height: 12)],
             if (_loading) const Padding(padding: EdgeInsets.only(top: 60), child: Center(child: CircularProgressIndicator(color: C.brand))),
@@ -104,6 +110,13 @@ class _MenuTabState extends State<MenuTab> {
                     Photo(d['image'] as String?, width: 76, height: 76, radius: R.sm),
                     const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      if (_weekly != null) ...[
+                        Text(
+                          d['onlineThisWeek'] == true ? 'En ligne cette semaine' : d['onlineNextWeek'] == true ? 'En ligne la semaine prochaine' : 'Plus tard dans la rotation',
+                          style: font(size: 11.5, weight: FontWeight.w700, color: d['onlineThisWeek'] == true ? const Color(0xFF1E7D4B) : d['onlineNextWeek'] == true ? C.brandDark : C.muted),
+                        ),
+                        const SizedBox(height: 3),
+                      ],
                       Text(asStr(d['name']), style: h3(), maxLines: 2, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 3),
                       Text('${periodLabels[d['period']] ?? ''} · ${categoryLabels[d['category']] ?? ''}', style: small()),

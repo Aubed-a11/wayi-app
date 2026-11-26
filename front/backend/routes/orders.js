@@ -6,7 +6,7 @@
 // ============================================================
 const express = require('express');
 const {
-  orders, getOrdersByUser, addOrder, getDishById, getRestaurantById, getUserById,
+  orders, getOrdersByUser, addOrder, getDishById, isDishOnline, getRestaurantById, getUserById,
   calcDistance, calcDeliveryFee, outOfZone, outOfZoneMessage, setOrderStatus, getReceiptByOrderId, addRating, drivers, reviews,
 } = require('../data/store');
 const { auth } = require('../middleware/auth');
@@ -54,6 +54,9 @@ router.post('/', auth, (req, res) => {
     // Pour tester le parcours complet, définir ALLOW_DEMO_ORDERS=1 dans le .env du serveur.
     if (dish.demo && process.env.ALLOW_DEMO_ORDERS !== '1') {
       return res.status(409).json({ error: `« ${dish.name} » est un plat d'exemple : ce restaurant n'est pas encore partenaire de WAYI. La commande sera ouverte très bientôt.` });
+    }
+    if (!isDishOnline(dish)) {
+      return res.status(409).json({ error: `« ${dish.name} » n'est pas à la carte cette semaine. Retire-le du panier et choisis un plat du menu de la semaine.` });
     }
     if (!groups[dish.restaurantId]) groups[dish.restaurantId] = [];
     groups[dish.restaurantId].push({ dish, qty: it.qty || 1 });

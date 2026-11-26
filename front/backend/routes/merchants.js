@@ -4,7 +4,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const { merchants, restaurants, dishes, orders, PLATFORM_CONFIG, reviews, getUserById, drivers, calcDistance, addDish, updateDish, deleteDish, enrichDish, getDishById, PERIODS, CATEGORIES, addRestaurant, createPendingRegistration, getPendingRegistration, deletePendingRegistration } = require('../data/store');
+const { merchants, restaurants, dishes, orders, PLATFORM_CONFIG, reviews, getUserById, drivers, calcDistance, addDish, updateDish, deleteDish, enrichDish, getDishById, PERIODS, CATEGORIES, addRestaurant, createPendingRegistration, getPendingRegistration, deletePendingRegistration, rotationFor, weekIndex, weekBounds } = require('../data/store');
 const { auth, signToken } = require('../middleware/auth');
 const { notify, sendEmail } = require('../services/notifications');
 const mails = require('../services/email/templates');
@@ -369,7 +369,16 @@ router.put('/orders/:id/assign-driver', auth, merchantAuth, (req, res) => {
 // GET /api/merchants/dishes — les plats du restaurant (lecture seule ; gérés par le super admin)
 router.get('/dishes', auth, merchantAuth, (req, res) => {
   const myDishes = dishes.filter(d => d.restaurantId === req.restaurant?.id);
-  res.json({ dishes: myDishes.map(enrichDish), total: myDishes.length, maxDishes: PLATFORM_CONFIG.subscriptionPlans[req.merchant.subscription.plan]?.maxDishes });
+  // Rotation hebdomadaire : le restaurant voit quels plats sont en ligne cette semaine et la suivante
+  const r = req.restaurant;
+  const now = rotationFor(r), next = rotationFor(r, weekIndex() + 1);
+  res.json({
+    dishes: myDishes.map(d => ({ ...enrichDish(d), onlineThisWeek: now.has(d.id), onlineNextWeek: next.has(d.id) })),
+    total: myDishes.length,
+    maxDishes: PLATFORM_CONFIG.subscriptionPlans[req.merchant.subscription.plan]?.maxDishes,
+    weeklyDishes: r?.weeklyDishes || null,
+    week: weekBounds(),
+  });
 });
 
 // POST /api/merchants/dishes — le restaurant ajoute un plat à SON menu

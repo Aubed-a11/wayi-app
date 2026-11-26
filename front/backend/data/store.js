@@ -114,8 +114,35 @@ function enrichDish(dish) {
   };
 }
 
+// ─── ROTATION HEBDOMADAIRE ─────────────────────────────────────
+// Un restaurant avec r.weeklyDishes = N ne montre que N plats par semaine :
+// la semaine change chaque lundi a 00:00 (heure du Benin) et on passe aux N
+// plats suivants de sa carte, en boucle.
+const WEEK_MS = 7 * 24 * 3600 * 1000;
+const ROTATION_REF = Date.UTC(2026, 10, 22, 23, 0, 0); // lundi 23/11/2026 00:00 heure du Benin
+function weekIndex(at = Date.now()) { return Math.floor((at - ROTATION_REF) / WEEK_MS); }
+function weekBounds(idx = weekIndex()) {
+  const start = new Date(ROTATION_REF + idx * WEEK_MS);
+  return { start: start.toISOString(), end: new Date(start.getTime() + WEEK_MS).toISOString() };
+}
+function rotationFor(restaurant, idx = weekIndex()) {
+  const all = dishes.filter(d => d.restaurantId === restaurant.id && d.available !== false);
+  const n = Number(restaurant.weeklyDishes) || 0;
+  if (!n || all.length <= n) return new Set(all.map(d => d.id));
+  const start = ((idx * n) % all.length + all.length) % all.length;
+  const ids = new Set();
+  for (let k = 0; k < n; k++) ids.add(all[(start + k) % all.length].id);
+  return ids;
+}
+// Plat visible par les clients cette semaine ?
+function isDishOnline(dish, at = Date.now()) {
+  const r = restaurants.find(x => x.id === dish.restaurantId);
+  if (!r || !r.weeklyDishes) return true;
+  return rotationFor(r, weekIndex(at)).has(dish.id);
+}
+
 function getMenu({ period, category, search } = {}) {
-  let result = [...dishes];
+  let result = dishes.filter(d => isDishOnline(d));
   if (period) result = result.filter(d => d.period === period);
   if (category) result = result.filter(d => d.category === category);
   if (search) {
@@ -629,6 +656,7 @@ function seedPartners() {
       console.log(`[Store] Compte restaurant cree : ${ACCOUNT.email}`);
     }
     if (known && (RESTAURANT.oldTaglines || []).includes(known.tagline)) known.tagline = RESTAURANT.tagline;
+    if (known && RESTAURANT.weeklyDishes && known.weeklyDishes === undefined) known.weeklyDishes = RESTAURANT.weeklyDishes;
     if (known && (RESTAURANT.oldPositions || []).some(([a, b]) => known.lat === a && known.lng === b)) {
       known.lat = RESTAURANT.lat; known.lng = RESTAURANT.lng; known.zone = RESTAURANT.zone;
     }
@@ -657,7 +685,7 @@ function seedPartners() {
     if (partnersSeeded.includes(RESTAURANT.id)) continue;
     if (!restaurants.find(r => r.id === RESTAURANT.id)) {
       restaurants.push({ icon: 'utensils', rating: null, verified: true, priorityScore: 60, momoMtn: null, momoMoov: null,
-        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined, oldPositions: undefined, plan: undefined, menuVersion: undefined });
+        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined, oldPositions: undefined, plan: undefined, menuVersion: undefined, weeklyDishes: RESTAURANT.weeklyDishes });
     }
     for (const d of DISHES) {
       if (dishes.find(x => x.id === d.id)) continue;
@@ -719,7 +747,7 @@ function seedDemoMenuIfEmpty() {
 module.exports = { snapshotState, restoreState, outOfZone, outOfZoneMessage,
   PLATFORM_CONFIG, PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, beninHour, seedDemoMenuIfEmpty, seedPartners, travelMinutes, driversWithin,
   restaurants, dishes, users, drivers, merchants, admins, reviews, orders, receipts, callLogs,
-  enrichDish, getMenu, getDishById, getRestaurantById, getDishesByRestaurant,
+  enrichDish, getMenu, getDishById, isDishOnline, rotationFor, weekIndex, weekBounds, getRestaurantById, getDishesByRestaurant,
   getUserById, getOrdersByUser, addOrder, updateOrder,
   createPendingRegistration, getPendingRegistration, deletePendingRegistration,
   generateReceipt, getReceiptByOrderId, setOrderStatus, addRating,

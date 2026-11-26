@@ -22,6 +22,8 @@ const RESTAURANT = {
   prepTime: '25-35',
   // Formule du contrat de partenariat (article 4)
   plan: 'ahossi',
+  // 4 plats en ligne par semaine, puis les 4 suivants chaque lundi (rotation sur les 15)
+  weeklyDishes: 4,
   menuVersion: 2,
 };
 

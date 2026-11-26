@@ -3,7 +3,7 @@
 // GET /api/menu?period=dejeuner&category=healthy&search=riz
 // ============================================================
 const express = require('express');
-const { PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, getMenu, getDishById, enrichDish, users, orders, restaurants, dishes } = require('../data/store');
+const { PERIODS, CATEGORIES, TASTES, DISH_LABELS, currentPeriod, getMenu, getDishById, enrichDish, isDishOnline, users, orders, restaurants, dishes } = require('../data/store');
 const { auth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -139,7 +139,7 @@ router.get('/top-restaurants', (req, res) => {
   const list = restaurants
     .filter(r => r.active !== false)
     .map(r => {
-      const menu = dishes.filter(d => d.restaurantId === r.id && d.available !== false);
+      const menu = dishes.filter(d => d.restaurantId === r.id && d.available !== false && isDishOnline(d));
       if (!menu.length) return null;
       const s = sold[r.id] || { dishes: 0, orders: 0, byDish: {} };
       const bestId = Object.entries(s.byDish).sort((a, b) => b[1] - a[1])[0]?.[0];
