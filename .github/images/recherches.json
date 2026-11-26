@@ -1,77 +1,9 @@
 {
- "poulet-yassa": [
-  "chicken yassa plate",
-  "poulet yassa senegal",
-  "yassa chicken rice"
- ],
- "sauce-arachide": [
-  "peanut stew chicken",
-  "groundnut stew",
-  "mafe chicken"
- ],
- "poulet-bicyclette": [
-  "grilled chicken african",
-  "roast chicken plate",
-  "braised chicken grill"
- ],
  "degue-raisin": [
-  "thiakry",
-  "degue dessert",
-  "millet yogurt dessert bowl"
- ],
- "poulet-kedjenou": [
-  "kedjenou",
-  "chicken stew pot african",
-  "chicken casserole tomato"
- ],
- "sauce-gombo": [
-  "okra soup",
-  "okra stew",
-  "gombo sauce"
- ],
- "poisson-grille": [
-  "grilled tilapia plate",
-  "grilled whole fish plate",
-  "grilled fish lemon"
- ],
- "jus-gingembre": [
-  "ginger juice glass",
-  "ginger drink glass",
-  "ginger lemonade"
- ],
- "sauce-legumes": [
-  "african vegetable stew",
-  "efo riro",
-  "spinach stew"
- ],
- "choukouya-mouton": [
-  "grilled lamb onions",
-  "suya",
-  "lamb skewers grill"
- ],
- "bomiwo-poulet": [
-  "amiwo",
-  "jollof chicken",
-  "tomato rice chicken"
- ],
- "couscous-royal": [
-  "couscous royal",
-  "couscous lamb vegetables",
-  "moroccan couscous"
- ],
- "monyo": [
-  "grilled fish tomato onion salsa",
-  "fish with tomato sauce",
-  "sauce tomate oignon"
- ],
- "choukouya-poulet": [
-  "chicken suya",
-  "grilled chicken onions",
-  "chicken skewers"
- ],
- "lapin-grille": [
-  "grilled rabbit",
-  "roast rabbit plate",
-  "rabbit stew"
+  "millet pudding bowl",
+  "chakery dessert",
+  "thiakry senegal",
+  "degue mil",
+  "yogurt millet dessert glass"
  ]
 }
