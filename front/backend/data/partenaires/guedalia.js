@@ -24,6 +24,11 @@ const RESTAURANT = {
   plan: 'ahossi',
   // 4 plats en ligne par semaine, puis les 4 suivants chaque lundi (rotation sur les 15)
   weeklyDishes: 4,
+  // Ordre de passage : chaque semaine melange plats en sauce, grillades et douceurs
+  rotationOrder: ['poulet-yassa', 'sauce-arachide', 'poulet-bicyclette', 'degue-raisin',
+    'poulet-kedjenou', 'sauce-gombo', 'poisson-grille', 'jus-gingembre',
+    'sauce-legumes', 'choukouya-mouton', 'bomiwo-poulet', 'couscous-royal',
+    'monyo', 'choukouya-poulet', 'lapin-grille'].map(s => `guedalia-${s}`),
   menuVersion: 2,
 };
 

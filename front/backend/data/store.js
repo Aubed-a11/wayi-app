@@ -127,6 +127,12 @@ function weekBounds(idx = weekIndex()) {
 }
 function rotationFor(restaurant, idx = weekIndex()) {
   const all = dishes.filter(d => d.restaurantId === restaurant.id && d.available !== false);
+  // Ordre de passage choisi pour le restaurant (sinon l'ordre d'ajout des plats)
+  const order = restaurant.rotationOrder || [];
+  if (order.length) {
+    const pos = (d) => { const i = order.indexOf(d.id); return i < 0 ? order.length : i; };
+    all.sort((a, b) => pos(a) - pos(b));
+  }
   const n = Number(restaurant.weeklyDishes) || 0;
   if (!n || all.length <= n) return new Set(all.map(d => d.id));
   const start = ((idx * n) % all.length + all.length) % all.length;
@@ -657,6 +663,7 @@ function seedPartners() {
     }
     if (known && (RESTAURANT.oldTaglines || []).includes(known.tagline)) known.tagline = RESTAURANT.tagline;
     if (known && RESTAURANT.weeklyDishes && known.weeklyDishes === undefined) known.weeklyDishes = RESTAURANT.weeklyDishes;
+    if (known && RESTAURANT.rotationOrder && known.rotationOrder === undefined) known.rotationOrder = RESTAURANT.rotationOrder;
     if (known && (RESTAURANT.oldPositions || []).some(([a, b]) => known.lat === a && known.lng === b)) {
       known.lat = RESTAURANT.lat; known.lng = RESTAURANT.lng; known.zone = RESTAURANT.zone;
     }
@@ -685,7 +692,7 @@ function seedPartners() {
     if (partnersSeeded.includes(RESTAURANT.id)) continue;
     if (!restaurants.find(r => r.id === RESTAURANT.id)) {
       restaurants.push({ icon: 'utensils', rating: null, verified: true, priorityScore: 60, momoMtn: null, momoMoov: null,
-        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined, oldPositions: undefined, plan: undefined, menuVersion: undefined, weeklyDishes: RESTAURANT.weeklyDishes });
+        createdAt: new Date().toISOString(), ...RESTAURANT, oldTaglines: undefined, oldPositions: undefined, plan: undefined, menuVersion: undefined, weeklyDishes: RESTAURANT.weeklyDishes, rotationOrder: RESTAURANT.rotationOrder });
     }
     for (const d of DISHES) {
       if (dishes.find(x => x.id === d.id)) continue;
