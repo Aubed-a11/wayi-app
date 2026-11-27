@@ -496,6 +496,7 @@ function restoreState(saved) {
   replaceContents(cleanupsDone, saved.cleanupsDone || []);
   if (process.env.DEMO_MENU !== '1') purgeDemoRestaurants();
   keepOnlyGuedaliaOnce();
+  removeGuedaliaOnce();
 }
 
 // Nettoyage demande le 25/11/2026 : retirer tous les restaurants et plats
@@ -513,6 +514,22 @@ function keepOnlyGuedaliaOnce() {
   for (let i = merchants.length - 1; i >= 0; i--) if (gone.has(merchants[i].restaurantId)) { merchants.splice(i, 1); m++; }
   cleanupsDone.push(KEY);
   console.log(`[Store] Nettoyage : ${gone.size} restaurant(s), ${n} plat(s) et ${m} compte(s) restaurant retires. Seul Guedalia reste.`);
+}
+
+// Suppression demandee le 27/11/2026 : retirer Guedalia (restaurant, plats, compte).
+// S'execute une seule fois. Historique des commandes et avis conserve.
+function removeGuedaliaOnce() {
+  const KEY = 'supprimer-guedalia-2026-11-27';
+  if (cleanupsDone.includes(KEY)) return;
+  const id = 'resto-guedalia';
+  const r = restaurants.findIndex(x => x.id === id);
+  if (r !== -1) restaurants.splice(r, 1);
+  let n = 0;
+  for (let i = dishes.length - 1; i >= 0; i--) if (dishes[i].restaurantId === id) { dishes.splice(i, 1); n++; }
+  let m = 0;
+  for (let i = merchants.length - 1; i >= 0; i--) if (merchants[i].restaurantId === id) { merchants.splice(i, 1); m++; }
+  cleanupsDone.push(KEY);
+  console.log(`[Store] Guedalia supprime : restaurant ${r !== -1 ? 'retire' : 'absent'}, ${n} plat(s), ${m} compte(s).`);
 }
 
 // Restaurants et plats fictifs (menu de demonstration) : retires des donnees au demarrage.
@@ -648,6 +665,8 @@ function seedPartners() {
   let added = 0;
   for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.js'))) {
     const { RESTAURANT, DISHES, ACCOUNT } = require(path.join(dir, f));
+    // Restaurants retires de la plateforme : jamais remis (l'ancien fichier peut rester sur le serveur)
+    if (['resto-guedalia'].includes(RESTAURANT.id)) continue;
     const known = restaurants.find(r => r.id === RESTAURANT.id);
     // Compte de l'espace restaurant, cree une seule fois
     const accKey = `compte:${RESTAURANT.id}`;
