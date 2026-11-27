@@ -86,6 +86,10 @@ app.use('/api/restaurants', restaurantsRoutes);
 app.use('/api/orders',      ordersRoutes);
 app.use('/api/drivers',     driversRoutes);
 app.use('/api/merchants',   merchantRoutes);
+// Univers WAYI Bénin (Mode masqué tant que le back office ne l'active pas)
+const modeRoutes = require('./routes/mode');
+app.get('/api/verticals', ...modeRoutes.verticals);
+app.use('/api/mode', modeRoutes);
 // Photos des plats envoyees depuis l'appli
 app.use('/uploads', express.static(require('path').join(__dirname, 'uploads'), { maxAge: '30d', fallthrough: false }));
 app.use('/api/payments',    paymentRoutes);

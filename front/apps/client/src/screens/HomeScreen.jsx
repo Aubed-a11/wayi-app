@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import { StatusBar, BottomNav } from '../components/UI';
 import { PERIODS, WeekMenu, toCartItem, Empty } from '../components/Wayi';
 import AddressSheet from '../components/AddressSheet';
+import { UniverseSwitch } from '../mode/shared';
 import { menuAPI, ordersAPI } from '../api';
 
 function currentPeriodId() {
@@ -79,6 +80,8 @@ export default function HomeScreen() {
               {activeOrders.length > 0 && <span className="w-dot">{activeOrders.length}</span>}
             </button>
           </div>
+
+          <UniverseSwitch />
 
           <h1 style={{ fontSize: 22, fontWeight: 700, margin: '18px 0 2px' }}>Bonjour{firstName ? ` ${firstName}` : ''} !</h1>
           <p style={{ fontSize: 16, fontWeight: 600, margin: 0, lineHeight: 1.4 }}>

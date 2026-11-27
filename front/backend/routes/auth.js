@@ -358,6 +358,15 @@ router.delete('/me', auth, async (req, res) => {
       o.address = 'Adresse supprimee';
     }
   }
+  // Univers Mode : commandes en cours bloquantes, annonces et favoris retires
+  if (role !== 'driver' && role !== 'merchant') {
+    const { mode } = require('../data/mode');
+    if (mode.orders.some(o => (o.buyerId === account.id || o.sellerId === account.id) && !['delivered', 'cancelled'].includes(o.status))) {
+      return res.status(409).json({ error: 'Une vente ou un achat Mode est en cours. Le compte pourra etre supprime une fois la commande terminee.' });
+    }
+    for (const l of mode.listings) if (l.sellerId === account.id && l.status !== 'sold') l.status = 'deleted';
+    delete mode.favorites[account.id];
+  }
   if (role === 'merchant') {
     const r = restaurants.find(x => x.id === account.restaurantId);
     if (r) { r.active = false; r.isOpen = false; }

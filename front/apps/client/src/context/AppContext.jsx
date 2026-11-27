@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { authAPI, ordersAPI } from '../api';
+import { authAPI, ordersAPI, verticalsAPI } from '../api';
 import { getSocket } from '../socket';
 
 const AppContext = createContext(null);
@@ -19,6 +19,11 @@ const initialState = {
   activeOrders: null,
   // Moyen de paiement choisi avec Yivi, pre-selectionne a l'ouverture du panier
   checkoutPreset: null,
+  // Univers WAYI Bénin : Restaurant (toujours) et Mode (selon le back office)
+  verticals: null,
+  universe: localStorage.getItem('wayi_universe') === 'mode' ? 'mode' : 'food',
+  // Annonce, conversation, commande... ouvertes dans l'univers Mode
+  modeCtx: {},
 };
 
 function reducer(state, action) {
@@ -63,6 +68,13 @@ function reducer(state, action) {
     // Panier complet renvoye par Yivi (deja revalide par le serveur)
     case 'CART_SET':
       return { ...state, cart: (action.payload || []).filter(c => c && c.id && c.qty > 0) };
+    case 'SET_VERTICALS':
+      return { ...state, verticals: action.payload };
+    case 'SET_UNIVERSE':
+      localStorage.setItem('wayi_universe', action.payload);
+      return { ...state, universe: action.payload, screen: 'home', prevScreen: null };
+    case 'MODE_CTX':
+      return { ...state, modeCtx: { ...state.modeCtx, ...action.payload } };
     case 'SET_CHECKOUT_PRESET':
       return { ...state, checkoutPreset: action.payload };
     default:
@@ -93,6 +105,15 @@ export function AppProvider({ children }) {
     window.addEventListener('wayi:logout', handleLogout);
     return () => window.removeEventListener('wayi:logout', handleLogout);
   }, []);
+
+  // Univers ouverts a ce compte (le Mode reste masque par defaut)
+  useEffect(() => {
+    verticalsAPI.get()
+      .then(({ data }) => dispatch({ type: 'SET_VERTICALS', payload: data }))
+      .catch(() => dispatch({ type: 'SET_VERTICALS', payload: null }));
+  }, [state.user?.id]);
+  const modeState = state.verticals?.verticals?.find(v => v.id === 'mode')?.state || 'hidden';
+  const universe = modeState === 'live' ? state.universe : 'food';
 
   const navigate = useCallback((screen) => dispatch({ type: 'NAVIGATE', payload: screen }), []);
   const goBack = useCallback(() => dispatch({ type: 'GO_BACK' }), []);
@@ -173,7 +194,7 @@ export function AppProvider({ children }) {
   }, [state.user, dispatch]);
 
   return (
-    <AppContext.Provider value={{ state, dispatch, navigate, goBack, cartCount, cartTotal, cartByRestaurant, toggleFavorite }}>
+    <AppContext.Provider value={{ state, dispatch, modeState, universe, navigate, goBack, cartCount, cartTotal, cartByRestaurant, toggleFavorite }}>
       {children}
     </AppContext.Provider>
   );

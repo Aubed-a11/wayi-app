@@ -195,4 +195,116 @@ if (admin) {
     await bo.close();
   }
 }
+// Univers Mode de WAYI Bénin (masqué au public : les comptes de capture sont testeurs)
+try {
+  const reg = async (name, email, phone) => {
+    const st = await post('/auth/register/start', { name, phone, email, password: PWD });
+    await post('/auth/register/verify', { email, code: st.devCode });
+    return loginAny(email, PWD, 'client');
+  };
+  const seller = await reg('Aïcha Bio', 'vendeuse@capture.test', '+22990000005');
+  const before = await (await fetch(API + '/verticals', { headers: { authorization: `Bearer ${client.token}` } })).json();
+  console.log('  Mode avant activation :', JSON.stringify(before.verticals));
+  await post('/mode/admin/settings', { testers: ['client@capture.test', 'vendeuse@capture.test'] }, admin.token, 'PUT');
+  // Photos libres de droits (Openverse), envoyees comme le ferait un vendeur
+  const photo = async (q) => {
+    try {
+      const r = await (await fetch(`https://api.openverse.org/v1/images/?q=${encodeURIComponent(q)}&page_size=5&license_type=all&aspect_ratio=tall`)).json();
+      for (const it of r.results || []) {
+        const img = await fetch(it.url, { headers: { 'user-agent': 'WAYI-captures/1.0' } });
+        if (!img.ok) continue;
+        const buf = Buffer.from(await img.arrayBuffer());
+        if (buf.length < 5000 || buf.length > 2900000) continue;
+        const up = await post('/mode/photos', { data: buf.toString('base64'), ext: (img.headers.get('content-type') || '').includes('png') ? 'png' : 'jpg' }, seller.token);
+        if (up.url) return up.url;
+      }
+    } catch (e) { console.log('  photo', q, e.message); }
+    return null;
+  };
+  const ads = [
+    { title: 'Robe en wax', category: 'robes', size: 'M', condition: 'tres_bon', price: 8000, city: 'Cotonou', q: 'african wax print dress', description: 'Robe portée deux fois, tissu sans défaut, aucune retouche nécessaire.' },
+    { title: 'Jean slim', category: 'pantalons', size: '40', condition: 'neuf', price: 6500, city: 'Abomey-Calavi', q: 'blue jeans', anonymous: true },
+    { title: 'Baskets blanches', category: 'chaussures', size: '42', condition: 'bon', price: 12000, city: 'Cotonou', q: 'white sneakers' },
+    { title: 'Chemise en lin', category: 'homme', size: 'L', condition: 'occasion', price: 4000, city: 'Porto-Novo', q: 'linen shirt' },
+    { title: 'Sac à main en cuir', category: 'sacs', size: 'Taille unique', condition: 'tres_bon', price: 15000, city: 'Cotonou', q: 'leather handbag' },
+    { title: 'Pagne tissé', category: 'pagnes', size: 'Taille unique', condition: 'neuf', price: 9500, city: 'Parakou', q: 'kente cloth' },
+  ];
+  const made = [];
+  for (const a of ads) {
+    const url = await photo(a.q);
+    const r = await post('/mode/listings', { ...a, q: undefined, photos: url ? [url] : ['https://www.wayibenin.com/icon-512.png'] }, seller.token);
+    if (r.listing) made.push(r.listing);
+  }
+  // Une vente terminée et notée, une commande à payer, une conversation
+  const sold = await post('/mode/orders', { listingId: made[5].id, method: 'cash', address: { label: 'Fidjrossè, Cotonou' } }, client.token);
+  await post(`/mode/orders/${sold.order.id}/status`, { status: 'handed' }, seller.token, 'PUT');
+  await post(`/mode/orders/${sold.order.id}/status`, { status: 'delivered' }, client.token, 'PUT');
+  await post(`/mode/orders/${sold.order.id}/review`, { rating: 5, comment: 'Article conforme, vendeuse très sérieuse.' }, client.token);
+  const c = await post(`/mode/listings/${made[0].id}/conversation`, { text: 'Bonjour, est-ce encore disponible ?' }, client.token);
+  await post(`/mode/conversations/${c.conversation.id}/messages`, { text: 'Oui, toujours disponible. Je peux la remettre au livreur aujourd\'hui.' }, seller.token);
+  const pending = await post('/mode/orders', { listingId: made[2].id, method: 'mtn', phone: '0197000000', address: { label: 'Campus UAC, Abomey-Calavi' } }, client.token);
+
+  const w = await browser.newPage();
+  await w.setViewport({ width: W, height: H, deviceScaleFactor: 2, isMobile: true });
+  w.on('pageerror', (e) => console.log('  erreur mode :', String(e).slice(0, 200)));
+  const shot = async (n) => { await w.screenshot({ path: `${OUT}/${n}.png` }); console.log('  capture', n); };
+  const click = (sel, txt) => w.evaluate((s, t) => { const el = [...document.querySelectorAll(s)].find(x => !t || x.textContent.includes(t)); if (el) el.click(); return !!el; }, sel, txt);
+  await w.goto('http://localhost:8081', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await w.evaluate((t) => { localStorage.setItem('wayi_token', t); localStorage.setItem('wayi_universe', 'food'); }, client.token);
+  await w.goto('http://localhost:8081', { waitUntil: 'domcontentloaded' }); await sleep(6000);
+  await shot('70-mode-restaurant-avec-choix');
+  await click('.md-switch button', 'Mode'); await sleep(4000);
+  await shot('71-mode-accueil');
+  await w.evaluate(() => document.querySelector('.w-scroll')?.scrollBy(0, 640)); await sleep(1500);
+  await shot('72-mode-annonces');
+  await click('.md-card'); await sleep(3500);
+  await shot('73-mode-fiche');
+  await w.evaluate(() => document.querySelector('.w-scroll')?.scrollBy(0, 560)); await sleep(1200);
+  await shot('74-mode-fiche-suite');
+  await click('.md-seller'); await sleep(3000);
+  await shot('75-mode-avis-vendeur');
+  await click('.back-btn'); await sleep(2500);
+  await click('.md-actions .md-btn', 'Acheter'); await sleep(3500);
+  await shot('76-mode-paiement');
+  await w.evaluate(() => { localStorage.setItem('wayi_universe', 'mode'); }); await w.goto('http://localhost:8081', { waitUntil: 'domcontentloaded' }); await sleep(5000);
+  await click('.nav-item', 'Messages'); await sleep(3000);
+  await shot('77-mode-messages');
+  await click('.md-conv'); await sleep(3000);
+  await shot('78-mode-conversation');
+  await click('.back-btn'); await sleep(2000);
+  await click('.nav-item', 'Vendre'); await sleep(3000);
+  await shot('79-mode-publier');
+  await w.evaluate(() => document.querySelector('.w-scroll')?.scrollBy(0, 700)); await sleep(1200);
+  await shot('80-mode-publier-suite');
+  await click('.nav-item', 'Compte'); await sleep(3000);
+  await shot('81-mode-compte');
+  await click('.md-menu button', 'Mes achats'); await sleep(3000);
+  await shot('82-mode-achats');
+  await click('.md-line'); await sleep(3500);
+  await shot('83-mode-suivi');
+  // Etat « Bientot » : un client qui n'est pas testeur
+  const other = await reg('Koffi Mensah', 'koffi@capture.test', '+22990000006');
+  await post('/mode/admin/settings', { state: 'soon' }, admin.token, 'PUT');
+  await w.evaluate((t) => { localStorage.setItem('wayi_token', t); localStorage.setItem('wayi_universe', 'food'); }, other.token);
+  await w.goto('http://localhost:8081', { waitUntil: 'domcontentloaded' }); await sleep(6000);
+  await shot('84-mode-bientot-accueil');
+  await click('.md-switch button', 'Mode'); await sleep(3000);
+  await shot('85-mode-bientot-page');
+  await post('/mode/admin/settings', { state: 'hidden' }, admin.token, 'PUT');
+  await w.goto('http://localhost:8081', { waitUntil: 'domcontentloaded' }); await sleep(6000);
+  await shot('86-mode-masque-accueil');
+  await w.close();
+
+  const bo = await browser.newPage();
+  await bo.setViewport({ width: 1440, height: 900 });
+  await bo.goto('http://localhost:8082/', { waitUntil: 'domcontentloaded' });
+  await bo.evaluate(t => localStorage.setItem('wayi_admin_token', t), admin.token);
+  await bo.goto('http://localhost:8082/', { waitUntil: 'networkidle2' }); await sleep(3500);
+  await bo.evaluate(() => { const el = [...document.querySelectorAll('.bo-side nav button')].find(b => b.textContent.includes('Mode')); if (el) el.click(); }); await sleep(3500);
+  await bo.screenshot({ path: `${OUT}/87-backoffice-mode.png` }); console.log('  capture 87-backoffice-mode');
+  await bo.evaluate(() => document.querySelector('.bo-content')?.scrollBy(0, 800)); await sleep(1500);
+  await bo.screenshot({ path: `${OUT}/88-backoffice-mode-annonces.png` }); console.log('  capture 88-backoffice-mode-annonces');
+  await bo.close();
+} catch (e) { console.log('  captures Mode :', e.message); }
+
 await browser.close();

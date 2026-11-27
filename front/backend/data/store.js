@@ -466,7 +466,7 @@ function deleteDish(id) {
 // Voir services/database/supabase.js pour le détail de l'approche et ses limites.
 
 function snapshotState() {
-  return { users, drivers, merchants, admins, restaurants, dishes, reviews, orders, receipts, callLogs, demoSeeded, partnersSeeded, cleanupsDone };
+  return { mode: require('./mode').mode, users, drivers, merchants, admins, restaurants, dishes, reviews, orders, receipts, callLogs, demoSeeded, partnersSeeded, cleanupsDone };
 }
 
 // Remplace le CONTENU des tableaux existants (sans changer leur référence,
@@ -489,6 +489,7 @@ function restoreState(saved) {
   replaceContents(orders, saved.orders);
   replaceContents(receipts, saved.receipts);
   replaceContents(callLogs, saved.callLogs); // absent des anciennes sauvegardes : sans effet dans ce cas
+  require('./mode').restoreMode(saved.mode); // absent des anciennes sauvegardes : sans effet
   if (saved.demoSeeded) demoSeeded = true;
   replaceContents(partnersSeeded, saved.partnersSeeded || []);
   purgeDemoAccounts();

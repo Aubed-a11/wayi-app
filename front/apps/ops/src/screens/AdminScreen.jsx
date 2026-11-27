@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   LayoutDashboard, Store, UtensilsCrossed, Receipt, Bike, PhoneCall, LogOut, Plus, Pencil, Trash2,
-  RefreshCw, Clock, TrendingUp, Wallet, ChefHat, MapPin, X, Search, Star, CircleAlert, Sparkles, Users,
+  RefreshCw, Clock, TrendingUp, Wallet, ChefHat, MapPin, X, Search, Star, CircleAlert, Sparkles, Users, Shirt,
 } from 'lucide-react';
+import ModeAdmin from './ModeAdmin';
 import { useApp } from '../context/AppContext';
 import { Spinner } from '../components/UI';
 import { DynamicIcon, TASTE_META } from '../components/DynamicIcon';
@@ -45,6 +46,7 @@ const NAV = [
   ['orders', 'Commandes', Receipt],
   ['drivers', 'Livreurs', Bike],
   ['telemarketing', 'Télémarketing', PhoneCall],
+  ['mode', 'Mode', Shirt],
 ];
 const TITLES = {
   dashboard: ["Vue d'ensemble", "L'activité de WAYI en un coup d'œil"],
@@ -53,6 +55,7 @@ const TITLES = {
   orders: ['Commandes', 'Suivi, paiements et attribution des livreurs'],
   drivers: ['Livreurs', 'Comptes, disponibilité et performance'],
   telemarketing: ['Télémarketing', 'Relances et appels des partenaires'],
+  mode: ['WAYI Mode', 'Ouverture au public, réglages des ventes et modération'],
 };
 
 const money = (n) => `${Number(n || 0).toLocaleString('fr-FR').replace(/ /g, ' ')} F`;
@@ -749,6 +752,7 @@ export default function AdminScreen() {
           )}
 
           {tab === 'telemarketing' && <div className="bo-card"><TelemarketingPanel /></div>}
+          {tab === 'mode' && <ModeAdmin />}
         </div>
       </div>
 

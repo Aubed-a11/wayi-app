@@ -98,3 +98,31 @@ export const paymentsAPI = {
 };
 
 export default api;
+
+// Univers WAYI Bénin (Restaurant, Mode). Le Mode reste masqué tant que le back office ne l'ouvre pas.
+export const verticalsAPI = { get: () => api.get('/verticals') };
+
+export const modeAPI = {
+  meta: () => api.get('/mode/meta'),
+  listings: (params) => api.get('/mode/listings', { params }),
+  listing: (id) => api.get(`/mode/listings/${id}`),
+  seller: (id) => api.get(`/mode/listings/${id}/seller`),
+  mine: () => api.get('/mode/mine'),
+  create: (data) => api.post('/mode/listings', data),
+  update: (id, data) => api.put(`/mode/listings/${id}`, data),
+  remove: (id) => api.delete(`/mode/listings/${id}`),
+  photo: (data, ext) => api.post('/mode/photos', { data, ext }, { timeout: 60000 }),
+  favorites: () => api.get('/mode/favorites'),
+  addFavorite: (id) => api.post(`/mode/favorites/${id}`),
+  removeFavorite: (id) => api.delete(`/mode/favorites/${id}`),
+  report: (id, reason, details) => api.post(`/mode/listings/${id}/report`, { reason, details }),
+  conversations: () => api.get('/mode/conversations'),
+  startConversation: (listingId, text) => api.post(`/mode/listings/${listingId}/conversation`, { text }),
+  conversation: (id) => api.get(`/mode/conversations/${id}`),
+  send: (id, text) => api.post(`/mode/conversations/${id}/messages`, { text }),
+  order: (data) => api.post('/mode/orders', data),
+  orders: () => api.get('/mode/orders'),
+  orderOne: (id) => api.get(`/mode/orders/${id}`),
+  orderStatus: (id, status) => api.put(`/mode/orders/${id}/status`, { status }),
+  review: (id, rating, comment) => api.post(`/mode/orders/${id}/review`, { rating, comment }),
+};

@@ -54,6 +54,17 @@ export const adminAPI = {
   merchants: () => adminApi.get('/admin/merchants'),
   createMerchant: (data) => adminApi.post('/admin/merchants', data),
   aiStatus: () => adminApi.get('/ai/status'),
+  // Univers Mode de WAYI Bénin (masqué au public tant qu'il n'est pas ouvert ici)
+  mode: {
+    overview: () => adminApi.get('/mode/admin/overview'),
+    settings: (data) => adminApi.put('/mode/admin/settings', data),
+    listings: (params) => adminApi.get('/mode/admin/listings', { params }),
+    moderate: (id, status, reason) => adminApi.put(`/mode/admin/listings/${id}`, { status, reason }),
+    reports: () => adminApi.get('/mode/admin/reports'),
+    resolve: (id, action) => adminApi.put(`/mode/admin/reports/${id}`, { action }),
+    orders: () => adminApi.get('/mode/admin/orders'),
+    updateOrder: (id, data) => adminApi.put(`/mode/admin/orders/${id}`, data),
+  },
 };
 
 // Instance dédiée au restaurant partenaire (session indépendante de l'admin)
