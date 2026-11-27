@@ -497,6 +497,7 @@ function restoreState(saved) {
   if (process.env.DEMO_MENU !== '1') purgeDemoRestaurants();
   keepOnlyGuedaliaOnce();
   removeGuedaliaOnce();
+  removeGuedaliaHistoryOnce();
 }
 
 // Nettoyage demande le 25/11/2026 : retirer tous les restaurants et plats
@@ -530,6 +531,22 @@ function removeGuedaliaOnce() {
   for (let i = merchants.length - 1; i >= 0; i--) if (merchants[i].restaurantId === id) { merchants.splice(i, 1); m++; }
   cleanupsDone.push(KEY);
   console.log(`[Store] Guedalia supprime : restaurant ${r !== -1 ? 'retire' : 'absent'}, ${n} plat(s), ${m} compte(s).`);
+}
+
+// Suppression demandee le 27/11/2026 : effacer aussi l'historique de Guedalia
+// (commandes, recus, avis, appels du telemarketing). S'execute une seule fois.
+function removeGuedaliaHistoryOnce() {
+  const KEY = 'supprimer-historique-guedalia-2026-11-27';
+  if (cleanupsDone.includes(KEY)) return;
+  const id = 'resto-guedalia';
+  const gone = new Set(orders.filter(o => o.restaurantId === id).map(o => o.id));
+  const drop = (arr, test) => { let n = 0; for (let i = arr.length - 1; i >= 0; i--) if (test(arr[i])) { arr.splice(i, 1); n++; } return n; };
+  const o = drop(orders, x => gone.has(x.id));
+  const r = drop(receipts, x => gone.has(x.orderId));
+  const v = drop(reviews, x => x.restaurantId === id || gone.has(x.orderId));
+  const c = drop(callLogs, x => x.targetId === id || x.targetId === 'merchant-guedalia');
+  cleanupsDone.push(KEY);
+  console.log(`[Store] Historique Guedalia efface : ${o} commande(s), ${r} recu(s), ${v} avis, ${c} appel(s).`);
 }
 
 // Restaurants et plats fictifs (menu de demonstration) : retires des donnees au demarrage.
