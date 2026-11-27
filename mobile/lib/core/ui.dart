@@ -148,7 +148,11 @@ class Photo extends StatelessWidget {
   const Photo(this.url, {super.key, this.radius = R.md, this.height, this.width});
   @override
   Widget build(BuildContext context) {
-    final placeholder = Container(color: C.surface2, alignment: Alignment.center, child: const Icon(Ic.utensils, color: C.muted, size: 26));
+    final placeholder = Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFFE7D3), Color(0xFFFFD1AE)])),
+      child: const Icon(Ic.utensils, color: C.brand, size: 26),
+    );
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: SizedBox(

@@ -5,7 +5,8 @@
 // Identifiants stables : l'insertion ne cree jamais de doublon.
 // ============================================================
 const SITE = process.env.PUBLIC_SITE_URL || 'https://www.wayibenin.com';
-const IMG = (slug) => `${SITE}/plats/guedalia/${slug}.jpg`;
+// Photos retirees le 27/11/2026 a la demande de WAYI (en attente des vraies photos du restaurant)
+const IMG = () => null;
 
 const RESTAURANT = {
   id: 'resto-guedalia',
@@ -69,4 +70,6 @@ const DISHES = PLATS.map(([slug, period, category, name, price, taste, label, de
   since, id: `guedalia-${slug}`, restaurantId: RESTAURANT.id, period, category, name, price, taste, label, desc, image: IMG(slug),
 }));
 
+// Cle de migration : retire une fois les photos deja enregistrees
+RESTAURANT.photosRemoved = 'sans-photos-2026-11-27';
 module.exports = { RESTAURANT, DISHES, ACCOUNT };

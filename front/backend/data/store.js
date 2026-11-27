@@ -690,6 +690,14 @@ function seedPartners() {
         console.log(`[Store] ${RESTAURANT.name} : formule ${plan.label} appliquee`);
       }
     }
+    // Retrait unique des photos des plats (le restaurant enverra ses vraies photos)
+    const photoKey = RESTAURANT.photosRemoved && `${RESTAURANT.id}:${RESTAURANT.photosRemoved}`;
+    if (photoKey && !partnersSeeded.includes(photoKey)) {
+      let n = 0;
+      for (const d of dishes) if (d.restaurantId === RESTAURANT.id && d.image) { d.image = null; n++; }
+      partnersSeeded.push(photoKey);
+      console.log(`[Store] ${RESTAURANT.name} : ${n} photo(s) de plats retiree(s)`);
+    }
     if (partnersSeeded.includes(RESTAURANT.id)) continue;
     if (!restaurants.find(r => r.id === RESTAURANT.id)) {
       restaurants.push({ icon: 'utensils', rating: null, verified: true, priorityScore: 60, momoMtn: null, momoMoov: null,

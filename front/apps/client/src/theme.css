@@ -631,3 +631,13 @@ html, body, #root, .app-shell, .screen { background: #FFFFFF; }
 .wm-tile-txt b { color: #fff; font-family: var(--font-display); font-size: 15.5px; line-height: 1.2; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .wm-tile.wide .wm-tile-txt b { font-size: 19px; }
 .wm-head .w-link { white-space: nowrap; flex-shrink: 0; }
+
+/* Plats sans photo : fond aux couleurs WAYI, grande icone en filigrane */
+.noimg .wm-photo { background: linear-gradient(140deg, #FF9A3C 0%, #F2690D 45%, #A8321F 100%); }
+.noimg .wm-photo .w-img-empty { color: rgba(255, 255, 255, .22); place-items: start end; padding: 22px 18px; }
+.noimg .wm-photo .w-img-empty svg { stroke-width: 1.3; }
+.noimg .wm-shade { background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(80,20,5,.35) 100%); }
+.wm-tile:nth-child(3n+1).noimg .wm-photo { background: linear-gradient(140deg, #3B2A6B 0%, #5B3FA0 55%, #2A1C4E 100%); }
+.wm-tile:nth-child(3n+2).noimg .wm-photo { background: linear-gradient(140deg, #1F7A55 0%, #16935F 50%, #0E4D36 100%); }
+.w-img:not([style*="background-image"]) { background: linear-gradient(140deg, #FFE7D3, #FFD1AE); }
+.w-img:not([style*="background-image"]) .w-img-empty { color: var(--brand); }

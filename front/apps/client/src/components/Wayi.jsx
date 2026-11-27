@@ -101,8 +101,8 @@ export function WeekMenu({ dishes, onOpen, onAdd, heroLabel = 'Le plat du moment
   const [hero, ...rest] = dishes;
   return (
     <div className="wm">
-      <div className="wm-hero" onClick={() => onOpen(hero)}>
-        <DishImg src={hero.image} className="wm-photo" />
+      <div className={`wm-hero${hero.image ? '' : ' noimg'}`} onClick={() => onOpen(hero)}>
+        <DishImg src={hero.image} className="wm-photo" iconSize={120} />
         <div className="wm-shade" />
         <span className="wm-chip">{heroLabel}</span>
         <div className="wm-hero-txt">
@@ -120,8 +120,8 @@ export function WeekMenu({ dishes, onOpen, onAdd, heroLabel = 'Le plat du moment
       {rest.length > 0 && (
         <div className="wm-tiles">
           {rest.map((d, i) => (
-            <div key={d.id} className={`wm-tile${rest.length % 2 === 1 && i === rest.length - 1 ? ' wide' : ''}`} onClick={() => onOpen(d)}>
-              <DishImg src={d.image} className="wm-photo" />
+            <div key={d.id} className={`wm-tile${rest.length % 2 === 1 && i === rest.length - 1 ? ' wide' : ''}${d.image ? '' : ' noimg'}`} onClick={() => onOpen(d)}>
+              <DishImg src={d.image} className="wm-photo" iconSize={78} />
               <div className="wm-shade" />
               {PERIOD_LABEL[d.period] && <span className="wm-chip sm">{PERIOD_LABEL[d.period]}</span>}
               <button className="wm-add" onClick={e => { e.stopPropagation(); onAdd(d); }} aria-label={`Ajouter ${d.name}`}>

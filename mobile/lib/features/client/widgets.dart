@@ -33,6 +33,25 @@ Widget _price(Dish d, {bool small = false}) => Container(
       child: Text(fcfa(d.price), style: font(size: small ? 12.5 : 15, weight: FontWeight.w800, color: C.brandDark)),
     );
 
+/// Fond des plats sans photo : couleurs WAYI et grande icone en filigrane
+const _noPhoto = [
+  [Color(0xFFFF9A3C), Color(0xFFF2690D), Color(0xFFA8321F)],
+  [Color(0xFF3B2A6B), Color(0xFF5B3FA0), Color(0xFF2A1C4E)],
+  [Color(0xFF1F7A55), Color(0xFF16935F), Color(0xFF0E4D36)],
+];
+Widget _cover(Dish d, double r, {int tone = 0, double icon = 90}) {
+  if (d.image != null && d.image!.isNotEmpty) return Photo(d.image, radius: r);
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(r),
+      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: _noPhoto[tone % _noPhoto.length]),
+    ),
+    alignment: Alignment.topRight,
+    padding: const EdgeInsets.fromLTRB(0, 18, 16, 0),
+    child: Icon(Ic.utensils, size: icon, color: Colors.white.withValues(alpha: 0.22)),
+  );
+}
+
 List<BoxShadow> get _lift => [BoxShadow(color: const Color(0xFF3C1905).withValues(alpha: 0.18), blurRadius: 30, offset: const Offset(0, 14))];
 
 /// Grande carte photo (plat vedette de la carte de la semaine)
@@ -47,7 +66,7 @@ class FeatureCard extends StatelessWidget {
           height: 310,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(26), boxShadow: _lift),
           child: Stack(children: [
-            Positioned.fill(child: Photo(dish.image, radius: 26)),
+            Positioned.fill(child: _cover(dish, 26, icon: 120)),
             Positioned.fill(child: DecoratedBox(decoration: _shade(26))),
             Positioned(left: 14, top: 14, child: _chip(tag)),
             Positioned(
@@ -81,7 +100,8 @@ class PhotoTile extends StatelessWidget {
   final String? tag;
   final double height;
   final bool wide;
-  const PhotoTile({super.key, required this.dish, this.tag, this.height = 220, this.wide = false});
+  final int tone;
+  const PhotoTile({super.key, required this.dish, this.tag, this.height = 220, this.wide = false, this.tone = 0});
   @override
   Widget build(BuildContext context) => GestureDetector(
         onTap: () => openDish(context, dish),
@@ -89,7 +109,7 @@ class PhotoTile extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), boxShadow: _lift),
           child: Stack(children: [
-            Positioned.fill(child: Photo(dish.image, radius: 22)),
+            Positioned.fill(child: _cover(dish, 22, tone: tone, icon: 76)),
             Positioned.fill(child: DecoratedBox(decoration: _shade(22))),
             if (tag != null && tag!.isNotEmpty) Positioned(left: 10, top: 10, child: _chip(tag!, small: true)),
             Positioned(right: 10, top: 10, child: AddButton(dish: dish, size: 38)),
@@ -122,11 +142,11 @@ class WeekMenu extends StatelessWidget {
       rows.add(Padding(
         padding: const EdgeInsets.only(top: 12),
         child: last
-            ? PhotoTile(dish: rest[i], tag: tagOf(rest[i].period), height: 190, wide: true)
+            ? PhotoTile(dish: rest[i], tag: tagOf(rest[i].period), height: 190, wide: true, tone: i + 1)
             : Row(children: [
-                Expanded(child: PhotoTile(dish: rest[i], tag: tagOf(rest[i].period))),
+                Expanded(child: PhotoTile(dish: rest[i], tag: tagOf(rest[i].period), tone: i + 1)),
                 const SizedBox(width: 12),
-                Expanded(child: PhotoTile(dish: rest[i + 1], tag: tagOf(rest[i + 1].period))),
+                Expanded(child: PhotoTile(dish: rest[i + 1], tag: tagOf(rest[i + 1].period), tone: i + 2)),
               ]),
       ));
     }
