@@ -389,3 +389,5 @@
   .bo-md-form { grid-template-columns: 1fr 1fr; }
   .bo-md-report { flex-wrap: wrap; }
 }
+.bo-md-check input[type=checkbox] { appearance: auto !important; -webkit-appearance: checkbox !important; width: 18px !important; height: 18px !important; min-width: 0 !important; padding: 0 !important; margin: 0; border: none !important; flex: none; accent-color: var(--o); }
+.bo-md-check { white-space: nowrap; }
