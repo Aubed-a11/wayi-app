@@ -1,7 +1,7 @@
 // Univers Mode de WAYI Bénin : éléments communs aux écrans
 import './mode.css';
 import { useEffect, useState } from 'react';
-import { Home, PlusSquare, MessageCircle, User, Heart, Shirt, UtensilsCrossed, Star, X, EyeOff } from 'lucide-react';
+import { Home, PlusSquare, MessageCircle, User, Heart, Shirt, UtensilsCrossed, Star, X, EyeOff, BadgeCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { modeAPI } from '../api';
 
@@ -60,10 +60,10 @@ export function Photo({ src, className = '', children, iconSize = 34 }) {
   );
 }
 
-export function Avatar({ name, initials, anonymous, size = 46 }) {
+export function Avatar({ name, initials, anonymous, shop, size = 46 }) {
   return (
-    <span className={`md-avatar${anonymous ? ' anon' : ''}`} style={{ width: size, height: size, fontSize: size * 0.36 }} aria-hidden="true">
-      {anonymous ? <EyeOff size={size * 0.42} strokeWidth={1.9} /> : (initials || (name || '?').slice(0, 1).toUpperCase())}
+    <span className={`md-avatar${anonymous ? ' anon' : ''}${shop ? ' shop' : ''}`} style={{ width: size, height: size, fontSize: size * 0.36 }} aria-hidden="true">
+      {shop ? <BadgeCheck size={size * 0.5} strokeWidth={1.9} /> : anonymous ? <EyeOff size={size * 0.42} strokeWidth={1.9} /> : (initials || (name || '?').slice(0, 1).toUpperCase())}
     </span>
   );
 }
@@ -97,7 +97,9 @@ export function ListingCard({ listing, onOpen }) {
   return (
     <div className="md-card" onClick={() => onOpen(listing)}>
       <Photo src={listing.photo} className="md-card-photo">
-        <span className="md-vis">{listing.anonymous ? 'Anonyme' : 'Public'}</span>
+        {listing.shop
+          ? <span className="md-vis shop"><BadgeCheck size={13} aria-hidden="true" /> Boutique</span>
+          : <span className="md-vis">{listing.anonymous ? 'Anonyme' : 'Public'}</span>}
         {!listing.mine && (
           <button
             className={`md-heart${fav ? ' on' : ''}`}
@@ -108,7 +110,7 @@ export function ListingCard({ listing, onOpen }) {
           </button>
         )}
         {listing.status === 'reserved' && <span className="md-ribbon">Réservé</span>}
-        {listing.status === 'sold' && <span className="md-ribbon">Vendu</span>}
+        {listing.status === 'sold' && <span className="md-ribbon">{listing.shop ? 'Épuisé' : 'Vendu'}</span>}
       </Photo>
       <div className="md-card-body">
         <b className="md-card-price">{fcfa(listing.price)}</b>

@@ -16,10 +16,11 @@ export default function OpsSplashScreen() {
     const timer = setTimeout(() => {
       if (state.adminToken) navigate('admin');
       else if (state.merchantToken) navigate('merchant');
+      else if (state.shopToken) navigate('shop');
       else navigate('ops_login');
     }, UNIFIED ? 250 : 2000);
     return () => clearTimeout(timer);
-  }, [state.adminToken, state.merchantToken]);
+  }, [state.adminToken, state.merchantToken, state.shopToken]);
 
   return (
     <div style={{

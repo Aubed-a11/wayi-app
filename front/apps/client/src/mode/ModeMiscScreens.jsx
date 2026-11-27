@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Shirt, EyeOff, Smartphone, MessageCircle, ShieldCheck, Tag } from 'lucide-react';
+import { Shirt, EyeOff, Smartphone, MessageCircle, ShieldCheck, Tag, BadgeCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar, BackBtn } from '../components/UI';
 import { modeAPI } from '../api';
@@ -20,11 +20,11 @@ export function ModeSellerScreen() {
       <StatusBar />
       <div className="w-scroll">
         <div className="w-pad">
-          <div className="md-bar"><BackBtn /><h1 className="md-title">Avis sur ce vendeur</h1></div>
+          <div className="md-bar"><BackBtn /><h1 className="md-title">{d?.seller?.shop ? 'La boutique' : 'Avis sur ce vendeur'}</h1></div>
           {!d ? <div className="w-skel" style={{ height: 220, borderRadius: 24 }} /> : (
             <>
               <div className="md-seller-card">
-                <Avatar name={s.name} initials={s.initials} anonymous={s.anonymous && !s.id} size={64} />
+                <Avatar name={s.name} initials={s.initials} anonymous={s.anonymous && !s.id} shop={s.shop} size={64} />
                 <div>
                   <b>{s.name}</b>
                   <span className="md-seller-rate">
@@ -33,6 +33,7 @@ export function ModeSellerScreen() {
                   <small>{s.sales} vente{s.sales > 1 ? 's' : ''} sur WAYI Mode</small>
                 </div>
               </div>
+              {s.shop && <div className="md-note ok"><BadgeCheck size={15} aria-hidden="true" /> Boutique partenaire vérifiée par WAYI : articles neufs, stock suivi et commandes préparées par la boutique.</div>}
               {s.anonymous && !s.id && <div className="md-note"><EyeOff size={15} aria-hidden="true" /> Ce vendeur a choisi la vente anonyme : seuls sa note et ses avis sont visibles.</div>}
 
               {totalReviews > 0 && (
@@ -65,7 +66,7 @@ export function ModeSellerScreen() {
 
               {d.listings.length > 0 && (
                 <>
-                  <h3 className="md-h3">Ses autres annonces</h3>
+                  <h3 className="md-h3">{s.shop ? 'Plus d\'articles de cette boutique' : 'Ses autres annonces'}</h3>
                   <div className="md-grid">{d.listings.map(l => <ListingCard key={l.id} listing={l} onOpen={open} />)}</div>
                 </>
               )}

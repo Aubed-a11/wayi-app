@@ -235,6 +235,23 @@ try {
     const r = await post('/mode/listings', { ...a, q: undefined, photos: url ? [url] : ['https://www.wayibenin.com/icon-512.png'] }, seller.token);
     if (r.listing) made.push(r.listing);
   }
+  // Boutique partenaire : compte créé par WAYI, articles avec tailles et stock
+  const sh = await post('/mode/admin/shops', { name: 'Maison Akpé', contactName: 'Akpé', email: 'boutique@capture.test', phone: '+22990000007', city: 'Cotonou', commissionRate: 0.12 }, admin.token);
+  const shopLogin = sh.devPassword ? await post('/mode/shop/login', { email: 'boutique@capture.test', password: sh.devPassword }) : {};
+  const shopToken = shopLogin.token;
+  const shopAds = [
+    { title: 'Robe en bazin brodée', category: 'robes', condition: 'neuf', price: 25000, q: 'embroidered african dress', variants: [{ size: 'S', qty: 0 }, { size: 'M', qty: 3 }, { size: 'L', qty: 2 }, { size: 'XL', qty: 1 }], description: 'Bazin riche, broderie faite main. Coupe ajustée.' },
+    { title: 'Chemise en pagne homme', category: 'homme', condition: 'neuf', price: 15000, q: 'african print shirt men', variants: [{ size: 'M', qty: 4 }, { size: 'L', qty: 4 }, { size: 'XL', qty: 2 }] },
+    { title: 'Sandales en cuir', category: 'chaussures', condition: 'neuf', price: 12000, q: 'leather sandals', variants: [{ size: '39', qty: 2 }, { size: '40', qty: 3 }, { size: '41', qty: 1 }] },
+  ];
+  const shopMade = [];
+  if (shopToken) {
+    for (const a of shopAds) {
+      const url = await (async () => { const u = await photo(a.q); return u; })();
+      const r = await post('/mode/listings', { ...a, q: undefined, city: 'Cotonou', photos: url ? [url] : ['https://www.wayibenin.com/icon-512.png'] }, shopToken);
+      if (r.listing) shopMade.push(r.listing);
+    }
+  }
   // Une vente terminée et notée, une commande à payer, une conversation
   const sold = await post('/mode/orders', { listingId: made[5].id, method: 'cash', address: { label: 'Fidjrossè, Cotonou' } }, client.token);
   await post(`/mode/orders/${sold.order.id}/status`, { status: 'handed' }, seller.token, 'PUT');
@@ -242,6 +259,12 @@ try {
   await post(`/mode/orders/${sold.order.id}/review`, { rating: 5, comment: 'Article conforme, vendeuse très sérieuse.' }, client.token);
   const c = await post(`/mode/listings/${made[0].id}/conversation`, { text: 'Bonjour, est-ce encore disponible ?' }, client.token);
   await post(`/mode/conversations/${c.conversation.id}/messages`, { text: 'Oui, toujours disponible. Je peux la remettre au livreur aujourd\'hui.' }, seller.token);
+  if (shopMade[0]) {
+    const so = await post('/mode/orders', { listingId: shopMade[0].id, method: 'cash', size: 'M', address: { label: 'Haie Vive, Cotonou' } }, client.token);
+    const sc = (await (await fetch(API + '/mode/conversations', { headers: { authorization: `Bearer ${client.token}` } })).json()).conversations?.find(c => c.listingId === shopMade[0].id);
+    if (sc) await post(`/mode/conversations/${sc.id}/messages`, { text: 'Bonjour, la taille M taille-t-elle grand ?' }, client.token);
+    void so;
+  }
   const pending = await post('/mode/orders', { listingId: made[2].id, method: 'mtn', phone: '0197000000', address: { label: 'Campus UAC, Abomey-Calavi' } }, client.token);
 
   const w = await browser.newPage();
@@ -257,7 +280,16 @@ try {
   await shot('71-mode-accueil');
   await w.evaluate(() => document.querySelector('.w-scroll')?.scrollBy(0, 640)); await sleep(1500);
   await shot('72-mode-annonces');
+  await click('.md-chip', 'Boutiques'); await sleep(2500);
+  await shot('89-mode-filtre-boutiques');
   await click('.md-card'); await sleep(3500);
+  await shot('90-mode-fiche-boutique');
+  await click('.md-sizes button:not([disabled])'); await sleep(600);
+  await w.evaluate(() => document.querySelector('.w-scroll')?.scrollBy(0, 420)); await sleep(1000);
+  await shot('91-mode-fiche-boutique-taille');
+  await click('.back-btn'); await sleep(2500);
+  await click('.md-chip', 'Boutiques'); await sleep(2500);
+  await click('.md-card', 'Sac à main'); await sleep(3500);
   await shot('73-mode-fiche');
   await w.evaluate(() => document.querySelector('.w-scroll')?.scrollBy(0, 560)); await sleep(1200);
   await shot('74-mode-fiche-suite');
@@ -304,7 +336,34 @@ try {
   await bo.screenshot({ path: `${OUT}/87-backoffice-mode.png` }); console.log('  capture 87-backoffice-mode');
   await bo.evaluate(() => document.querySelector('.bo-content')?.scrollBy(0, 800)); await sleep(1500);
   await bo.screenshot({ path: `${OUT}/88-backoffice-mode-annonces.png` }); console.log('  capture 88-backoffice-mode-annonces');
+  await bo.evaluate(() => document.querySelector('.bo-content')?.scrollBy(0, 400)); await sleep(1200);
+  await bo.screenshot({ path: `${OUT}/92-backoffice-boutiques.png` }); console.log('  capture 92-backoffice-boutiques');
   await bo.close();
+
+  // Espace boutique
+  if (shopToken) {
+    for (const [vw, vh, tag] of [[1440, 900, 'bureau'], [390, 844, 'mobile']]) {
+      const sp = await browser.newPage();
+      await sp.setViewport({ width: vw, height: vh, deviceScaleFactor: tag === 'mobile' ? 2 : 1 });
+      sp.on('pageerror', (e) => console.log('  erreur boutique :', String(e).slice(0, 200)));
+      await sp.goto('http://localhost:8082/', { waitUntil: 'domcontentloaded' });
+      await sp.evaluate(t => { localStorage.clear(); localStorage.setItem('wayi_shop_token', t); }, shopToken);
+      await sp.goto('http://localhost:8082/', { waitUntil: 'networkidle2' }); await sleep(4500);
+      await sp.screenshot({ path: `${OUT}/93-boutique-${tag}-accueil.png` }); console.log('  capture 93-boutique', tag);
+      const tabSel = tag === 'bureau' ? '.bo-side nav button' : '.bo-mtabs button';
+      for (const [n, t] of [['94', 'Articles'], ['96', 'Commandes'], ['97', 'Messages']]) {
+        await sp.evaluate((sel, t) => { const el = [...document.querySelectorAll(sel)].find(b => b.textContent.includes(t)); if (el) el.click(); }, tabSel, t); await sleep(2500);
+        if (t === 'Messages') { await sp.evaluate(() => document.querySelector('.sh-conv')?.click()); await sleep(2500); }
+        await sp.screenshot({ path: `${OUT}/${n}-boutique-${tag}-${t.toLowerCase()}.png` }); console.log('  capture', n, tag);
+        if (t === 'Articles') {
+          await sp.evaluate(() => document.querySelector('.bo-md-item .bo-icon-btn')?.click()); await sleep(2000);
+          await sp.screenshot({ path: `${OUT}/95-boutique-${tag}-modifier.png` }); console.log('  capture 95', tag);
+          await sp.evaluate(() => document.querySelector('.bo-modal-head .bo-icon-btn')?.click()); await sleep(800);
+        }
+      }
+      await sp.close();
+    }
+  } else console.log('  boutique : pas de jeton', JSON.stringify(sh).slice(0, 200));
 } catch (e) { console.log('  captures Mode :', e.message); }
 
 await browser.close();

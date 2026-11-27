@@ -10,18 +10,19 @@
 const MODE = import.meta.env.MODE;
 const BASES = MODE === 'mobile'
   // Fichier index.html explicite : sans lui, l'appli recharge l'espace client
-  ? { driver: '/livreur/index.html', merchant: '/pro/index.html', admin: '/pro/index.html' }
+  ? { driver: '/livreur/index.html', merchant: '/pro/index.html', admin: '/pro/index.html', shop: '/pro/index.html' }
   : MODE === 'development'
-    ? { driver: 'http://localhost:5174/', merchant: 'http://localhost:5175/', admin: 'http://localhost:5175/' }
+    ? { driver: 'http://localhost:5174/', merchant: 'http://localhost:5175/', admin: 'http://localhost:5175/', shop: 'http://localhost:5175/' }
     : {
       driver: import.meta.env.VITE_DRIVER_URL || 'https://driver.wayibenin.com/',
       merchant: import.meta.env.VITE_PRO_URL || 'https://admin.wayibenin.com/',
       admin: import.meta.env.VITE_PRO_URL || 'https://admin.wayibenin.com/',
+      shop: import.meta.env.VITE_PRO_URL || 'https://admin.wayibenin.com/',
     };
 
-export const ROLE_LABEL = { client: 'Client', merchant: 'Restaurant', driver: 'Livreur', admin: 'Administration' };
+export const ROLE_LABEL = { client: 'Client', merchant: 'Restaurant', driver: 'Livreur', admin: 'Administration', shop: 'Boutique Mode' };
 
-const TOKEN_KEY = { driver: 'wayi_driver_token', merchant: 'wayi_merchant_token', admin: 'wayi_admin_token' };
+const TOKEN_KEY = { driver: 'wayi_driver_token', merchant: 'wayi_merchant_token', admin: 'wayi_admin_token', shop: 'wayi_shop_token' };
 
 // Ouvre l'espace livreur / restaurant / admin avec son jeton
 export function openSpace(role, token) {

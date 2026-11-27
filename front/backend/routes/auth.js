@@ -57,6 +57,9 @@ router.post('/login-any', async (req, res) => {
     if (merchant && await ok(merchant)) accounts.push({ role: 'merchant', token: signToken({ id: merchant.id, role: 'merchant', email: merchant.email }), name: merchant.name });
     const driver = drivers.find(match);
     if (driver && await ok(driver)) accounts.push({ role: 'driver', token: signToken({ id: driver.id, role: 'driver', email: driver.email }), name: driver.name, pendingApproval: !!driver.pendingApproval });
+    // Boutique partenaire de l'univers Mode
+    const shop = require('../data/mode').mode.shops.find(x => x.active && (x.email === email.toLowerCase() || (x.phone && x.phone === email)));
+    if (shop && await ok(shop)) accounts.push({ role: 'shop', token: signToken({ id: shop.id, role: 'shop', email: shop.email }), name: shop.name });
     const admin = admins.find(match);
     if (admin && await ok(admin)) accounts.push({ role: 'admin', token: signToken({ id: admin.id, role: 'admin', email: admin.email }), name: admin.name });
 

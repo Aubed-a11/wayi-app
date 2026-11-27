@@ -1,6 +1,6 @@
 // Back office : univers Mode de WAYI Bénin (ouverture au public, réglages, modération)
 import { useEffect, useState, useCallback } from 'react';
-import { EyeOff, Clock3, Globe, Shirt, Users, ShoppingBag, Wallet, Flag, Percent, Save, RefreshCw, Eye, Ban, Check, Sparkles } from 'lucide-react';
+import { EyeOff, Clock3, Globe, Shirt, Users, ShoppingBag, Wallet, Flag, Percent, Save, RefreshCw, Eye, Ban, Check, Sparkles, Store, Plus, X, BadgeCheck } from 'lucide-react';
 import { adminAPI } from '../api';
 
 const money = (n) => `${Number(n || 0).toLocaleString('fr-FR').replace(/[  ]/g, ' ')} F`;
@@ -19,9 +19,11 @@ export default function ModeAdmin() {
   const [ov, setOv] = useState(null);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState('listings');
+  const [tab, setTab] = useState('shops');
   const [rows, setRows] = useState(null);
   const [msg, setMsg] = useState(null);
+  const [newShop, setNewShop] = useState(null);
+  const [created, setCreated] = useState(null);
   const toast = useCallback((t, k = 'ok') => { setMsg({ t, k }); clearTimeout(window.__boMd); window.__boMd = setTimeout(() => setMsg(null), 3500); }, []);
 
   const load = useCallback(() => {
@@ -33,7 +35,8 @@ export default function ModeAdmin() {
   }, [toast]);
   const loadRows = useCallback(() => {
     setRows(null);
-    const p = tab === 'listings' ? adminAPI.mode.listings().then(r => r.data.listings)
+    const p = tab === 'shops' ? adminAPI.mode.shops().then(r => r.data.shops)
+      : tab === 'listings' ? adminAPI.mode.listings().then(r => r.data.listings)
       : tab === 'reports' ? adminAPI.mode.reports().then(r => r.data.reports)
       : adminAPI.mode.orders().then(r => r.data.orders);
     p.then(setRows).catch(() => setRows([]));
@@ -125,15 +128,43 @@ export default function ModeAdmin() {
       <section className="bo-card">
         <div className="bo-card-head">
           <div className="bo-pills" style={{ margin: 0 }}>
-            {[['listings', 'Annonces'], ['reports', `Signalements${st.openReports ? ` (${st.openReports})` : ''}`], ['orders', 'Commandes']].map(([k, l]) => (
+            {[['shops', `Boutiques${st.shops ? ` (${st.shops})` : ''}`], ['listings', 'Annonces'], ['reports', `Signalements${st.openReports ? ` (${st.openReports})` : ''}`], ['orders', 'Commandes']].map(([k, l]) => (
               <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>
             ))}
           </div>
-          <button className="bo-icon-btn" onClick={loadRows} aria-label="Actualiser"><RefreshCw size={16} /></button>
+          <span style={{ display: 'flex', gap: 8 }}>
+            {tab === 'shops' && <button className="bo-btn" onClick={() => { setCreated(null); setNewShop({ name: '', contactName: '', email: '', phone: '', city: 'Cotonou', commission: '' }); }}><Plus size={15} /> Ajouter une boutique</button>}
+            <button className="bo-icon-btn" onClick={loadRows} aria-label="Actualiser"><RefreshCw size={16} /></button>
+          </span>
         </div>
+        {tab === 'shops' && <p className="bo-muted" style={{ margin: '-4px 0 14px' }}>Les boutiques publient leurs articles depuis leur espace (admin.wayibenin.com, « Boutique partenaire »). Les clients voient « Boutique partenaire WAYI », jamais leur nom.</p>}
+        {created && <div className={`bo-notice ${created.devPassword ? 'warn' : 'ok'}`}>{created.devPassword ? <>Boutique créée. L'e-mail n'a pas pu partir : mot de passe temporaire à transmettre à {created.shop.email} : <b>{created.devPassword}</b></> : <>Boutique créée. Les identifiants ont été envoyés à {created.shop.email}.</>}</div>}
 
         {rows === null ? <div className="bo-empty">Chargement...</div> : !rows.length ? (
-          <div className="bo-empty">{tab === 'listings' ? 'Aucune annonce pour le moment.' : tab === 'reports' ? 'Aucun signalement.' : 'Aucune commande Mode.'}</div>
+          <div className="bo-empty">{tab === 'shops' ? 'Aucune boutique partenaire. Ajoute la première avec le bouton ci-dessus.' : tab === 'listings' ? 'Aucune annonce pour le moment.' : tab === 'reports' ? 'Aucun signalement.' : 'Aucune commande Mode.'}</div>
+        ) : tab === 'shops' ? (
+          <div className="bo-md-shops">
+            {rows.map(x => (
+              <div key={x.id} className={`bo-md-shop${x.active ? '' : ' off'}`}>
+                <div className="bo-md-shop-top">
+                  <span>{x.name.charAt(0)}</span>
+                  <div><b>{x.name}</b><small>{x.contactName ? `${x.contactName} · ` : ''}{x.email}{x.phone ? ` · ${x.phone}` : ''}</small></div>
+                  <span className={`bo-status ${x.active ? 'ok' : 'ko'}`}>{x.active ? 'Active' : 'Suspendue'}</span>
+                </div>
+                <div className="bo-md-shop-stats">
+                  <div><b>{x.stats.listings}</b><small>Articles</small></div>
+                  <div><b>{x.stats.stock}</b><small>En stock</small></div>
+                  <div><b>{x.stats.sales}</b><small>Ventes</small></div>
+                  <div><b>{x.stats.inProgress}</b><small>En cours</small></div>
+                </div>
+                <small className="bo-muted">{x.city} · commission {x.commissionRate == null ? `WAYI (${Math.round(ov.settings.commissionRate * 1000) / 10} %)` : `${Math.round(x.commissionRate * 1000) / 10} %`} · reversé {money(x.stats.earned)}</small>
+                <div className="bo-md-foot">
+                  <button className="bo-btn ghost" onClick={() => { const v = window.prompt('Commission de cette boutique en % (vide = commission WAYI)', x.commissionRate == null ? '' : String(Math.round(x.commissionRate * 1000) / 10)); if (v !== null) act(() => adminAPI.mode.updateShop(x.id, { commissionRate: v.trim() === '' ? null : Number(v.replace(',', '.')) / 100 }), 'Commission mise à jour'); }}><Percent size={14} /> Commission</button>
+                  <button className="bo-btn ghost" onClick={() => window.confirm(x.active ? 'Suspendre cette boutique ? Ses articles sortent du catalogue.' : 'Réactiver cette boutique ?') && act(() => adminAPI.mode.updateShop(x.id, { active: !x.active }), x.active ? 'Boutique suspendue' : 'Boutique réactivée')}>{x.active ? <><Ban size={14} /> Suspendre</> : <><Check size={14} /> Réactiver</>}</button>
+                </div>
+              </div>
+            ))}
+          </div>
         ) : tab === 'listings' ? (
           <div className="bo-md-listings">
             {rows.map(l => (
@@ -142,7 +173,7 @@ export default function ModeAdmin() {
                 <div className="bo-md-body">
                   <b>{l.title}, {l.size}</b>
                   <span>{money(l.price)} · {l.conditionLabel} · {l.city}</span>
-                  <small>{l.seller.name}{l.anonymous ? ' (anonyme)' : ''} · {l.views} vues{l.reports ? ` · ${l.reports} signalement(s)` : ''}</small>
+                  <small>{l.seller.shop && <BadgeCheck size={12} style={{ verticalAlign: -2, color: 'var(--o)' }} />} {l.seller.name}{l.anonymous ? ' (anonyme)' : ''}{l.stock != null ? ` · ${l.stock} en stock` : ''} · {l.views} vues{l.reports ? ` · ${l.reports} signalement(s)` : ''}</small>
                   {l.hiddenReason && <small className="bo-md-reason">{l.hiddenReason}</small>}
                   <div className="bo-md-foot">
                     <span className={`bo-status ${LIST_TONE[l.status]}`}>{LIST_LABEL[l.status] || l.status}</span>
@@ -182,9 +213,9 @@ export default function ModeAdmin() {
                 {rows.map(o => (
                   <tr key={o.id}>
                     <td><b>{o.number}</b><br /><small className="bo-muted">{new Date(o.createdAt).toLocaleDateString('fr-FR')}</small></td>
-                    <td>{o.listing?.title}<br /><small className="bo-muted">{o.address?.label}</small></td>
+                    <td>{o.listing?.title}{o.size ? `, ${o.size}` : ''}<br /><small className="bo-muted">{o.address?.label}</small></td>
                     <td>{o.buyer}<br /><small className="bo-muted">{o.buyerPhone}</small></td>
-                    <td>{o.seller}</td>
+                    <td>{o.seller}{o.shop ? <><br /><small className="bo-muted">Boutique partenaire</small></> : null}</td>
                     <td><b>{money(o.total)}</b><br /><small className="bo-muted">Commission {money(o.commission)}</small></td>
                     <td>
                       {o.methodLabel}<br />
@@ -205,6 +236,34 @@ export default function ModeAdmin() {
           </div>
         )}
       </section>
+
+      {newShop && (
+        <div className="bo-modal" onClick={() => setNewShop(null)}>
+          <div className="bo-modal-card" onClick={e => e.stopPropagation()}>
+            <div className="bo-modal-head"><h3><Store size={18} style={{ verticalAlign: -3 }} /> Nouvelle boutique partenaire</h3><button className="bo-icon-btn" onClick={() => setNewShop(null)} aria-label="Fermer"><X size={18} /></button></div>
+            <div className="bo-modal-body bo-form">
+              <label>Nom de la boutique (jamais montré aux clients)<input value={newShop.name} onChange={e => setNewShop(s => ({ ...s, name: e.target.value }))} placeholder="Ex. : Maison Akpé" /></label>
+              <div className="two">
+                <label>Responsable<input value={newShop.contactName} onChange={e => setNewShop(s => ({ ...s, contactName: e.target.value }))} /></label>
+                <label>Téléphone<input value={newShop.phone} onChange={e => setNewShop(s => ({ ...s, phone: e.target.value }))} placeholder="01 97 00 00 00" /></label>
+              </div>
+              <label>E-mail de connexion<input type="email" value={newShop.email} onChange={e => setNewShop(s => ({ ...s, email: e.target.value }))} /></label>
+              <div className="two">
+                <label>Ville
+                  <select value={newShop.city} onChange={e => setNewShop(s => ({ ...s, city: e.target.value }))}>{ov.meta.cities.map(c => <option key={c}>{c}</option>)}</select>
+                </label>
+                <label>Commission (%)<input inputMode="decimal" value={newShop.commission} onChange={e => setNewShop(s => ({ ...s, commission: e.target.value }))} placeholder={`${Math.round(ov.settings.commissionRate * 1000) / 10} (WAYI)`} /></label>
+              </div>
+              <button className="bo-btn full" onClick={async () => {
+                try {
+                  const { data } = await adminAPI.mode.createShop({ ...newShop, commissionRate: newShop.commission.trim() === '' ? null : Number(newShop.commission.replace(',', '.')) / 100 });
+                  setCreated(data); setNewShop(null); loadRows(); load();
+                } catch (e) { toast(err(e), 'ko'); }
+              }}>Créer la boutique et envoyer les identifiants</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

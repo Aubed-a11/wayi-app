@@ -64,6 +64,9 @@ export const adminAPI = {
     resolve: (id, action) => adminApi.put(`/mode/admin/reports/${id}`, { action }),
     orders: () => adminApi.get('/mode/admin/orders'),
     updateOrder: (id, data) => adminApi.put(`/mode/admin/orders/${id}`, data),
+    shops: () => adminApi.get('/mode/admin/shops'),
+    createShop: (data) => adminApi.post('/mode/admin/shops', data),
+    updateShop: (id, data) => adminApi.put(`/mode/admin/shops/${id}`, data),
   },
 };
 
@@ -106,4 +109,38 @@ export const merchantAPI = {
   removeDish: (id) => merchantApi.delete(`/merchants/dishes/${id}`),
   plans: () => merchantApi.get('/merchants/subscription/plans'),
   analytics: () => merchantApi.get('/merchants/analytics'),
+};
+
+// Instance dédiée aux boutiques partenaires de l'univers Mode
+const shopApi = axios.create({ baseURL: API_BASE, timeout: 15000 });
+shopApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('wayi_shop_token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+shopApi.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('wayi_shop_token');
+      window.dispatchEvent(new CustomEvent('wayi:shop_logout'));
+    }
+    return Promise.reject(err);
+  }
+);
+
+export const shopAPI = {
+  login: (data) => shopApi.post('/mode/shop/login', data),
+  me: () => shopApi.get('/mode/shop/me'),
+  password: (current, next) => shopApi.put('/mode/shop/password', { current, next }),
+  listings: () => shopApi.get('/mode/mine'),
+  create: (data) => shopApi.post('/mode/listings', data),
+  update: (id, data) => shopApi.put(`/mode/listings/${id}`, data),
+  remove: (id) => shopApi.delete(`/mode/listings/${id}`),
+  photo: (data, ext) => shopApi.post('/mode/photos', { data, ext }, { timeout: 60000 }),
+  orders: () => shopApi.get('/mode/orders'),
+  orderStatus: (id, status) => shopApi.put(`/mode/orders/${id}/status`, { status }),
+  conversations: () => shopApi.get('/mode/conversations'),
+  conversation: (id) => shopApi.get(`/mode/conversations/${id}`),
+  send: (id, text) => shopApi.post(`/mode/conversations/${id}/messages`, { text }),
 };

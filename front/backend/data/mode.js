@@ -74,13 +74,14 @@ const mode = {
   reviews: [],
   orders: [],
   launchSellers: [],       // vendeurs inscrits à l'offre de lancement (dans l'ordre)
+  shops: [],               // boutiques partenaires (comptes créés par WAYI, nom caché aux clients)
 };
 
 function restoreMode(saved) {
   if (!saved || typeof saved !== 'object') return;
   Object.assign(mode.settings, saved.settings || {});
   mode.settings.launchOffer = { enabled: true, sellers: 20, sales: 5, ...(saved.settings?.launchOffer || {}) };
-  for (const k of ['listings', 'conversations', 'reports', 'reviews', 'orders', 'launchSellers']) {
+  for (const k of ['listings', 'conversations', 'reports', 'reviews', 'orders', 'launchSellers', 'shops']) {
     mode[k].length = 0;
     if (Array.isArray(saved[k])) mode[k].push(...saved[k]);
   }
@@ -109,6 +110,9 @@ function sellerStats(sellerId) {
 // Commission d'une nouvelle vente : 0 pendant l'offre de lancement
 function commissionFor(sellerId) {
   const s = mode.settings;
+  // Boutique partenaire : sa commission propre (contrat), sinon celle de WAYI ; pas d'offre de lancement
+  const shop = mode.shops.find(x => x.id === sellerId);
+  if (shop) return { rate: shop.commissionRate ?? s.commissionRate, launchOffer: false };
   const offer = s.launchOffer;
   if (offer?.enabled) {
     const rank = mode.launchSellers.indexOf(sellerId);

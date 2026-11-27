@@ -16,6 +16,7 @@ const PAY_STYLE = {
 export function ModeCheckoutScreen() {
   const { state, navigate, dispatch } = useApp();
   const id = state.modeCtx.listingId;
+  const size = state.modeCtx.size || undefined;
   const [l, setL] = useState(null);
   const [meta, setMeta] = useState(null);
   const addr = state.user?.addresses?.find(a => a.isDefault) || state.user?.addresses?.[0];
@@ -35,7 +36,7 @@ export function ModeCheckoutScreen() {
     if (method !== 'cash' && phone.replace(/\D/g, '').length < 8) { setError('Indique ton numéro Mobile Money.'); return; }
     setBusy(true); setError('');
     try {
-      const { data } = await modeAPI.order({ listingId: id, method, phone, address: { label: address } });
+      const { data } = await modeAPI.order({ listingId: id, method, phone, size, address: { label: address } });
       dispatch({ type: 'MODE_CTX', payload: { orderId: data.order.id } });
       toast('Commande enregistrée');
       navigate('mode-order');
@@ -53,7 +54,7 @@ export function ModeCheckoutScreen() {
           {l && (
             <div className="md-sum-item">
               <Photo src={l.photos[0]} className="md-sum-photo" iconSize={24} />
-              <span><b>{l.title}, {l.size}</b><small>{l.seller.name} · {l.city}</small><strong>{fcfa(l.price)}</strong></span>
+              <span><b>{l.title}, {size || l.size}</b><small>{l.seller.name} · {l.city}</small><strong>{fcfa(l.price)}</strong></span>
             </div>
           )}
 

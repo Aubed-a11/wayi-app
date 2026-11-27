@@ -40,7 +40,7 @@ export function ModeInboxScreen() {
                 <button key={c.id} className={`md-conv${c.unread ? ' unread' : ''}`} onClick={() => open(c)}>
                   <span className="md-conv-pic">
                     <Photo src={c.listing?.photo} className="md-conv-photo" iconSize={20} />
-                    <Avatar name={c.other.name} anonymous={c.other.anonymous} size={26} />
+                    <Avatar name={c.other.name} anonymous={c.other.anonymous} shop={c.other.shop} size={26} />
                   </span>
                   <span className="md-conv-txt">
                     <span className="md-conv-top"><b>{c.other.name}</b><small>{clock(c.last?.at || c.updatedAt)}</small></span>
@@ -109,7 +109,7 @@ export function ModeChatScreen() {
       <div className="md-chat-head">
         <BackBtn onBack={() => navigate('mode-inbox')} />
         <div className="md-chat-who">
-          <Avatar name={conv?.other.name} anonymous={conv?.other.anonymous} size={38} />
+          <Avatar name={conv?.other.name} anonymous={conv?.other.anonymous} shop={conv?.other.shop} size={38} />
           <b>{conv?.other.name || '...'}</b>
         </div>
       </div>

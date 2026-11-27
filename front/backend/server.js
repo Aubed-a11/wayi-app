@@ -66,6 +66,7 @@ app.use(LOGIN_PATHS, makeGlobalLoginCap(rateLimit, { windowMs: 15 * 60 * 1000, m
 app.use(['/api/auth/login', '/api/auth/login-any', '/api/drivers/login', '/api/drivers/register', '/api/merchants/login', '/api/merchants/register', '/api/auth/register', '/api/auth/forgot-password', '/api/auth/reset-password', '/api/auth/social'], makeLimiter(rateLimit, { windowMs: 15 * 60 * 1000, max: 30 }));
 app.use('/api/drivers/login', makeLimiter(rateLimit, { windowMs: 15 * 60 * 1000, max: 20 }));
 app.use('/api/merchants/login', makeLimiter(rateLimit, { windowMs: 15 * 60 * 1000, max: 20 }));
+app.use('/api/mode/shop/login', makeLimiter(rateLimit, { windowMs: 15 * 60 * 1000, max: 20 }));
 app.use('/api/admin/login', makeLimiter(rateLimit, { windowMs: 15 * 60 * 1000, max: 10 }));
 app.use('/api/ai/chat', makeLimiter(rateLimit, { windowMs: 60 * 1000, max: 20 }));
 app.use('/api', makeLimiter(rateLimit, { windowMs: 60 * 1000, max: 300 }));

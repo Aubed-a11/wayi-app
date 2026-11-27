@@ -13,6 +13,7 @@ import AdminLoginScreen    from './screens/AdminLoginScreen';
 import AdminScreen         from './screens/AdminScreen';
 import MerchantLoginScreen from './screens/MerchantLoginScreen';
 import MerchantScreen      from './screens/MerchantScreen';
+import ShopScreen, { ShopLoginScreen } from './screens/ShopScreen';
 
 export default function App() {
   const { state } = useApp();
@@ -23,7 +24,9 @@ export default function App() {
     admin:          <AdminScreen />,
     merchant_login: <MerchantLoginScreen />,
     merchant:       <MerchantScreen />,
+    shop_login:     <ShopLoginScreen />,
+    shop:           <ShopScreen />,
   };
-  if (UNIFIED) { screens.ops_login = <ToWelcome />; screens.admin_login = <ToWelcome />; screens.merchant_login = <ToWelcome />; }
+  if (UNIFIED) { screens.ops_login = <ToWelcome />; screens.admin_login = <ToWelcome />; screens.merchant_login = <ToWelcome />; screens.shop_login = <ToWelcome />; }
   return <div className="app-shell">{screens[state.screen] || <OpsSplashScreen />}</div>;
 }

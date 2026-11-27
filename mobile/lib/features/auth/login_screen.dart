@@ -37,6 +37,11 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final accounts = await Session.login(_email.text, _password.text);
       if (!mounted) return;
+      // Compte boutique Mode : son espace est sur le site pro
+      if (accounts.isEmpty) {
+        setState(() => _error = "Ce compte s'utilise sur admin.wayibenin.com (espace boutique).");
+        return;
+      }
       final chosen = accounts.length == 1 ? accounts.first : await chooseAccount(context, accounts);
       if (chosen != null && mounted) await enterAccount(context, chosen);
     } on ApiException catch (e) {

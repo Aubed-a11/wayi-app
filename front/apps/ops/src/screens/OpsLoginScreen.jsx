@@ -13,7 +13,7 @@ export default function OpsLoginScreen() {
           Wayi Pro
         </div>
         <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13, marginTop: 4 }}>
-          Espace professionnel, restaurants et backoffice
+          Espace professionnel : restaurants, boutiques et back office
         </div>
       </div>
 
@@ -28,6 +28,16 @@ export default function OpsLoginScreen() {
             <div style={{ fontSize: 12, color: 'var(--gray)' }}>Gérer mes commandes et mon activité</div>
           </div>
           
+        </button>
+
+        <button
+          onClick={() => navigate('shop_login')}
+          style={{ background: 'var(--white)', border: '1.5px solid var(--border)', borderRadius: 'var(--r-lg)', padding: '20px', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', fontFamily: 'var(--font-body)', textAlign: 'left' }}
+        >
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--ink)' }}>Boutique partenaire (Mode)</div>
+            <div style={{ fontSize: 12, color: 'var(--gray)' }}>Publier mes articles, gérer mon stock et mes commandes</div>
+          </div>
         </button>
 
         <button

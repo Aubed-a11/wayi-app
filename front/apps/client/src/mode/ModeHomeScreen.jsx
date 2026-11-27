@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, MapPin, ChevronDown, MessageCircle, Shirt, Ruler, Scissors, Footprints, ShoppingBag, Layers, User, Baby, Watch, Sparkles, SlidersHorizontal, Check, RefreshCw } from 'lucide-react';
+import { Search, MapPin, ChevronDown, MessageCircle, BadgeCheck, Shirt, Ruler, Scissors, Footprints, ShoppingBag, Layers, User, Baby, Watch, Sparkles, SlidersHorizontal, Check, RefreshCw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBar } from '../components/UI';
 import { modeAPI } from '../api';
@@ -23,7 +23,7 @@ export default function ModeHomeScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [q, setQ] = useState('');
-  const [f, setF] = useState({ category: '', size: '', price: '', condition: '', city: localStorage.getItem('wayi_mode_city') || '' });
+  const [f, setF] = useState({ category: '', size: '', price: '', condition: '', source: '', city: localStorage.getItem('wayi_mode_city') || '' });
   const [sheet, setSheet] = useState(null);
   const [unread, setUnread] = useState(0);
   const firstName = state.user?.name?.split(' ')[0] || '';
@@ -33,7 +33,7 @@ export default function ModeHomeScreen() {
 
   const params = useMemo(() => {
     const [minPrice, maxPrice] = f.price ? f.price.split('-') : ['', ''];
-    return { q: q || undefined, category: f.category || undefined, size: f.size || undefined, condition: f.condition || undefined, city: f.city || undefined, minPrice: minPrice || undefined, maxPrice: maxPrice || undefined };
+    return { q: q || undefined, category: f.category || undefined, size: f.size || undefined, condition: f.condition || undefined, source: f.source || undefined, city: f.city || undefined, minPrice: minPrice || undefined, maxPrice: maxPrice || undefined };
   }, [q, f]);
 
   const load = () => {
@@ -52,7 +52,7 @@ export default function ModeHomeScreen() {
   };
   const open = (l) => { dispatch({ type: 'MODE_CTX', payload: { listingId: l.id } }); navigate('mode-item'); };
   const label = (list, id) => list?.find(x => x.id === id)?.label;
-  const filtered = !!(q || f.category || f.size || f.price || f.condition || f.city);
+  const filtered = !!(q || f.category || f.size || f.price || f.condition || f.source || f.city);
   const chips = [
     { k: 'category', label: label(meta?.categories, f.category) || 'Catégorie' },
     { k: 'size', label: f.size ? `Taille ${f.size}` : 'Taille' },
@@ -112,6 +112,9 @@ export default function ModeHomeScreen() {
 
           <div className="md-filters">
             <SlidersHorizontal size={18} aria-hidden="true" className="md-filters-ico" />
+            <button className={`md-chip${f.source === 'shop' ? ' on' : ''}`} onClick={() => set('source', 'shop')}>
+              <BadgeCheck size={15} aria-hidden="true" /> Boutiques
+            </button>
             {chips.map(c => (
               <button key={c.k} className={`md-chip${f[c.k] ? ' on' : ''}`} onClick={() => setSheet(c.k)}>
                 {c.label} <ChevronDown size={14} aria-hidden="true" />
@@ -121,7 +124,7 @@ export default function ModeHomeScreen() {
 
           <div className="md-head">
             <h2>{filtered ? `${total} article${total > 1 ? 's' : ''}` : 'Annonces récentes'}</h2>
-            {filtered && <button className="w-link" onClick={() => { setQ(''); setF({ category: '', size: '', price: '', condition: '', city: '' }); localStorage.removeItem('wayi_mode_city'); }}>Tout effacer</button>}
+            {filtered && <button className="w-link" onClick={() => { setQ(''); setF({ category: '', size: '', price: '', condition: '', source: '', city: '' }); localStorage.removeItem('wayi_mode_city'); }}>Tout effacer</button>}
           </div>
 
           {loading ? (

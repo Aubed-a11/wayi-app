@@ -6,7 +6,8 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const { auth, verifyToken } = require('../middleware/auth');
+const bcrypt = require('bcryptjs');
+const { auth, verifyToken, signToken } = require('../middleware/auth');
 const { users, admins } = require('../data/store');
 const M = require('../data/mode');
 
@@ -28,15 +29,37 @@ const isAdmin = (req) => req.user?.role === 'admin' && admins.some(a => a.id ===
 const now = () => new Date().toISOString();
 const clean = (v, max = 200) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 const cleanLong = (v, max = 1500) => String(v ?? '').replace(/\r/g, '').replace(/\n{3,}/g, '\n\n').trim().slice(0, max);
-const userName = (id) => users.find(u => u.id === id)?.name || 'Membre WAYI';
+const SHOP_LABEL = 'Boutique partenaire WAYI';
+const shopById = (id) => mode.shops.find(x => x.id === id);
+const userName = (id) => users.find(u => u.id === id)?.name || shopById(id)?.name || 'Membre WAYI';
+// Compte boutique connecté (jeton role 'shop', boutique active)
+const shopOf = (req) => (req.user?.role === 'shop' ? mode.shops.find(x => x.id === req.user.id && x.active) : null);
 const firstName = (id) => userName(id).split(' ')[0];
 
 // Univers visible pour ce compte ? Sinon la route n'existe pas (404), comme si rien n'était là
 function needLive(req, res, next) {
   const user = clientOf(req);
-  if (isAdmin(req) || M.modeAccess(user) === 'live') return next();
+  // Les boutiques préparent leur catalogue même quand le Mode est masqué
+  if (isAdmin(req) || shopOf(req) || M.modeAccess(user) === 'live') return next();
   return res.status(404).json({ error: `Route ${req.originalUrl} introuvable` });
 }
+// Client ou boutique : celui qui agit (vendeur, participant d'une conversation...)
+function needActor(req, res, next) {
+  const shop = shopOf(req);
+  if (shop) { req.actor = { id: shop.id, kind: 'shop', shop }; return next(); }
+  const u = clientOf(req);
+  if (!u) return res.status(401).json({ error: 'Connecte-toi avec ton compte WAYI.' });
+  req.client = u; req.actor = { id: u.id, kind: 'client' };
+  next();
+}
+function needShop(req, res, next) {
+  const shop = shopOf(req);
+  if (!shop) return res.status(401).json({ error: 'Connecte-toi avec ton compte boutique.' });
+  req.shop = shop; req.actor = { id: shop.id, kind: 'shop', shop };
+  next();
+}
+const stockOf = (l) => (l.variants || []).reduce((n, v) => n + v.qty, 0);
+const sizesOf = (l) => (l.variants ? l.variants.filter(v => v.qty > 0).map(v => v.size) : [l.size]);
 function needClient(req, res, next) {
   const u = clientOf(req);
   if (!u) return res.status(401).json({ error: 'Connecte-toi avec ton compte client WAYI.' });
@@ -47,6 +70,8 @@ function needClient(req, res, next) {
 function sellerView(listing, viewerId) {
   const stats = M.sellerStats(listing.sellerId);
   const mine = viewerId === listing.sellerId;
+  // Boutique partenaire : son nom reste caché, comme les restaurants
+  if (listing.shopId) return mine ? { shop: true, name: shopById(listing.shopId)?.name || SHOP_LABEL, ...stats } : { shop: true, verified: true, name: SHOP_LABEL, initials: null, ...stats };
   if (listing.anonymous && !mine) return { anonymous: true, name: 'Vendeur anonyme', initials: null, ...stats };
   const name = userName(listing.sellerId);
   const parts = name.split(' ').filter(Boolean);
@@ -60,7 +85,8 @@ function sellerView(listing, viewerId) {
 
 function card(l, viewerId) {
   return {
-    id: l.id, title: l.title, price: l.price, size: l.size, city: l.city,
+    id: l.id, title: l.title, price: l.price, size: l.variants ? (sizesOf(l).join(' / ') || l.size) : l.size, city: l.city,
+    shop: !!l.shopId, sizes: sizesOf(l),
     category: l.category, categoryLabel: M.label(M.CATEGORIES, l.category),
     condition: l.condition, conditionLabel: M.label(M.CONDITIONS, l.condition),
     photo: l.photos?.[0] || null, photosCount: l.photos?.length || 0,
@@ -77,12 +103,24 @@ function detail(l, viewerId) {
     favoritesCount: Object.values(mode.favorites).filter(f => f.includes(l.id)).length,
     seller: sellerView(l, viewerId),
     deliveryFee: mode.settings.deliveryFee,
+    variants: l.variants ? l.variants.map(v => ({ size: v.size, available: v.qty > 0, low: v.qty > 0 && v.qty <= 2, ...(viewerId === l.sellerId ? { qty: v.qty } : {}) })) : null,
   };
 }
 
-function validateListing(body, partial = false) {
+function validateListing(body, partial = false, isShop = false) {
   const out = {};
   const need = (k) => !partial || k in body;
+  if (isShop && need('variants')) {
+    const list = (Array.isArray(body.variants) ? body.variants : [])
+      .map(v => ({ size: clean(v?.size, 20), qty: Math.max(0, Math.min(999, Math.round(Number(v?.qty) || 0))) }))
+      .filter(v => v.size);
+    const seen = new Set();
+    out.variants = list.filter(v => !seen.has(v.size) && seen.add(v.size)).slice(0, 30);
+    if (!out.variants.length) return { error: 'Ajoute au moins une taille avec sa quantité.' };
+    if (!partial && !out.variants.some(v => v.qty > 0)) return { error: 'Indique la quantité en stock.' };
+    out.size = out.variants.map(v => v.size).join(' / ');
+    body = { ...body, size: out.size };
+  }
   if (need('title')) { out.title = clean(body.title, 80); if (out.title.length < 3) return { error: 'Donne un titre à ton annonce (3 caractères minimum).' }; }
   if (need('category')) { if (!M.CATEGORIES.some(c => c.id === body.category)) return { error: 'Choisis une catégorie.' }; out.category = body.category; }
   if (need('size')) { out.size = clean(body.size, 20); if (!out.size) return { error: 'Indique la taille.' }; }
@@ -121,7 +159,8 @@ const adminOnly = (req, res, next) => (isAdmin(req) ? next() : res.status(403).j
 function adminListing(l) {
   return {
     ...card(l, null), description: l.description, photos: l.photos, views: l.views || 0,
-    seller: { id: l.sellerId, name: userName(l.sellerId), email: users.find(u => u.id === l.sellerId)?.email || null, ...M.sellerStats(l.sellerId) },
+    seller: { id: l.sellerId, name: userName(l.sellerId), shop: !!l.shopId, email: users.find(u => u.id === l.sellerId)?.email || shopById(l.sellerId)?.email || null, ...M.sellerStats(l.sellerId) },
+    variants: l.variants || null, stock: l.variants ? stockOf(l) : null,
     reports: mode.reports.filter(r => r.listingId === l.id && r.status === 'open').length,
     hiddenReason: l.hiddenReason || null,
   };
@@ -140,6 +179,7 @@ router.get('/admin/overview', auth, adminOnly, (_req, res) => {
       volume: done.reduce((s, o) => s + o.price, 0),
       commission: done.reduce((s, o) => s + o.commission, 0),
       launchSellers: mode.launchSellers.length,
+      shops: mode.shops.filter(x => x.active).length,
     },
     meta: { categories: M.CATEGORIES, conditions: M.CONDITIONS, cities: M.CITIES, reasons: M.REPORT_REASONS, steps: M.ORDER_STEPS, payments: M.PAYMENT_METHODS, states: M.STATES },
   });
@@ -218,12 +258,13 @@ function orderView(o, viewerId) {
     // Paiement Mobile Money a envoyer au numero WAYI tant qu'il n'est pas confirme
     payTo: o.paymentStatus === 'pending' && o.method !== 'cash' ? payTo(o.method) : null,
     address: o.address, reviewed: mode.reviews.some(r => r.orderId === o.id),
-    listing: l ? { id: l.id, title: l.title, photo: l.photos?.[0] || null, size: l.size, city: l.city } : { title: o.title },
+    listing: l ? { id: l.id, title: l.title, photo: l.photos?.[0] || null, size: o.size || l.size, city: l.city } : { title: o.title, size: o.size },
+    size: o.size || null, shop: !!o.shopId,
     role: asSeller ? 'seller' : 'buyer',
     // Le vendeur voit l'acheteur (pour la remise) ; l'acheteur voit le vendeur selon la visibilité de l'annonce
     counterpart: asSeller
       ? { name: userName(o.buyerId), phone: users.find(u => u.id === o.buyerId)?.phone || null }
-      : { name: o.anonymous ? 'Vendeur anonyme' : firstName(o.sellerId) },
+      : { name: o.shopId ? SHOP_LABEL : o.anonymous ? 'Vendeur anonyme' : firstName(o.sellerId) },
     sellerAmount: asSeller ? o.price - o.commission : undefined,
     commission: asSeller ? o.commission : undefined,
     launchOffer: asSeller ? !!o.launchOffer : undefined,
@@ -234,7 +275,7 @@ router.get('/admin/orders', auth, adminOnly, (_req, res) => {
   res.json({
     orders: [...mode.orders].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map(o => ({
       ...orderView(o, o.sellerId), buyer: userName(o.buyerId), buyerPhone: users.find(u => u.id === o.buyerId)?.phone || null,
-      seller: userName(o.sellerId), commission: o.commission,
+      seller: userName(o.sellerId), shop: !!o.shopId, commission: o.commission,
     })),
   });
 });
@@ -243,6 +284,11 @@ function setOrderStatus(o, status, by) {
   o.status = status;
   o.history.push({ status, at: now(), by });
   const l = mode.listings.find(x => x.id === o.listingId);
+  if (l?.variants) {
+    // Boutique : la pièce revient en stock si la commande est annulée
+    if (status === 'cancelled') { const v = l.variants.find(x => x.size === o.size); if (v) v.qty += 1; if (l.status === 'sold' && stockOf(l) > 0) l.status = 'active'; }
+    return;
+  }
   if (l && status === 'delivered') { l.status = 'sold'; l.soldAt = now(); }
   if (l && status === 'cancelled' && l.status === 'reserved') l.status = 'active';
 }
@@ -263,6 +309,102 @@ router.put('/admin/orders/:id', auth, adminOnly, (req, res) => {
   res.json({ order: orderView(o, o.sellerId) });
 });
 
+// ── Boutiques partenaires (comptes créés par WAYI) ───────────
+const safeShop = ({ password: _p, ...x }) => x;
+function shopStats(id) {
+  const ls = mode.listings.filter(l => l.sellerId === id && l.status !== 'deleted');
+  const os = mode.orders.filter(o => o.sellerId === id);
+  const done = os.filter(o => o.status === 'delivered');
+  return {
+    listings: ls.filter(l => l.status === 'active').length, soldOut: ls.filter(l => l.status === 'sold').length,
+    stock: ls.reduce((n, l) => n + (l.variants ? stockOf(l) : 0), 0),
+    toPrepare: os.filter(o => o.status === 'confirmed').length,
+    inProgress: os.filter(o => ['awaiting_payment', 'confirmed', 'handed', 'on_the_way'].includes(o.status)).length,
+    sales: done.length, earned: done.reduce((n, o) => n + o.price - o.commission, 0),
+    ...M.sellerStats(id),
+  };
+}
+
+router.get('/admin/shops', auth, adminOnly, (_req, res) => {
+  res.json({ shops: mode.shops.map(x => ({ ...safeShop(x), stats: shopStats(x.id) })) });
+});
+
+router.post('/admin/shops', auth, adminOnly, async (req, res) => {
+  const b = req.body || {};
+  const name = clean(b.name, 80);
+  const email = clean(b.email, 120).toLowerCase();
+  if (name.length < 2) return res.status(400).json({ error: 'Nom de la boutique requis' });
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'E-mail invalide' });
+  if (mode.shops.some(x => x.email === email)) return res.status(409).json({ error: 'Cet e-mail a déjà un compte boutique' });
+  const rate = b.commissionRate === '' || b.commissionRate == null ? null : Number(b.commissionRate);
+  if (rate !== null && !(rate >= 0 && rate <= 0.5)) return res.status(400).json({ error: 'Commission entre 0 et 50 %' });
+  const temp = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-2).toUpperCase();
+  const shop = {
+    id: `shop-${uuidv4().slice(0, 8)}`, name, email, password: await bcrypt.hash(temp, 10),
+    contactName: clean(b.contactName, 80), phone: clean(b.phone, 30), city: M.CITIES.includes(b.city) ? b.city : 'Cotonou',
+    commissionRate: rate, active: true, createdAt: now(),
+  };
+  mode.shops.push(shop);
+  let mail = null;
+  try {
+    const { sendEmail } = require('../services/notifications');
+    const mails = require('../services/email/templates');
+    mail = await sendEmail({
+      to: email, subject: 'Bienvenue chez WAYI, ton espace boutique',
+      html: mails.welcomeAccount({ name: shop.contactName || name, role: `boutique partenaire (${name})`, email, password: temp, url: 'https://admin.wayibenin.com', extra: 'Dans ton espace boutique, tu publies tes articles avec leurs tailles et ton stock, puis tu prépares les commandes que WAYI t\'envoie.' }),
+    });
+  } catch { mail = null; }
+  const failed = !mail?.success;
+  res.status(201).json({
+    shop: safeShop(shop), emailSent: !failed && !mail?.simulated,
+    devPassword: (failed || (mail?.simulated && process.env.NODE_ENV !== 'production')) ? temp : undefined,
+  });
+});
+
+router.put('/admin/shops/:id', auth, adminOnly, (req, res) => {
+  const shop = shopById(req.params.id);
+  if (!shop) return res.status(404).json({ error: 'Boutique introuvable' });
+  const b = req.body || {};
+  if ('active' in b) {
+    shop.active = !!b.active;
+    // Boutique suspendue : ses articles sortent du catalogue
+    for (const l of mode.listings) if (l.shopId === shop.id && l.status === 'active' && !shop.active) { l.status = 'paused'; l.pausedBy = 'admin'; }
+    if (shop.active) for (const l of mode.listings) if (l.shopId === shop.id && l.pausedBy === 'admin') { l.status = stockOf(l) > 0 ? 'active' : 'sold'; delete l.pausedBy; }
+  }
+  if ('name' in b && clean(b.name, 80).length >= 2) shop.name = clean(b.name, 80);
+  if ('phone' in b) shop.phone = clean(b.phone, 30);
+  if ('contactName' in b) shop.contactName = clean(b.contactName, 80);
+  if ('city' in b && M.CITIES.includes(b.city)) shop.city = b.city;
+  if ('commissionRate' in b) {
+    const rate = b.commissionRate === '' || b.commissionRate == null ? null : Number(b.commissionRate);
+    if (rate !== null && !(rate >= 0 && rate <= 0.5)) return res.status(400).json({ error: 'Commission entre 0 et 50 %' });
+    shop.commissionRate = rate;
+  }
+  res.json({ shop: { ...safeShop(shop), stats: shopStats(shop.id) } });
+});
+
+// Connexion de la boutique (espace pro, admin.wayibenin.com)
+router.post('/shop/login', async (req, res) => {
+  const email = clean(req.body?.email, 120).toLowerCase();
+  const shop = mode.shops.find(x => x.email === email);
+  const ok = shop && await bcrypt.compare(String(req.body?.password || ''), shop.password).catch(() => false);
+  if (!ok) return res.status(401).json({ error: 'Identifiants incorrects' });
+  if (!shop.active) return res.status(403).json({ error: 'Compte boutique suspendu. Contacte WAYI.' });
+  res.json({ token: signToken({ id: shop.id, role: 'shop', email: shop.email }), shop: safeShop(shop) });
+});
+
+router.get('/shop/me', auth, needShop, (req, res) => {
+  res.json({ shop: safeShop(req.shop), stats: shopStats(req.shop.id), modeState: mode.settings.state, meta: { categories: M.CATEGORIES, conditions: M.CONDITIONS, sizes: M.SIZES, maxPhotos: mode.settings.maxPhotos, commissionRate: req.shop.commissionRate ?? mode.settings.commissionRate } });
+});
+
+router.put('/shop/password', auth, needShop, async (req, res) => {
+  const { current, next: nextPw } = req.body || {};
+  if (!await bcrypt.compare(String(current || ''), req.shop.password).catch(() => false)) return res.status(403).json({ error: 'Mot de passe actuel incorrect' });
+  if (String(nextPw || '').length < 8) return res.status(400).json({ error: '8 caractères minimum' });
+  req.shop.password = await bcrypt.hash(String(nextPw), 10);
+  res.json({ ok: true });
+});
+
 // ── À partir d'ici : seulement si l'univers est ouvert pour ce compte ──
 router.use(needLive);
 
@@ -280,11 +422,13 @@ router.get('/meta', (_req, res) => {
 router.get('/listings', (req, res) => {
   const viewer = clientOf(req)?.id;
   const { q, category, size, condition, city, sort } = req.query;
+
   const minPrice = Number(req.query.minPrice) || 0;
   const maxPrice = Number(req.query.maxPrice) || Infinity;
   const words = clean(q, 60).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(' ').filter(Boolean);
   let list = mode.listings.filter(l => l.status === 'active'
-    && (!category || l.category === category) && (!size || l.size === size)
+    && (!category || l.category === category) && (!size || sizesOf(l).includes(size))
+    && (!req.query.source || (req.query.source === 'shop' ? !!l.shopId : !l.shopId))
     && (!condition || l.condition === condition) && (!city || l.city === city)
     && l.price >= minPrice && l.price <= maxPrice);
   if (words.length) {
@@ -316,17 +460,18 @@ router.get('/listings/:id/seller', (req, res) => {
   const reviews = mode.reviews.filter(r => r.sellerId === l.sellerId).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     .slice(0, 30).map(r => ({ id: r.id, rating: r.rating, comment: r.comment, author: firstName(r.buyerId), createdAt: r.createdAt }));
   const dist = [5, 4, 3, 2, 1].map(n => ({ stars: n, count: mode.reviews.filter(r => r.sellerId === l.sellerId && r.rating === n).length }));
-  const others = l.anonymous ? [] : mode.listings.filter(x => x.sellerId === l.sellerId && x.status === 'active' && !x.anonymous && x.id !== l.id).slice(0, 12).map(x => card(x, viewer));
+  const others = l.anonymous && !l.shopId ? [] : mode.listings.filter(x => x.sellerId === l.sellerId && x.status === 'active' && !x.anonymous && x.id !== l.id).slice(0, 12).map(x => card(x, viewer));
   res.json({ seller: sellerView(l, viewer), reviews, distribution: dist, listings: others });
 });
 
-router.get('/mine', auth, needClient, (req, res) => {
-  const list = mode.listings.filter(l => l.sellerId === req.client.id && l.status !== 'deleted')
+router.get('/mine', auth, needActor, (req, res) => {
+  const me = req.actor.id;
+  const list = mode.listings.filter(l => l.sellerId === me && l.status !== 'deleted')
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  res.json({ listings: list.map(l => ({ ...card(l, req.client.id), views: l.views || 0, hiddenReason: l.hiddenReason || null })), stats: M.sellerStats(req.client.id) });
+  res.json({ listings: list.map(l => ({ ...card(l, me), views: l.views || 0, hiddenReason: l.hiddenReason || null, variants: l.variants || null, stock: l.variants ? stockOf(l) : null, description: l.description, photos: l.photos })), stats: M.sellerStats(me) });
 });
 
-router.post('/photos', auth, needClient, (req, res) => {
+router.post('/photos', auth, needActor, (req, res) => {
   const { data, ext } = req.body || {};
   const type = String(ext || 'jpg').toLowerCase().replace('jpeg', 'jpg');
   if (!['jpg', 'png', 'webp'].includes(type)) return res.status(400).json({ error: 'Format de photo non accepté (JPG, PNG ou WebP).' });
@@ -338,19 +483,21 @@ router.post('/photos', auth, needClient, (req, res) => {
   if (!isImage) return res.status(400).json({ error: "Ce fichier n'est pas une image." });
   const dir = path.join(__dirname, '..', 'uploads', 'mode');
   fs.mkdirSync(dir, { recursive: true });
-  const name = `${req.client.id}-${uuidv4()}.${type}`;
+  const name = `${req.actor.id}-${uuidv4()}.${type}`;
   fs.writeFileSync(path.join(dir, name), buf);
   const base = (process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`).replace(/\/+$/, '');
   res.status(201).json({ url: `${base}/uploads/mode/${name}` });
 });
 
-router.post('/listings', auth, needClient, (req, res) => {
-  const { data, error } = validateListing(req.body || {});
+router.post('/listings', auth, needActor, (req, res) => {
+  const isShop = req.actor.kind === 'shop';
+  const { data, error } = validateListing(req.body || {}, false, isShop);
   if (error) return res.status(400).json({ error });
-  const mineActive = mode.listings.filter(l => l.sellerId === req.client.id && l.status === 'active').length;
-  if (mineActive >= 100) return res.status(429).json({ error: 'Tu as déjà 100 annonces en ligne.' });
-  const l = { id: `ann-${uuidv4().slice(0, 8)}`, sellerId: req.client.id, description: '', anonymous: false, ...data, status: 'active', views: 0, createdAt: now(), updatedAt: now() };
+  const mineActive = mode.listings.filter(l => l.sellerId === req.actor.id && l.status === 'active').length;
+  if (mineActive >= (isShop ? 1000 : 100)) return res.status(429).json({ error: `Tu as déjà ${isShop ? 1000 : 100} annonces en ligne.` });
+  const l = { id: `ann-${uuidv4().slice(0, 8)}`, sellerId: req.actor.id, description: '', anonymous: false, ...data, ...(isShop ? { shopId: req.actor.id, anonymous: false } : {}), status: 'active', views: 0, createdAt: now(), updatedAt: now() };
   mode.listings.push(l);
+  if (isShop) return res.status(201).json({ listing: detail(l, req.actor.id) });
   // Offre de lancement : les premiers vendeurs, dans l'ordre de leur première annonce
   const offer = mode.settings.launchOffer;
   let launch = false;
@@ -358,26 +505,30 @@ router.post('/listings', auth, needClient, (req, res) => {
   res.status(201).json({ listing: detail(l, req.client.id), launchOffer: launch || mode.launchSellers.includes(req.client.id) });
 });
 
-router.put('/listings/:id', auth, needClient, (req, res) => {
-  const l = mode.listings.find(x => x.id === req.params.id && x.sellerId === req.client.id && x.status !== 'deleted');
+router.put('/listings/:id', auth, needActor, (req, res) => {
+  const l = mode.listings.find(x => x.id === req.params.id && x.sellerId === req.actor.id && x.status !== 'deleted');
   if (!l) return res.status(404).json({ error: 'Annonce introuvable' });
   const body = req.body || {};
+  const isShop = !!l.shopId;
   if ('status' in body) {
     if (l.status === 'hidden') return res.status(403).json({ error: 'Annonce masquée par la modération. Écris à WAYI pour la rétablir.' });
-    if (l.status === 'reserved' || l.status === 'sold') return res.status(409).json({ error: 'Cette annonce a déjà une commande.' });
+    if (!isShop && (l.status === 'reserved' || l.status === 'sold')) return res.status(409).json({ error: 'Cette annonce a déjà une commande.' });
     if (!['active', 'paused'].includes(body.status)) return res.status(400).json({ error: 'Statut inconnu' });
     l.status = body.status;
   }
-  const { data, error } = validateListing(body, true);
+  const { data, error } = validateListing(body, true, isShop);
   if (error) return res.status(400).json({ error });
+  if (isShop) { delete data.anonymous; }
   Object.assign(l, data, { updatedAt: now() });
-  res.json({ listing: detail(l, req.client.id) });
+  // Boutique : épuisé sans stock, remis en ligne au réassort
+  if (isShop && l.status !== 'hidden' && l.status !== 'paused') l.status = stockOf(l) > 0 ? 'active' : 'sold';
+  res.json({ listing: detail(l, req.actor.id) });
 });
 
-router.delete('/listings/:id', auth, needClient, (req, res) => {
-  const l = mode.listings.find(x => x.id === req.params.id && x.sellerId === req.client.id && x.status !== 'deleted');
+router.delete('/listings/:id', auth, needActor, (req, res) => {
+  const l = mode.listings.find(x => x.id === req.params.id && x.sellerId === req.actor.id && x.status !== 'deleted');
   if (!l) return res.status(404).json({ error: 'Annonce introuvable' });
-  if (l.status === 'reserved') return res.status(409).json({ error: 'Une commande est en cours sur cette annonce.' });
+  if (l.status === 'reserved' || mode.orders.some(o => o.listingId === l.id && !['delivered', 'cancelled'].includes(o.status))) return res.status(409).json({ error: 'Une commande est en cours sur cette annonce.' });
   l.status = 'deleted'; l.updatedAt = now();
   res.json({ ok: true });
 });
@@ -416,21 +567,22 @@ function convView(c, me) {
   const l = mode.listings.find(x => x.id === c.listingId);
   const iAmSeller = c.sellerId === me;
   const otherId = iAmSeller ? c.buyerId : c.sellerId;
+  const shopHidden = !iAmSeller && !!c.shopId;
   const last = c.messages[c.messages.length - 1];
   const readAt = c.readAt?.[me] || '';
   return {
     id: c.id, listingId: c.listingId,
     listing: l ? { id: l.id, title: l.title, price: l.price, photo: l.photos?.[0] || null, status: l.status } : null,
     role: iAmSeller ? 'seller' : 'buyer',
-    other: { name: !iAmSeller && c.anonymous ? 'Vendeur anonyme' : userName(otherId), anonymous: !iAmSeller && c.anonymous },
+    other: { name: shopHidden ? SHOP_LABEL : !iAmSeller && c.anonymous ? 'Vendeur anonyme' : userName(otherId), anonymous: !shopHidden && !iAmSeller && c.anonymous, shop: shopHidden },
     last: last ? { text: last.text, at: last.at, mine: last.from === me } : null,
     unread: c.messages.filter(m => m.from !== me && m.at > readAt).length,
     updatedAt: c.updatedAt,
   };
 }
 
-router.get('/conversations', auth, needClient, (req, res) => {
-  const me = req.client.id;
+router.get('/conversations', auth, needActor, (req, res) => {
+  const me = req.actor.id;
   const list = mode.conversations.filter(c => c.buyerId === me || c.sellerId === me).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   const views = list.map(c => convView(c, me));
   res.json({ conversations: views, unread: views.reduce((s, c) => s + c.unread, 0) });
@@ -451,7 +603,7 @@ router.post('/listings/:id/conversation', auth, needClient, (req, res) => {
   if (l.sellerId === req.client.id) return res.status(400).json({ error: "C'est ton annonce." });
   let c = mode.conversations.find(x => x.listingId === l.id && x.buyerId === req.client.id);
   if (!c) {
-    c = { id: `conv-${uuidv4().slice(0, 8)}`, listingId: l.id, buyerId: req.client.id, sellerId: l.sellerId, anonymous: !!l.anonymous, messages: [], readAt: {}, createdAt: now(), updatedAt: now() };
+    c = { id: `conv-${uuidv4().slice(0, 8)}`, listingId: l.id, buyerId: req.client.id, sellerId: l.sellerId, shopId: l.shopId || null, anonymous: !!l.anonymous, messages: [], readAt: {}, createdAt: now(), updatedAt: now() };
     mode.conversations.push(c);
   }
   const text = cleanLong(req.body?.text, 1000);
@@ -460,31 +612,35 @@ router.post('/listings/:id/conversation', auth, needClient, (req, res) => {
 });
 
 function myConv(req, res) {
-  const c = mode.conversations.find(x => x.id === req.params.id && (x.buyerId === req.client.id || x.sellerId === req.client.id));
+  const me = req.actor.id;
+  const c = mode.conversations.find(x => x.id === req.params.id && (x.buyerId === me || x.sellerId === me));
   if (!c) { res.status(404).json({ error: 'Conversation introuvable' }); return null; }
   return c;
 }
 
-router.get('/conversations/:id', auth, needClient, (req, res) => {
+router.get('/conversations/:id', auth, needActor, (req, res) => {
   const c = myConv(req, res); if (!c) return;
-  const me = req.client.id;
+  const me = req.actor.id;
   c.readAt = { ...(c.readAt || {}), [me]: now() };
   res.json({ conversation: convView(c, me), messages: c.messages.slice(-200).map(m => ({ id: m.id, text: m.text, at: m.at, mine: m.from === me })) });
 });
 
-router.post('/conversations/:id/messages', auth, needClient, (req, res) => {
+router.post('/conversations/:id/messages', auth, needActor, (req, res) => {
   const c = myConv(req, res); if (!c) return;
   const text = cleanLong(req.body?.text, 1000);
   if (!text) return res.status(400).json({ error: 'Message vide' });
-  const m = addMessage(c, req.client.id, text);
+  const m = addMessage(c, req.actor.id, text);
   res.status(201).json({ message: { id: m.id, text: m.text, at: m.at, mine: true } });
 });
 
 // ── Commandes ────────────────────────────────────────────────
 router.post('/orders', auth, needClient, (req, res) => {
-  const { listingId, method, phone, address } = req.body || {};
+  const { listingId, method, phone, address, size } = req.body || {};
   const l = mode.listings.find(x => x.id === listingId);
   if (!l || l.status !== 'active') return res.status(409).json({ error: "Cet article n'est plus disponible." });
+  const variant = l.variants ? l.variants.find(v => v.size === size) : null;
+  if (l.variants && !variant) return res.status(400).json({ error: 'Choisis ta taille.' });
+  if (variant && variant.qty < 1) return res.status(409).json({ error: `La taille ${variant.size} est épuisée.` });
   if (l.sellerId === req.client.id) return res.status(400).json({ error: 'Tu ne peux pas acheter ton propre article.' });
   if (!M.PAYMENT_METHODS.some(p => p.id === method)) return res.status(400).json({ error: 'Choisis un mode de paiement.' });
   const addr = { label: clean(address?.label, 120), details: clean(address?.details, 200) };
@@ -496,6 +652,7 @@ router.post('/orders', auth, needClient, (req, res) => {
   const o = {
     id: uuidv4(), number: `M${String(mode.orders.length + 1).padStart(5, '0')}`,
     listingId: l.id, title: l.title, buyerId: req.client.id, sellerId: l.sellerId, anonymous: !!l.anonymous,
+    shopId: l.shopId || null, size: variant ? variant.size : l.size,
     price: l.price, deliveryFee: fee, total: l.price + fee,
     commissionRate: rate, commission: Math.round(l.price * rate), launchOffer,
     method, phone: digits || null, address: addr,
@@ -505,32 +662,35 @@ router.post('/orders', auth, needClient, (req, res) => {
   };
   o.history.push({ status: o.status, at: o.createdAt, by: 'buyer' });
   mode.orders.push(o);
-  l.status = 'reserved';
+  // Particulier : article unique réservé ; boutique : une pièce retirée du stock
+  if (variant) { variant.qty -= 1; if (stockOf(l) === 0) l.status = 'sold'; }
+  else l.status = 'reserved';
   // Un message automatique prévient le vendeur dans la messagerie
   let c = mode.conversations.find(x => x.listingId === l.id && x.buyerId === req.client.id);
-  if (!c) { c = { id: `conv-${uuidv4().slice(0, 8)}`, listingId: l.id, buyerId: req.client.id, sellerId: l.sellerId, anonymous: !!l.anonymous, messages: [], readAt: {}, createdAt: now(), updatedAt: now() }; mode.conversations.push(c); }
-  addMessage(c, req.client.id, `Commande ${o.number} passée pour « ${l.title} ». Livraison : ${addr.label}.`);
+  if (!c) { c = { id: `conv-${uuidv4().slice(0, 8)}`, listingId: l.id, buyerId: req.client.id, sellerId: l.sellerId, shopId: l.shopId || null, anonymous: !!l.anonymous, messages: [], readAt: {}, createdAt: now(), updatedAt: now() }; mode.conversations.push(c); }
+  addMessage(c, req.client.id, `Commande ${o.number} passée pour « ${l.title} »${variant ? `, taille ${variant.size}` : ''}. Livraison : ${addr.label}.`);
   res.status(201).json({ order: orderView(o, req.client.id) });
 });
 
-router.get('/orders', auth, needClient, (req, res) => {
-  const me = req.client.id;
+router.get('/orders', auth, needActor, (req, res) => {
+  const me = req.actor.id;
   const mine = mode.orders.filter(o => o.buyerId === me || o.sellerId === me).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   res.json({ purchases: mine.filter(o => o.buyerId === me).map(o => orderView(o, me)), sales: mine.filter(o => o.sellerId === me).map(o => orderView(o, me)) });
 });
 
-router.get('/orders/:id', auth, needClient, (req, res) => {
-  const o = mode.orders.find(x => x.id === req.params.id && (x.buyerId === req.client.id || x.sellerId === req.client.id));
+router.get('/orders/:id', auth, needActor, (req, res) => {
+  const me = req.actor.id;
+  const o = mode.orders.find(x => x.id === req.params.id && (x.buyerId === me || x.sellerId === me));
   if (!o) return res.status(404).json({ error: 'Commande introuvable' });
-  res.json({ order: orderView(o, req.client.id) });
+  res.json({ order: orderView(o, me) });
 });
 
 // Le vendeur remet l'article au livreur ; l'acheteur confirme la réception ou annule avant la remise
-router.put('/orders/:id/status', auth, needClient, (req, res) => {
-  const o = mode.orders.find(x => x.id === req.params.id && (x.buyerId === req.client.id || x.sellerId === req.client.id));
+router.put('/orders/:id/status', auth, needActor, (req, res) => {
+  const me = req.actor.id;
+  const o = mode.orders.find(x => x.id === req.params.id && (x.buyerId === me || x.sellerId === me));
   if (!o) return res.status(404).json({ error: 'Commande introuvable' });
   const { status } = req.body || {};
-  const me = req.client.id;
   const isSeller = o.sellerId === me;
   const allowed =
     (isSeller && status === 'handed' && o.status === 'confirmed') ||

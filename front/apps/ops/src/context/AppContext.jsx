@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import { adminAPI, merchantAPI } from '../api';
+import { adminAPI, merchantAPI, shopAPI } from '../api';
 
 const AppContext = createContext(null);
 
@@ -8,6 +8,8 @@ const initialState = {
   adminToken: localStorage.getItem('wayi_admin_token'),
   merchant: null,
   merchantToken: localStorage.getItem('wayi_merchant_token'),
+  shop: null,
+  shopToken: localStorage.getItem('wayi_shop_token'),
   screen: 'splash',
   prevScreen: null,
 };
@@ -26,6 +28,12 @@ function reducer(state, action) {
     case 'MERCHANT_LOGOUT':
       localStorage.removeItem('wayi_merchant_token');
       return { ...state, merchant: null, merchantToken: null, screen: 'merchant_login' };
+    case 'SHOP_LOGIN':
+      localStorage.setItem('wayi_shop_token', action.payload.token);
+      return { ...state, shop: action.payload.shop, shopToken: action.payload.token };
+    case 'SHOP_LOGOUT':
+      localStorage.removeItem('wayi_shop_token');
+      return { ...state, shop: null, shopToken: null, screen: 'shop_login' };
     case 'NAVIGATE':
       return { ...state, screen: action.payload, prevScreen: state.screen };
     case 'GO_BACK':
@@ -64,12 +72,26 @@ export function AppProvider({ children }) {
       }
     };
     bootstrapMerchant();
+    const bootstrapShop = async () => {
+      if (!state.shopToken) return;
+      try {
+        const { data } = await shopAPI.me();
+        dispatch({ type: 'SHOP_LOGIN', payload: { shop: data.shop, token: state.shopToken } });
+        dispatch({ type: 'NAVIGATE', payload: 'shop' });
+      } catch {
+        localStorage.removeItem('wayi_shop_token');
+      }
+    };
+    bootstrapShop();
+    const handleShopLogout = () => dispatch({ type: 'SHOP_LOGOUT' });
+    window.addEventListener('wayi:shop_logout', handleShopLogout);
     const handleMerchantLogout = () => dispatch({ type: 'MERCHANT_LOGOUT' });
     window.addEventListener('wayi:merchant_logout', handleMerchantLogout);
 
     return () => {
       window.removeEventListener('wayi:admin_logout', handleAdminLogout);
       window.removeEventListener('wayi:merchant_logout', handleMerchantLogout);
+      window.removeEventListener('wayi:shop_logout', handleShopLogout);
     };
   }, []);
 

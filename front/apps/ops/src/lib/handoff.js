@@ -3,7 +3,7 @@
 // Doit etre importe EN PREMIER dans main.jsx : enregistre le jeton recu
 // dans l'adresse (#auth=...) avant que l'appli ne lise la session.
 // ============================================================
-const KEYS = { driver: 'wayi_driver_token', merchant: 'wayi_merchant_token', admin: 'wayi_admin_token' };
+const KEYS = { driver: 'wayi_driver_token', merchant: 'wayi_merchant_token', admin: 'wayi_admin_token', shop: 'wayi_shop_token' };
 
 // Dans l'appli mobile, la connexion et la deconnexion passent par l'ecran unique de WAYI
 export const UNIFIED = import.meta.env.MODE === 'mobile';

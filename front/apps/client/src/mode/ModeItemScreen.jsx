@@ -18,6 +18,7 @@ export default function ModeItemScreen() {
   const [reason, setReason] = useState('');
   const [details, setDetails] = useState('');
   const [busy, setBusy] = useState(false);
+  const [size, setSize] = useState('');
   const gallery = useRef(null);
   const toggleFav = useModeFavorite();
 
@@ -85,6 +86,11 @@ export default function ModeItemScreen() {
   if (!l) return <div className="screen md-screen"><div className="w-skel" style={{ height: '58vh', borderRadius: 0 }} /></div>;
 
   const photos = l.photos.length ? l.photos : [null];
+  const buy = () => {
+    if (l.variants && !size) { toast('Choisis ta taille'); document.querySelector('.md-sizes')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    dispatch({ type: 'MODE_CTX', payload: { size: l.variants ? size : null } });
+    navigate('mode-checkout');
+  };
   const s = l.seller;
   const available = l.status === 'active';
 
@@ -120,8 +126,21 @@ export default function ModeItemScreen() {
                 : 'Annonce masquée par la modération WAYI.'}
             </div>
           )}
-          <h1 className="md-item-title">{l.title}, {l.size}</h1>
+          <h1 className="md-item-title">{l.variants ? l.title : `${l.title}, ${l.size}`}</h1>
           <div className="md-item-price">{fcfa(l.price)}</div>
+          {l.variants && (
+            <div className="md-sizes" role="radiogroup" aria-label="Taille">
+              <span className="md-sizes-lbl">Choisis ta taille</span>
+              <div>
+                {l.variants.map(v => (
+                  <button key={v.size} role="radio" aria-checked={size === v.size} disabled={!v.available || l.mine} className={size === v.size ? 'on' : ''} onClick={() => setSize(v.size)}>
+                    {v.size}
+                    {l.mine ? <small>{v.qty} en stock</small> : !v.available ? <small>Épuisé</small> : v.low ? <small>Dernières pièces</small> : null}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="md-item-meta">
             <span>{l.conditionLabel}</span><i />
             <span><MapPin size={13} aria-hidden="true" /> {l.city}</span><i />
@@ -129,9 +148,10 @@ export default function ModeItemScreen() {
           </div>
 
           <button className="md-seller" onClick={() => navigate('mode-seller')}>
-            <Avatar name={s.name} initials={s.initials} anonymous={s.anonymous && !l.mine} />
+            <Avatar name={s.name} initials={s.initials} anonymous={s.anonymous && !l.mine} shop={s.shop} />
             <span className="md-seller-txt">
-              <b>{l.mine ? 'Toi' : s.name}{l.mine && l.anonymous ? ' (vente anonyme)' : ''}</b>
+              <b>{l.mine && !s.shop ? 'Toi' : s.name}{l.mine && l.anonymous ? ' (vente anonyme)' : ''}</b>
+              {s.shop && <span className="md-verified"><BadgeCheck size={13} aria-hidden="true" /> Vérifiée par WAYI</span>}
               <small>
                 {s.rating ? <><Star size={13} fill="currentColor" aria-hidden="true" /> {String(s.rating).replace('.', ',')} / 5 · </> : 'Nouveau vendeur · '}
                 {s.sales} vente{s.sales > 1 ? 's' : ''}{l.city ? ` · ${l.city}` : ''}
@@ -155,7 +175,7 @@ export default function ModeItemScreen() {
           <h3 className="md-h3">Détails</h3>
           <div className="md-rows">
             <div><span>Catégorie</span><b>{l.categoryLabel}</b></div>
-            <div><span>Taille</span><b>{l.size}</b></div>
+            <div><span>{l.variants ? 'Tailles' : 'Taille'}</span><b>{l.variants ? l.variants.map(v => v.size).join(', ') : l.size}</b></div>
             <div><span>Ville</span><b>{l.city}</b></div>
           </div>
 
@@ -184,7 +204,7 @@ export default function ModeItemScreen() {
         ) : (
           <>
             <button className="md-btn ghost" disabled={busy || !['active', 'reserved'].includes(l.status)} onClick={write}>Écrire au vendeur</button>
-            <button className="md-btn" disabled={!available} onClick={() => navigate('mode-checkout')}>{available ? 'Acheter' : l.status === 'sold' ? 'Vendu' : 'Réservé'}</button>
+            <button className="md-btn" disabled={!available} onClick={buy}>{available ? 'Acheter' : l.status === 'sold' ? (l.shop ? 'Épuisé' : 'Vendu') : 'Réservé'}</button>
           </>
         )}
       </div>
