@@ -208,7 +208,7 @@ export default function ShopScreen() {
   const [text, setText] = useState('');
   const [edit, setEdit] = useState(null); // null | 'new' | article
   const [pwOpen, setPwOpen] = useState(false);
-  const [pw, setPw] = useState({ current: '', next: '' });
+  const [pw, setPw] = useState({ current: '', next: '', again: '' });
   const [msg, setMsg] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const toast = useCallback((t, k = 'ok') => { setMsg({ t, k }); clearTimeout(window.__shT); window.__shT = setTimeout(() => setMsg(null), 3500); }, []);
@@ -241,7 +241,13 @@ export default function ShopScreen() {
     catch (e) { toast(err(e), 'ko'); }
   };
   const changePw = async () => {
-    try { await shopAPI.password(pw.current, pw.next); setPwOpen(false); setPw({ current: '', next: '' }); toast('Mot de passe changé'); }
+    if (pw.next !== pw.again) { toast('Les deux mots de passe ne sont pas identiques', 'ko'); return; }
+    try {
+      const { data } = await shopAPI.password(pw.current, pw.next);
+      // Le changement ferme les autres sessions : on garde la nouvelle ici
+      dispatch({ type: 'SHOP_LOGIN', payload: { shop: { ...shop, mustChangePassword: false }, token: data.token } });
+      setPwOpen(false); setPw({ current: '', next: '', again: '' }); toast('Mot de passe changé'); load();
+    }
     catch (e) { toast(err(e), 'ko'); }
   };
 
@@ -404,11 +410,13 @@ export default function ShopScreen() {
           <ArticleForm meta={me?.meta} shop={shop} initial={edit === 'new' ? null : edit} toast={toast} onDone={() => { setEdit(null); load(); }} />
         </Modal>
       )}
-      {pwOpen && (
-        <Modal title="Changer mon mot de passe" onClose={() => setPwOpen(false)}>
+      {(pwOpen || me?.shop?.mustChangePassword) && (
+        <Modal title={me?.shop?.mustChangePassword ? 'Choisis ton mot de passe' : 'Changer mon mot de passe'} onClose={() => !me?.shop?.mustChangePassword && setPwOpen(false)}>
           <div className="bo-form">
-            <label>Mot de passe actuel<input type="password" value={pw.current} onChange={e => setPw(p => ({ ...p, current: e.target.value }))} /></label>
-            <label>Nouveau mot de passe (8 caractères minimum)<input type="password" value={pw.next} onChange={e => setPw(p => ({ ...p, next: e.target.value }))} /></label>
+            {me?.shop?.mustChangePassword && <div className="bo-notice warn">Première connexion : remplace le mot de passe temporaire reçu par e-mail par un mot de passe que toi seul connais.</div>}
+            <label>{me?.shop?.mustChangePassword ? 'Mot de passe temporaire' : 'Mot de passe actuel'}<input type="password" autoComplete="current-password" value={pw.current} onChange={e => setPw(p => ({ ...p, current: e.target.value }))} /></label>
+            <label>Nouveau mot de passe (8 caractères minimum)<input type="password" autoComplete="new-password" value={pw.next} onChange={e => setPw(p => ({ ...p, next: e.target.value }))} /></label>
+            <label>Confirme le nouveau mot de passe<input type="password" autoComplete="new-password" value={pw.again} onChange={e => setPw(p => ({ ...p, again: e.target.value }))} /></label>
             <button className="bo-btn full" onClick={changePw}>Enregistrer</button>
           </div>
         </Modal>

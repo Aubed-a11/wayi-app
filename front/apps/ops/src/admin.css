@@ -452,3 +452,15 @@
   .sh-order { flex-wrap: wrap; }
   .sh-order-end { align-items: flex-start; text-align: left; max-width: none; }
 }
+.bo-md-gate { display: grid; place-items: center; min-height: 60vh; }
+.bo-md-gate .bo-card { width: 100%; max-width: 440px; text-align: center; padding: 30px 26px; }
+.bo-md-gate h2 { font-size: 19px; margin: 12px 0 6px; }
+.bo-md-gate .bo-form { text-align: left; margin-top: 16px; }
+.bo-md-gate-ico { width: 60px; height: 60px; border-radius: 18px; margin: 0 auto; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--o), var(--t)); box-shadow: 0 10px 24px rgba(242,105,13,.3); }
+.bo-md-log { display: flex; flex-direction: column; }
+.bo-md-log > div { display: grid; grid-template-columns: 26px 1fr auto auto; gap: 10px; align-items: center; padding: 9px 4px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.bo-md-log > div:last-child { border-bottom: none; }
+.bo-md-log span { color: #1F7A55; display: flex; }
+.bo-md-log .bad span, .bo-md-log .bad b { color: #C0392B; }
+.bo-md-log small { color: var(--mut); font-size: 12px; }
+@media (max-width: 900px) { .bo-md-log > div { grid-template-columns: 22px 1fr; } .bo-md-log small { grid-column: 2; } }

@@ -33,7 +33,7 @@ const SHOP_LABEL = 'Boutique partenaire WAYI';
 const shopById = (id) => mode.shops.find(x => x.id === id);
 const userName = (id) => users.find(u => u.id === id)?.name || shopById(id)?.name || 'Membre WAYI';
 // Compte boutique connecté (jeton role 'shop', boutique active)
-const shopOf = (req) => (req.user?.role === 'shop' ? mode.shops.find(x => x.id === req.user.id && x.active) : null);
+const shopOf = (req) => (req.user?.role === 'shop' ? mode.shops.find(x => x.id === req.user.id && x.active && (x.pv || 0) === (req.user.pv || 0)) : null);
 const firstName = (id) => userName(id).split(' ')[0];
 
 // Univers visible pour ce compte ? Sinon la route n'existe pas (404), comme si rien n'était là
@@ -156,6 +156,66 @@ router.use(optionalAuth);
 // ── Administration (back office) ─────────────────────────────
 const adminOnly = (req, res, next) => (isAdmin(req) ? next() : res.status(403).json({ error: 'Accès réservé au super admin' }));
 
+// Verrou propre au tableau de bord Mode : en plus de la connexion admin, un code d'accès
+// (choisi par l'admin, gardé chiffré) ouvre une session Mode de 2 heures.
+const jwt = require('jsonwebtoken');
+const SEC = mode.security;
+const MAX_TRIES = 5, LOCK_MIN = 15, SESSION = '2h';
+const modeSecret = () => `${process.env.JWT_SECRET || 'wayi_secret_key_change_in_production'}:mode-admin`;
+function audit(req, event, ok = true) {
+  SEC.log.unshift({ at: now(), event, ok, admin: req.user?.email || null, ip: (req.headers['x-forwarded-for'] || req.ip || '').toString().split(',')[0].trim().slice(0, 45) });
+  SEC.log.length = Math.min(SEC.log.length, 60);
+}
+const lockedFor = () => (SEC.lockedUntil && new Date(SEC.lockedUntil) > new Date() ? Math.ceil((new Date(SEC.lockedUntil) - new Date()) / 60000) : 0);
+function modeAdmin(req, res, next) {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Accès réservé au super admin' });
+  const t = req.headers['x-mode-token'];
+  try {
+    const p = jwt.verify(String(t || ''), modeSecret());
+    if (p.scope === 'mode-admin' && p.sub === req.user.id && p.cv === SEC.codeVersion && SEC.codeHash) return next();
+  } catch { /* session Mode absente ou expirée */ }
+  return res.status(423).json({ error: 'Tableau de bord Mode verrouillé', code: 'MODE_LOCKED' });
+}
+const issueModeToken = (req) => jwt.sign({ sub: req.user.id, scope: 'mode-admin', cv: SEC.codeVersion }, modeSecret(), { expiresIn: SESSION });
+const strongCode = (c) => typeof c === 'string' && c.length >= 6 && c.length <= 64;
+
+router.get('/admin/lock', auth, adminOnly, (_req, res) => {
+  res.json({ hasCode: !!SEC.codeHash, lockedMinutes: lockedFor() });
+});
+router.post('/admin/lock/setup', auth, adminOnly, async (req, res) => {
+  if (SEC.codeHash) return res.status(409).json({ error: "Un code d'accès existe déjà." });
+  const code = String(req.body?.code || '');
+  if (!strongCode(code)) return res.status(400).json({ error: '6 caractères minimum.' });
+  SEC.codeHash = await bcrypt.hash(code, 10); SEC.codeVersion += 1; SEC.failures = 0; SEC.lockedUntil = null;
+  audit(req, "Code d'accès créé");
+  res.status(201).json({ modeToken: issueModeToken(req) });
+});
+router.post('/admin/unlock', auth, adminOnly, async (req, res) => {
+  if (!SEC.codeHash) return res.status(409).json({ error: "Crée d'abord le code d'accès." });
+  const wait = lockedFor();
+  if (wait) return res.status(429).json({ error: `Trop d'essais. Réessaie dans ${wait} min.` });
+  const ok = await bcrypt.compare(String(req.body?.code || ''), SEC.codeHash).catch(() => false);
+  if (!ok) {
+    SEC.failures += 1;
+    if (SEC.failures >= MAX_TRIES) { SEC.lockedUntil = new Date(Date.now() + LOCK_MIN * 60000).toISOString(); SEC.failures = 0; }
+    audit(req, 'Code incorrect', false);
+    const left = SEC.lockedUntil && lockedFor() ? 0 : MAX_TRIES - SEC.failures;
+    return res.status(401).json({ error: left ? `Code incorrect. ${left} essai${left > 1 ? 's' : ''} restant${left > 1 ? 's' : ''}.` : `Code incorrect. Accès bloqué ${LOCK_MIN} min.` });
+  }
+  SEC.failures = 0; SEC.lockedUntil = null;
+  audit(req, 'Ouverture');
+  res.json({ modeToken: issueModeToken(req) });
+});
+router.post('/admin/lock/change', auth, modeAdmin, async (req, res) => {
+  const { current, next: nextCode } = req.body || {};
+  if (!await bcrypt.compare(String(current || ''), SEC.codeHash).catch(() => false)) { audit(req, 'Changement de code refusé', false); return res.status(401).json({ error: 'Code actuel incorrect' }); }
+  if (!strongCode(String(nextCode || ''))) return res.status(400).json({ error: '6 caractères minimum.' });
+  SEC.codeHash = await bcrypt.hash(String(nextCode), 10); SEC.codeVersion += 1; // toutes les sessions Mode ouvertes sont fermées
+  audit(req, "Code d'accès changé");
+  res.json({ modeToken: issueModeToken(req) });
+});
+router.get('/admin/lock/log', auth, modeAdmin, (_req, res) => res.json({ log: SEC.log }));
+
 function adminListing(l) {
   return {
     ...card(l, null), description: l.description, photos: l.photos, views: l.views || 0,
@@ -166,12 +226,13 @@ function adminListing(l) {
   };
 }
 
-router.get('/admin/overview', auth, adminOnly, (_req, res) => {
+router.get('/admin/overview', auth, modeAdmin, (_req, res) => {
   const active = mode.listings.filter(l => l.status === 'active');
   const sellers = new Set(mode.listings.filter(l => l.status !== 'deleted').map(l => l.sellerId));
   const done = mode.orders.filter(o => o.status === 'delivered');
   res.json({
     settings: mode.settings,
+    security: { sessionHours: 2, lastAccess: SEC.log.find(l => l.event === 'Ouverture') || null, failedRecently: SEC.log.filter(l => !l.ok && new Date(l.at) > new Date(Date.now() - 86400000)).length },
     stats: {
       listings: active.length, sellers: sellers.size,
       openReports: mode.reports.filter(r => r.status === 'open').length,
@@ -185,7 +246,7 @@ router.get('/admin/overview', auth, adminOnly, (_req, res) => {
   });
 });
 
-router.put('/admin/settings', auth, adminOnly, (req, res) => {
+router.put('/admin/settings', auth, modeAdmin, (req, res) => {
   const s = mode.settings;
   const b = req.body || {};
   if ('state' in b) { if (!M.STATES.includes(b.state)) return res.status(400).json({ error: 'État inconnu' }); s.state = b.state; }
@@ -208,14 +269,14 @@ router.put('/admin/settings', auth, adminOnly, (req, res) => {
   res.json({ settings: s });
 });
 
-router.get('/admin/listings', auth, adminOnly, (req, res) => {
+router.get('/admin/listings', auth, modeAdmin, (req, res) => {
   const st = req.query.status;
   const list = mode.listings.filter(l => l.status !== 'deleted' && (!st || l.status === st))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   res.json({ listings: list.map(adminListing) });
 });
 
-router.put('/admin/listings/:id', auth, adminOnly, (req, res) => {
+router.put('/admin/listings/:id', auth, modeAdmin, (req, res) => {
   const l = mode.listings.find(x => x.id === req.params.id);
   if (!l) return res.status(404).json({ error: 'Annonce introuvable' });
   const { status, reason } = req.body || {};
@@ -226,7 +287,7 @@ router.put('/admin/listings/:id', auth, adminOnly, (req, res) => {
   res.json({ listing: adminListing(l) });
 });
 
-router.get('/admin/reports', auth, adminOnly, (_req, res) => {
+router.get('/admin/reports', auth, modeAdmin, (_req, res) => {
   const list = [...mode.reports].sort((a, b) => (a.status === 'open') === (b.status === 'open') ? b.createdAt.localeCompare(a.createdAt) : a.status === 'open' ? -1 : 1);
   res.json({
     reports: list.map(r => {
@@ -236,7 +297,7 @@ router.get('/admin/reports', auth, adminOnly, (_req, res) => {
   });
 });
 
-router.put('/admin/reports/:id', auth, adminOnly, (req, res) => {
+router.put('/admin/reports/:id', auth, modeAdmin, (req, res) => {
   const r = mode.reports.find(x => x.id === req.params.id);
   if (!r) return res.status(404).json({ error: 'Signalement introuvable' });
   const { action } = req.body || {};
@@ -271,7 +332,7 @@ function orderView(o, viewerId) {
   };
 }
 
-router.get('/admin/orders', auth, adminOnly, (_req, res) => {
+router.get('/admin/orders', auth, modeAdmin, (_req, res) => {
   res.json({
     orders: [...mode.orders].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map(o => ({
       ...orderView(o, o.sellerId), buyer: userName(o.buyerId), buyerPhone: users.find(u => u.id === o.buyerId)?.phone || null,
@@ -293,7 +354,7 @@ function setOrderStatus(o, status, by) {
   if (l && status === 'cancelled' && l.status === 'reserved') l.status = 'active';
 }
 
-router.put('/admin/orders/:id', auth, adminOnly, (req, res) => {
+router.put('/admin/orders/:id', auth, modeAdmin, (req, res) => {
   const o = mode.orders.find(x => x.id === req.params.id);
   if (!o) return res.status(404).json({ error: 'Commande introuvable' });
   const { status, payment } = req.body || {};
@@ -310,7 +371,9 @@ router.put('/admin/orders/:id', auth, adminOnly, (req, res) => {
 });
 
 // ── Boutiques partenaires (comptes créés par WAYI) ───────────
-const safeShop = ({ password: _p, ...x }) => x;
+const safeShop = ({ password: _p, failedLogins: _f, lockedUntil: _l, pv: _v, ...x }) => x;
+// Jeton boutique lié à la version du mot de passe : le changer déconnecte les autres appareils
+const shopToken = (shop) => signToken({ id: shop.id, role: 'shop', email: shop.email, pv: shop.pv || 0 });
 function shopStats(id) {
   const ls = mode.listings.filter(l => l.sellerId === id && l.status !== 'deleted');
   const os = mode.orders.filter(o => o.sellerId === id);
@@ -325,11 +388,11 @@ function shopStats(id) {
   };
 }
 
-router.get('/admin/shops', auth, adminOnly, (_req, res) => {
+router.get('/admin/shops', auth, modeAdmin, (_req, res) => {
   res.json({ shops: mode.shops.map(x => ({ ...safeShop(x), stats: shopStats(x.id) })) });
 });
 
-router.post('/admin/shops', auth, adminOnly, async (req, res) => {
+router.post('/admin/shops', auth, modeAdmin, async (req, res) => {
   const b = req.body || {};
   const name = clean(b.name, 80);
   const email = clean(b.email, 120).toLowerCase();
@@ -343,6 +406,7 @@ router.post('/admin/shops', auth, adminOnly, async (req, res) => {
     id: `shop-${uuidv4().slice(0, 8)}`, name, email, password: await bcrypt.hash(temp, 10),
     contactName: clean(b.contactName, 80), phone: clean(b.phone, 30), city: M.CITIES.includes(b.city) ? b.city : 'Cotonou',
     commissionRate: rate, active: true, createdAt: now(),
+    mustChangePassword: true, pv: 0, failedLogins: 0, lockedUntil: null,
   };
   mode.shops.push(shop);
   let mail = null;
@@ -361,7 +425,7 @@ router.post('/admin/shops', auth, adminOnly, async (req, res) => {
   });
 });
 
-router.put('/admin/shops/:id', auth, adminOnly, (req, res) => {
+router.put('/admin/shops/:id', auth, modeAdmin, (req, res) => {
   const shop = shopById(req.params.id);
   if (!shop) return res.status(404).json({ error: 'Boutique introuvable' });
   const b = req.body || {};
@@ -387,10 +451,20 @@ router.put('/admin/shops/:id', auth, adminOnly, (req, res) => {
 router.post('/shop/login', async (req, res) => {
   const email = clean(req.body?.email, 120).toLowerCase();
   const shop = mode.shops.find(x => x.email === email);
+  if (shop?.lockedUntil && new Date(shop.lockedUntil) > new Date()) {
+    return res.status(429).json({ error: `Trop d'essais. Réessaie dans ${Math.ceil((new Date(shop.lockedUntil) - new Date()) / 60000)} min.` });
+  }
   const ok = shop && await bcrypt.compare(String(req.body?.password || ''), shop.password).catch(() => false);
-  if (!ok) return res.status(401).json({ error: 'Identifiants incorrects' });
+  if (!ok) {
+    if (shop) {
+      shop.failedLogins = (shop.failedLogins || 0) + 1;
+      if (shop.failedLogins >= 5) { shop.lockedUntil = new Date(Date.now() + 15 * 60000).toISOString(); shop.failedLogins = 0; }
+    }
+    return res.status(401).json({ error: 'Identifiants incorrects' });
+  }
   if (!shop.active) return res.status(403).json({ error: 'Compte boutique suspendu. Contacte WAYI.' });
-  res.json({ token: signToken({ id: shop.id, role: 'shop', email: shop.email }), shop: safeShop(shop) });
+  shop.failedLogins = 0; shop.lockedUntil = null; shop.lastLoginAt = now();
+  res.json({ token: shopToken(shop), shop: safeShop(shop) });
 });
 
 router.get('/shop/me', auth, needShop, (req, res) => {
@@ -401,8 +475,10 @@ router.put('/shop/password', auth, needShop, async (req, res) => {
   const { current, next: nextPw } = req.body || {};
   if (!await bcrypt.compare(String(current || ''), req.shop.password).catch(() => false)) return res.status(403).json({ error: 'Mot de passe actuel incorrect' });
   if (String(nextPw || '').length < 8) return res.status(400).json({ error: '8 caractères minimum' });
+  if (String(nextPw) === String(current)) return res.status(400).json({ error: 'Choisis un mot de passe différent.' });
   req.shop.password = await bcrypt.hash(String(nextPw), 10);
-  res.json({ ok: true });
+  req.shop.pv = (req.shop.pv || 0) + 1; req.shop.mustChangePassword = false;
+  res.json({ ok: true, token: shopToken(req.shop) });
 });
 
 // ── À partir d'ici : seulement si l'univers est ouvert pour ce compte ──

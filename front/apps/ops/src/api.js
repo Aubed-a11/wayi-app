@@ -9,12 +9,20 @@ const adminApi = axios.create({ baseURL: API_BASE, timeout: 10000 });
 adminApi.interceptors.request.use((config) => {
   const token = localStorage.getItem('wayi_admin_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  // Tableau de bord Mode : session propre (code d'accès), gardée seulement le temps de l'onglet
+  const modeToken = sessionStorage.getItem('wayi_mode_token');
+  if (modeToken && String(config.url || '').startsWith('/mode/admin')) config.headers['X-Mode-Token'] = modeToken;
   return config;
 });
 adminApi.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 423 && err.response?.data?.code === 'MODE_LOCKED') {
+      sessionStorage.removeItem('wayi_mode_token');
+      window.dispatchEvent(new CustomEvent('wayi:mode_locked'));
+    }
+    // Un code Mode incorrect ne doit pas déconnecter l'admin
+    if (err.response?.status === 401 && !String(err.config?.url || '').startsWith('/mode/admin')) {
       localStorage.removeItem('wayi_admin_token');
       window.dispatchEvent(new CustomEvent('wayi:admin_logout'));
     }
@@ -64,6 +72,11 @@ export const adminAPI = {
     resolve: (id, action) => adminApi.put(`/mode/admin/reports/${id}`, { action }),
     orders: () => adminApi.get('/mode/admin/orders'),
     updateOrder: (id, data) => adminApi.put(`/mode/admin/orders/${id}`, data),
+    lock: () => adminApi.get('/mode/admin/lock'),
+    setupCode: (code) => adminApi.post('/mode/admin/lock/setup', { code }),
+    unlock: (code) => adminApi.post('/mode/admin/unlock', { code }),
+    changeCode: (current, next) => adminApi.post('/mode/admin/lock/change', { current, next }),
+    accessLog: () => adminApi.get('/mode/admin/lock/log'),
     shops: () => adminApi.get('/mode/admin/shops'),
     createShop: (data) => adminApi.post('/mode/admin/shops', data),
     updateShop: (id, data) => adminApi.put(`/mode/admin/shops/${id}`, data),

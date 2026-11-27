@@ -8,8 +8,9 @@ const APP = 'http://localhost:8080';
 const OUT = process.argv[2] || 'captures';
 fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let MODE_TOKEN = null; // session du tableau de bord Mode (code d'acces)
 const post = async (path, body, token, method = 'POST') => {
-  const r = await fetch(API + path, { method, headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body || {}) });
+  const r = await fetch(API + path, { method, headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}), ...(MODE_TOKEN && path.startsWith('/mode/admin') ? { 'x-mode-token': MODE_TOKEN } : {}) }, body: JSON.stringify(body || {}) });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) console.log('  !', path, r.status, JSON.stringify(j).slice(0, 200));
   return j;
@@ -205,6 +206,7 @@ try {
   const seller = await reg('Aïcha Bio', 'vendeuse@capture.test', '+22990000005');
   const before = await (await fetch(API + '/verticals', { headers: { authorization: `Bearer ${client.token}` } })).json();
   console.log('  Mode avant activation :', JSON.stringify(before.verticals));
+  MODE_TOKEN = (await post('/mode/admin/lock/setup', { code: 'Capture-Mode-2026' }, admin.token)).modeToken;
   await post('/mode/admin/settings', { testers: ['client@capture.test', 'vendeuse@capture.test'] }, admin.token, 'PUT');
   // Photos libres de droits (Openverse), envoyees comme le ferait un vendeur
   const photo = async (q) => {
@@ -332,7 +334,10 @@ try {
   await bo.goto('http://localhost:8082/', { waitUntil: 'domcontentloaded' });
   await bo.evaluate(t => localStorage.setItem('wayi_admin_token', t), admin.token);
   await bo.goto('http://localhost:8082/', { waitUntil: 'networkidle2' }); await sleep(3500);
-  await bo.evaluate(() => { const el = [...document.querySelectorAll('.bo-side nav button')].find(b => b.textContent.includes('Mode')); if (el) el.click(); }); await sleep(3500);
+  await bo.evaluate(() => { const el = [...document.querySelectorAll('.bo-side nav button')].find(b => b.textContent.includes('Mode')); if (el) el.click(); }); await sleep(2500);
+  await bo.screenshot({ path: `${OUT}/86b-backoffice-mode-verrouille.png` }); console.log('  capture 86b-backoffice-mode-verrouille');
+  await bo.type('.bo-md-gate input[type=password]', 'Capture-Mode-2026'); await sleep(300);
+  await bo.evaluate(() => document.querySelector('.bo-md-gate button.bo-btn')?.click()); await sleep(3500);
   await bo.screenshot({ path: `${OUT}/87-backoffice-mode.png` }); console.log('  capture 87-backoffice-mode');
   await bo.evaluate(() => document.querySelector('.bo-content')?.scrollBy(0, 800)); await sleep(1500);
   await bo.screenshot({ path: `${OUT}/88-backoffice-mode-annonces.png` }); console.log('  capture 88-backoffice-mode-annonces');

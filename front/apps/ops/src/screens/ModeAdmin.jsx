@@ -1,6 +1,6 @@
 // Back office : univers Mode de WAYI Bénin (ouverture au public, réglages, modération)
 import { useEffect, useState, useCallback } from 'react';
-import { EyeOff, Clock3, Globe, Shirt, Users, ShoppingBag, Wallet, Flag, Percent, Save, RefreshCw, Eye, Ban, Check, Sparkles, Store, Plus, X, BadgeCheck } from 'lucide-react';
+import { Lock, LockOpen, ShieldCheck, KeyRound, EyeOff, Clock3, Globe, Shirt, Users, ShoppingBag, Wallet, Flag, Percent, Save, RefreshCw, Eye, Ban, Check, Sparkles, Store, Plus, X, BadgeCheck } from 'lucide-react';
 import { adminAPI } from '../api';
 
 const money = (n) => `${Number(n || 0).toLocaleString('fr-FR').replace(/[  ]/g, ' ')} F`;
@@ -15,7 +15,7 @@ const ORDER_TONE = { awaiting_payment: 'wait', confirmed: 'info', handed: 'go', 
 const LIST_LABEL = { active: 'En ligne', paused: 'En pause', reserved: 'Réservée', sold: 'Vendue', hidden: 'Masquée' };
 const LIST_TONE = { active: 'ok', paused: 'wait', reserved: 'info', sold: 'go', hidden: 'ko' };
 
-export default function ModeAdmin() {
+function ModeDashboard({ onLock }) {
   const [ov, setOv] = useState(null);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -237,6 +237,8 @@ export default function ModeAdmin() {
         )}
       </section>
 
+      <SecurityCard ov={ov} onLock={onLock} toast={toast} />
+
       {newShop && (
         <div className="bo-modal" onClick={() => setNewShop(null)}>
           <div className="bo-modal-card" onClick={e => e.stopPropagation()}>
@@ -264,6 +266,117 @@ export default function ModeAdmin() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+
+// Sécurité du tableau de bord Mode : verrouillage, changement de code, journal des accès
+function SecurityCard({ ov, onLock, toast }) {
+  const [log, setLog] = useState(null);
+  const [cur, setCur] = useState('');
+  const [next, setNext] = useState('');
+  const [open, setOpen] = useState(false);
+  useEffect(() => { adminAPI.mode.accessLog().then(({ data }) => setLog(data.log)).catch(() => setLog([])); }, []);
+  const change = async () => {
+    try {
+      const { data } = await adminAPI.mode.changeCode(cur, next);
+      sessionStorage.setItem('wayi_mode_token', data.modeToken);
+      setCur(''); setNext(''); setOpen(false); toast("Code d'accès changé");
+      adminAPI.mode.accessLog().then(({ data: d }) => setLog(d.log)).catch(() => {});
+    } catch (e) { toast(err(e), 'ko'); }
+  };
+  return (
+    <section className="bo-card">
+      <div className="bo-card-head">
+        <h2><ShieldCheck size={18} style={{ verticalAlign: -3, color: 'var(--o)' }} /> Sécurité du tableau de bord Mode</h2>
+        <span style={{ display: 'flex', gap: 8 }}>
+          <button className="bo-btn ghost" onClick={() => setOpen(o => !o)}><KeyRound size={15} /> Changer le code</button>
+          <button className="bo-btn" onClick={onLock}><Lock size={15} /> Verrouiller</button>
+        </span>
+      </div>
+      <p className="bo-muted" style={{ marginTop: 0 }}>
+        Ce tableau de bord demande un code d'accès en plus de la connexion admin. La session se ferme seule après {ov.security?.sessionHours || 2} h ou à la fermeture de l'onglet. Après 5 codes faux, l'accès est bloqué 15 minutes.
+        {ov.security?.failedRecently ? ` ${ov.security.failedRecently} essai(s) refusé(s) ces dernières 24 h.` : ''}
+      </p>
+      {open && (
+        <div className="bo-md-form" style={{ gridTemplateColumns: '1fr 1fr auto', marginBottom: 14 }}>
+          <label>Code actuel<input type="password" value={cur} onChange={e => setCur(e.target.value)} autoComplete="current-password" /></label>
+          <label>Nouveau code (6 caractères minimum)<input type="password" value={next} onChange={e => setNext(e.target.value)} autoComplete="new-password" /></label>
+          <button className="bo-btn" disabled={!cur || next.length < 6} onClick={change}>Enregistrer</button>
+        </div>
+      )}
+      <div className="bo-md-log">
+        {(log || []).slice(0, 12).map((l, i) => (
+          <div key={i} className={l.ok ? '' : 'bad'}>
+            <span>{l.ok ? <LockOpen size={14} /> : <Lock size={14} />}</span>
+            <b>{l.event}</b>
+            <small>{l.admin || 'admin'} · {l.ip || 'IP inconnue'}</small>
+            <small>{new Date(l.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</small>
+          </div>
+        ))}
+        {log && !log.length && <div className="bo-empty">Aucun accès enregistré.</div>}
+      </div>
+    </section>
+  );
+}
+
+// Porte d'entrée : code d'accès propre au Mode (créé la première fois)
+export default function ModeAdmin() {
+  const [open, setOpen] = useState(!!sessionStorage.getItem('wayi_mode_token'));
+  const [lock, setLock] = useState(null);
+  const [code, setCode] = useState('');
+  const [code2, setCode2] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const relock = useCallback(() => { sessionStorage.removeItem('wayi_mode_token'); setOpen(false); setCode(''); setCode2(''); }, []);
+  useEffect(() => {
+    window.addEventListener('wayi:mode_locked', relock);
+    return () => window.removeEventListener('wayi:mode_locked', relock);
+  }, [relock]);
+  useEffect(() => {
+    if (!open) adminAPI.mode.lock().then(({ data }) => setLock(data)).catch(() => setLock({ hasCode: true }));
+  }, [open]);
+
+  if (open) return <ModeDashboard onLock={relock} />;
+
+  const setup = lock && !lock.hasCode;
+  const submit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (setup && code !== code2) { setError('Les deux codes ne sont pas identiques.'); return; }
+    setBusy(true);
+    try {
+      const { data } = setup ? await adminAPI.mode.setupCode(code) : await adminAPI.mode.unlock(code);
+      sessionStorage.setItem('wayi_mode_token', data.modeToken);
+      setOpen(true);
+    } catch (e2) { setError(err(e2)); setCode(''); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <div className="bo-md-gate">
+      <form className="bo-card" onSubmit={submit}>
+        <span className="bo-md-gate-ico"><Lock size={26} /></span>
+        <h2>{setup ? "Crée le code d'accès Mode" : 'Tableau de bord Mode verrouillé'}</h2>
+        <p className="bo-muted">
+          {setup
+            ? "Ce code protège l'univers Mode (ouverture au public, boutiques, commandes). Il sera demandé à chaque ouverture, en plus de ta connexion admin. Garde-le pour toi."
+            : "Saisis le code d'accès Mode pour continuer. La session reste ouverte 2 heures dans cet onglet."}
+        </p>
+        {!lock ? <div className="bo-empty">Chargement...</div> : (
+          <div className="bo-form">
+            <label>{setup ? 'Nouveau code (6 caractères minimum)' : "Code d'accès"}
+              <input type="password" autoFocus value={code} onChange={e => setCode(e.target.value)} autoComplete={setup ? 'new-password' : 'current-password'} />
+            </label>
+            {setup && <label>Confirme le code<input type="password" value={code2} onChange={e => setCode2(e.target.value)} autoComplete="new-password" /></label>}
+            {lock.lockedMinutes > 0 && !error && <div className="bo-notice warn">Trop d'essais : accès bloqué encore {lock.lockedMinutes} min.</div>}
+            {error && <div className="bo-notice ko">{error}</div>}
+            <button className="bo-btn full" disabled={busy || code.length < 6}>{busy ? 'Vérification...' : setup ? 'Créer le code et ouvrir' : 'Déverrouiller'}</button>
+          </div>
+        )}
+      </form>
     </div>
   );
 }

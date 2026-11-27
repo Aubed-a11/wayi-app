@@ -75,6 +75,8 @@ const mode = {
   orders: [],
   launchSellers: [],       // vendeurs inscrits à l'offre de lancement (dans l'ordre)
   shops: [],               // boutiques partenaires (comptes créés par WAYI, nom caché aux clients)
+  // Verrou du tableau de bord Mode (back office) : code d'accès propre, essais, journal
+  security: { codeHash: null, codeVersion: 0, failures: 0, lockedUntil: null, log: [] },
 };
 
 function restoreMode(saved) {
@@ -86,6 +88,7 @@ function restoreMode(saved) {
     if (Array.isArray(saved[k])) mode[k].push(...saved[k]);
   }
   mode.favorites = saved.favorites && typeof saved.favorites === 'object' ? saved.favorites : {};
+  if (saved.security && typeof saved.security === 'object') Object.assign(mode.security, saved.security);
 }
 
 const STATES = ['hidden', 'soon', 'live'];
