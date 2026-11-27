@@ -91,6 +91,8 @@ const modeRoutes = require('./routes/mode');
 app.get('/api/verticals', ...modeRoutes.verticals);
 app.use('/api/mode', modeRoutes);
 // Photos des plats envoyees depuis l'appli
+// Photos envoyees (plats, logos, annonces Mode) : affichables depuis les sites WAYI (autre sous-domaine)
+app.use('/uploads', (_req, res, next) => { res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); next(); });
 app.use('/uploads', express.static(require('path').join(__dirname, 'uploads'), { maxAge: '30d', fallthrough: false }));
 app.use('/api/payments',    paymentRoutes);
 
