@@ -39,15 +39,15 @@ const _noPhoto = [
   [Color(0xFF3B2A6B), Color(0xFF5B3FA0), Color(0xFF2A1C4E)],
   [Color(0xFF1F7A55), Color(0xFF16935F), Color(0xFF0E4D36)],
 ];
-Widget _cover(Dish d, double r, {int tone = 0, double icon = 90}) {
+Widget _cover(Dish d, double r, {int tone = 0, double icon = 90, bool tile = false}) {
   if (d.image != null && d.image!.isNotEmpty) return Photo(d.image, radius: r);
   return Container(
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(r),
       gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: _noPhoto[tone % _noPhoto.length]),
     ),
-    alignment: Alignment.topRight,
-    padding: const EdgeInsets.fromLTRB(0, 18, 16, 0),
+    alignment: tile ? const Alignment(0.9, -0.2) : Alignment.topRight,
+    padding: tile ? EdgeInsets.zero : const EdgeInsets.fromLTRB(0, 18, 16, 0),
     child: Icon(Ic.utensils, size: icon, color: Colors.white.withValues(alpha: 0.22)),
   );
 }
@@ -109,7 +109,7 @@ class PhotoTile extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), boxShadow: _lift),
           child: Stack(children: [
-            Positioned.fill(child: _cover(dish, 22, tone: tone, icon: 76)),
+            Positioned.fill(child: _cover(dish, 22, tone: tone, icon: 70, tile: true)),
             Positioned.fill(child: DecoratedBox(decoration: _shade(22))),
             if (tag != null && tag!.isNotEmpty) Positioned(left: 10, top: 10, child: _chip(tag!, small: true)),
             Positioned(right: 10, top: 10, child: AddButton(dish: dish, size: 38)),
