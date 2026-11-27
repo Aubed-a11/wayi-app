@@ -48,13 +48,13 @@ function compressImage(file, max = 1280, quality = 0.82) {
   });
 }
 
-function Modal({ title, onClose, children }) {
+function Modal({ title, onClose, children, locked = false }) {
   return (
     <div className="bo-modal" onClick={onClose}>
       <div className="bo-modal-card" onClick={e => e.stopPropagation()}>
         <div className="bo-modal-head">
           <h3>{title}</h3>
-          <button className="bo-icon-btn" onClick={onClose} aria-label="Fermer"><X size={18} /></button>
+          {!locked && <button className="bo-icon-btn" onClick={onClose} aria-label="Fermer"><X size={18} /></button>}
         </div>
         <div className="bo-modal-body">{children}</div>
       </div>
@@ -411,7 +411,7 @@ export default function ShopScreen() {
         </Modal>
       )}
       {(pwOpen || me?.shop?.mustChangePassword) && (
-        <Modal title={me?.shop?.mustChangePassword ? 'Choisis ton mot de passe' : 'Changer mon mot de passe'} onClose={() => !me?.shop?.mustChangePassword && setPwOpen(false)}>
+        <Modal title={me?.shop?.mustChangePassword ? 'Choisis ton mot de passe' : 'Changer mon mot de passe'} onClose={() => !me?.shop?.mustChangePassword && setPwOpen(false)} locked={!!me?.shop?.mustChangePassword}>
           <div className="bo-form">
             {me?.shop?.mustChangePassword && <div className="bo-notice warn">Première connexion : remplace le mot de passe temporaire reçu par e-mail par un mot de passe que toi seul connais.</div>}
             <label>{me?.shop?.mustChangePassword ? 'Mot de passe temporaire' : 'Mot de passe actuel'}<input type="password" autoComplete="current-password" value={pw.current} onChange={e => setPw(p => ({ ...p, current: e.target.value }))} /></label>
